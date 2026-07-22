@@ -57,7 +57,7 @@ export function Navbar() {
         </Link>
 
         {/* Center: Desktop Menu Navigation with Layout Animation */}
-        <nav className="hidden md:flex items-center gap-1.5 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0">
+        <nav className="hidden lg:flex items-center gap-1 z-0 px-4 flex-1 justify-center max-w-xl mx-auto">
           {navItems.map((item) => {
             const isActive = item.href === '/' 
               ? pathname === '/' 
@@ -68,7 +68,7 @@ export function Navbar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "relative text-[11px] font-semibold px-3 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5",
+                  "relative text-[11px] font-semibold px-2.5 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5 flex-shrink-0",
                   isActive 
                     ? "text-text-primary" 
                     : "text-text-secondary hover:text-text-primary"
@@ -91,7 +91,7 @@ export function Navbar() {
         </nav>
 
         {/* Right Side: Search and ThemeSwitcher Actions */}
-        <div className="hidden md:flex items-center gap-3 relative z-10">
+        <div className="hidden lg:flex items-center gap-2.5 relative z-10 flex-shrink-0">
           <button 
             onClick={() => window.dispatchEvent(new CustomEvent("toggle-command-palette"))}
             className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-200/20 dark:bg-white/5 border border-glass-border hover:bg-neutral-200/40 dark:hover:bg-white/10 transition-all duration-300 text-xs text-text-secondary hover:text-text-primary group"
@@ -116,7 +116,7 @@ export function Navbar() {
         {/* Mobile menu triggers */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 rounded-full hover:bg-neutral-200/20 dark:hover:bg-white/5 transition-colors relative z-10 border border-transparent hover:border-glass-border"
+          className="lg:hidden p-2 rounded-full hover:bg-neutral-200/20 dark:hover:bg-white/5 transition-colors relative z-10 border border-transparent hover:border-glass-border"
           aria-label="Toggle Navigation Drawer"
         >
           {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -130,7 +130,7 @@ export function Navbar() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -15, scale: 0.98 }}
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              className="absolute top-[110%] left-0 right-0 p-4 rounded-2xl bg-glass-bg border border-glass-border backdrop-blur-2xl md:hidden flex flex-col gap-2 shadow-2xl z-50"
+              className="absolute top-[110%] left-0 right-0 p-4 rounded-2xl bg-glass-bg border border-glass-border backdrop-blur-2xl lg:hidden flex flex-col gap-2 shadow-2xl z-50"
             >
               {navItems.map((item) => (
                 <Link 

@@ -151,7 +151,7 @@ export default function HomePage() {
           </motion.div>
 
           {/* RIGHT PANEL: Centerpiece and Floating Boot Terminal */}
-          <div className="col-span-1 lg:col-span-6 flex flex-col items-center justify-center relative min-h-[460px] overflow-visible">
+          <div className="col-span-1 lg:col-span-6 flex flex-col items-center justify-center relative min-h-[520px] overflow-visible">
             {/* Holographic Centerpiece */}
             <Centerpiece />
 
@@ -186,7 +186,7 @@ export default function HomePage() {
       </section>
 
       {/* LOWER GRID SECTION: macOS Control Dashboard & Raycast AI Panel */}
-      <section className="relative z-20 py-8 px-4 sm:px-6 md:px-8 max-w-[1400px] mx-auto">
+      <section id="macos-dashboard-widget" className="relative z-20 py-8 px-4 sm:px-6 md:px-8 max-w-[1400px] mx-auto">
         <div className="flex flex-col xl:flex-row gap-6 items-stretch justify-center">
           {/* Interactive Desktop Workspace Dashboard */}
           <div className="flex-1">
@@ -205,7 +205,7 @@ export default function HomePage() {
           ========================================== */}
       
       {/* SECTION A: DYNAMIC FEATURED PRODUCTS (Editable via Admin CMS) */}
-      <section className="py-16 md:py-24 px-4 sm:px-6 md:px-8 max-w-[1400px] mx-auto relative z-20">
+      <section id="featured-products-section" className="py-16 md:py-24 px-4 sm:px-6 md:px-8 max-w-[1400px] mx-auto relative z-20">
         <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
           <h2 className="text-3xl font-serif font-bold text-text-primary tracking-tight">
             Explore Criska Products

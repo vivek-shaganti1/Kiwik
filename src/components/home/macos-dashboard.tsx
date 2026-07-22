@@ -40,6 +40,17 @@ export function MacosDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState<string[]>(["Criska AI"]);
 
+  React.useEffect(() => {
+    const handleSwitchTab = (e: Event) => {
+      const customEvent = e as CustomEvent<SidebarTab>;
+      if (customEvent.detail) {
+        setActiveTab(customEvent.detail);
+      }
+    };
+    window.addEventListener("switch-dashboard-tab", handleSwitchTab);
+    return () => window.removeEventListener("switch-dashboard-tab", handleSwitchTab);
+  }, []);
+
   const projects: DashboardProject[] = [
     {
       name: "Criska AI",
