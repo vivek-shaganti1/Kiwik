@@ -151,31 +151,66 @@ export function AIChatbot() {
   };
 
   const generateResponse = (rawQuery: string): { text: string; matchedProjects: any[] } => {
-    // 1. Pre-process query to resolve common voice-transcription phonetics
-    let query = rawQuery.toLowerCase();
-    query = query.replace(/\btext tag\b/g, "tech stack");
-    query = query.replace(/\btext tags\b/g, "tech stack");
-    query = query.replace(/\btech tag\b/g, "tech stack");
-    query = query.replace(/\btech tags\b/g, "tech stack");
-    query = query.replace(/\bchris gayle\b/g, "criskaai");
-    query = query.replace(/\bchris copy\b/g, "criskapay");
-    query = query.replace(/\bchris\b/g, "criska");
-    query = query.replace(/\bchrisy\b/g, "criska");
-    query = query.replace(/\bchrisha\b/g, "criska");
-    query = query.replace(/\buses\b/g, "purpose");
+    // 1. Convert to lowercase and strip punctuation
+    let query = rawQuery.toLowerCase().trim();
+    
+    // Resolve conversational noise and conversational phrases
+    const noisePhrases = [
+      "tell me about", "what is", "show me", "can you tell me", "do you have", 
+      "give me details on", "details on", "information about", "info on", 
+      "who is", "please tell me about", "ok tell me about", "ok", "hey", "hi", "hello"
+    ];
+    
+    let searchPhrase = query;
+    noisePhrases.forEach(phrase => {
+      // Use word boundaries or simple replace to strip noise phrases
+      const regex = new RegExp(`\\b${phrase}\\b`, 'gi');
+      searchPhrase = searchPhrase.replace(regex, "").trim();
+    });
+
+    // 2. Map common voice-transcription phonetic mispronunciations
+    const phonetics: { [key: string]: string } = {
+      "cubic dot ai": "kiwik.1",
+      "cubic dot one": "kiwik.1",
+      "cubic": "kiwik.1",
+      "kiwi": "kiwik.1",
+      "kyiv": "kiwik.1",
+      "civic": "kiwik.1",
+      "chris gayle": "criskaai",
+      "chris copy": "criskapay",
+      "chris cloud": "criskacloud",
+      "crescent cloud": "criskacloud",
+      "chris os": "criskaos",
+      "chris bot": "criskabot",
+      "text tag": "tech stack",
+      "text tags": "tech stack",
+      "tech tag": "tech stack",
+      "tech tags": "tech stack",
+      "uses": "purpose"
+    };
+
+    Object.keys(phonetics).forEach(key => {
+      if (query.includes(key)) {
+        query = query.replace(new RegExp(key, 'g'), phonetics[key]);
+      }
+      if (searchPhrase.includes(key)) {
+        searchPhrase = searchPhrase.replace(new RegExp(key, 'g'), phonetics[key]);
+      }
+    });
 
     let matchedProjects: any[] = [];
     let text = "";
 
-    // Setup Fuse.js for project searching
-    const fuse = new Fuse(projects, {
-      keys: ["name", "category", "tagline", "description", "techStack.name"],
-      threshold: 0.45,
-    });
+    // 3. Handle list queries ("list all the projects", etc.)
+    const isListQuery = query.includes("list") || query.includes("all projects") || query.includes("all the projects") || query.includes("what are the projects") || query.includes("projects mentioned") || query.includes("show all");
+    if (isListQuery) {
+      text = `Here is a complete list of the **${projects.length} Criska projects** currently active:\n\n` +
+        projects.map((p, i) => `${i + 1}. **${p.name}** (${p.category}) — *${p.tagline}*`).join("\n") +
+        `\n\nAsk me about any specific project or their tech stack to get live telemetry!`;
+      return { text, matchedProjects: projects };
+    }
 
-    const results = fuse.search(query);
-
-    // 2. Handle queries about contributors / team members
+    // 4. Handle team / contributors queries
     if (query.includes("people") || query.includes("worked") || query.includes("contributors") || query.includes("team") || query.includes("who built")) {
       const allContributorsMap = new Map<string, { name: string; role: string; projects: string[] }>();
       projects.forEach((p) => {
@@ -198,11 +233,40 @@ export function AIChatbot() {
       return { text, matchedProjects };
     }
 
-    // 3. Handle queries about README documentation
+    // 5. Handle direct substring scans for projects (highest priority match)
+    const directMatch = projects.find(p => {
+      const pName = p.name.toLowerCase();
+      const pSlug = p.slug.toLowerCase();
+      // Compare without spaces/dots/dashes
+      const cleanPName = pName.replace(/[\.\-\s]/g, "");
+      const cleanPSlug = pSlug.replace(/[\.\-\s]/g, "");
+      const cleanQ = query.replace(/[\.\-\s]/g, "");
+      const cleanSP = searchPhrase.replace(/[\.\-\s]/g, "");
+
+      return cleanQ.includes(cleanPName) || cleanQ.includes(cleanPSlug) || 
+             cleanSP.includes(cleanPName) || cleanSP.includes(cleanPSlug) ||
+             (cleanPName === "kiwik1" && (cleanQ.includes("kiwik") || cleanQ.includes("kiwi")));
+    });
+
+    if (directMatch) {
+      matchedProjects = [directMatch];
+      text = `Here are details on **${directMatch.name}** (${directMatch.category} project, v${directMatch.version || "1.0.0"}): \n\n* **Status**: ${directMatch.status.replace("-", " ")} (${directMatch.completionPercent}% complete)\n* **Tagline**: ${directMatch.tagline}\n* **Stack**: ${directMatch.techStack.map(t => t.name).join(", ")}\n\nYou can click below to explore its live edge monitor or full documentation.`;
+      return { text, matchedProjects };
+    }
+
+    // 6. Setup Fuse.js for secondary fuzzy search matches
+    const fuse = new Fuse(projects, {
+      keys: ["name", "category", "tagline", "description", "techStack.name"],
+      threshold: 0.55,
+    });
+
+    const results = fuse.search(searchPhrase || query);
+
+    // 7. Handle README / Documentation queries
     if (query.includes("readme") || query.includes("documentation") || query.includes("doc")) {
       const matched = results.length > 0 ? results[0].item : null;
       if (matched) {
-        text = `Here is a summary of the **README.md** documentation for **${matched.name}**:\n\n* **Description**: ${matched.description}\n* **Key Stack**: ${matched.techStack.slice(0, 5).map(t => t.name).join(", ")}\n* **Details**: Check out the full markdown tab on its detail page below!`;
+        text = `Here is a summary of the **README.md** documentation for **${matched.name}**:\n\n* **Description**: ${matched.description}\n* **Key Stack**: ${matched.techStack.slice(0, 5).map((t: any) => t.name).join(", ")}\n* **Details**: Check out the full markdown tab on its detail page below!`;
         return { text, matchedProjects: [matched] };
       } else {
         text = "Which project's README would you like to explore? (e.g. CriskaAI, CriskaCloud, CriskaPay)";
@@ -210,19 +274,18 @@ export function AIChatbot() {
       }
     }
 
-    // 4. Handle technology queries
+    // 8. Handle tech stack queries
     const isTechQuery = query.includes("tech") || query.includes("stack") || query.includes("work") || query.includes("language") || query.includes("framework");
     if (isTechQuery) {
-      if (results.length > 0) {
-        matchedProjects = results.map(r => r.item).slice(0, 4);
-        text = `Here is the tech stack used in our key projects:\n\n` +
-          matchedProjects.map(p => `* **${p.name}**: uses *${p.techStack.map((t: any) => t.name).slice(0, 6).join(", ")}*`).join("\n") +
-          `\n\nExplore any of these projects below for detailed telemetry!`;
-        return { text, matchedProjects };
-      }
+      const targets = results.length > 0 ? results.map(r => r.item) : projects;
+      matchedProjects = targets.slice(0, 4);
+      text = `Here is the tech stack used in our key projects:\n\n` +
+        matchedProjects.map(p => `* **${p.name}**: uses *${p.techStack.map((t: any) => t.name).slice(0, 6).join(", ")}*`).join("\n") +
+        `\n\nExplore any of these projects below for detailed telemetry!`;
+      return { text, matchedProjects };
     }
 
-    // 5. Check if we have a direct match for a specific project
+    // 9. Process fuzzy match results
     if (results.length > 0) {
       const match = results[0].item;
       matchedProjects = [match];
