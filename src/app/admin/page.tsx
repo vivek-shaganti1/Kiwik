@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -50,7 +50,14 @@ import {
 import { useProjectsStore, useProjects } from "@/stores/projects-store";
 import { useSiteCMSStore } from "@/stores/site-cms-store";
 import { GlassCard } from "@/components/glass/glass-card";
-import type { Project } from "@/types";
+import type {
+  Project,
+  ProjectStatus,
+  ProjectCategory,
+  TechCategory,
+  TechItem,
+  Feature,
+} from "@/types";
 import { cn } from "@/lib/utils";
 
 type AdminTab =
@@ -65,14 +72,49 @@ type AdminTab =
   | "seo"
   | "audit-snapshots";
 
+// Blank Project Template
+const emptyProject: Project = {
+  id: "",
+  slug: "",
+  name: "",
+  tagline: "",
+  description: "",
+  longDescription: "",
+  status: "in-progress",
+  category: "web",
+  tags: ["new"],
+  version: "1.0.0",
+  completionPercent: 50,
+  liveUrl: "",
+  githubUrl: "",
+  coverImage: "/images/kiwik-cover.jpg",
+  images: [],
+  techStack: [],
+  features: [],
+  changelog: [],
+  contributors: [],
+  timeline: [],
+  readme: "",
+  architecture: "",
+  lastUpdated: new Date().toISOString().split("T")[0],
+  createdAt: new Date().toISOString().split("T")[0],
+  owner: "Criska",
+  stars: 0,
+  forks: 0,
+  views: 0,
+  deploymentStatus: "live"
+};
+
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<AdminTab>("hero");
+  const [activeTab, setActiveTab] = useState<AdminTab>("projects");
   const projects = useProjects();
   const {
     addProject,
     updateProject,
     deleteProject,
+    movePriority,
     duplicateProject,
+    resetToDefaults,
   } = useProjectsStore();
 
   const cms = useSiteCMSStore((state) => state.cms);
@@ -95,7 +137,6 @@ export default function AdminPage() {
     updateTrustItem,
     deleteTrustItem,
     updateHowWeWork,
-    updateWorkflowStep,
     updateFooter,
     updateTheme,
     updateSEO,
@@ -108,7 +149,17 @@ export default function AdminPage() {
     importJSONBackup,
   } = useSiteCMSStore();
 
-  // Search & Form States
+  // Search & Filter States for Projects
+  const [projectSearch, setProjectSearch] = useState("");
+  const [projectStatusFilter, setProjectStatusFilter] = useState<string>("all");
+  const [projectCategoryFilter, setProjectCategoryFilter] = useState<string>("all");
+
+  // Project Modal State
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project>(emptyProject);
+  const [modalSubTab, setModalSubTab] = useState<"basic" | "details" | "tech" | "features" | "readme">("basic");
+
+  // Form Inputs
   const [newRotatingWord, setNewRotatingWord] = useState("");
   const [newNavLabel, setNewNavLabel] = useState("");
   const [newNavHref, setNewNavHref] = useState("");
@@ -120,18 +171,104 @@ export default function AdminPage() {
   const [newTrustTitle, setNewTrustTitle] = useState("");
   const [newTrustDesc, setNewTrustDesc] = useState("");
 
+  // Sub-items for project modal
+  const [newTechName, setNewTechName] = useState("");
+  const [newTechCat, setNewTechCat] = useState<TechCategory>("frontend");
+  const [newFeatureTitle, setNewFeatureTitle] = useState("");
+  const [newFeatureDesc, setNewFeatureDesc] = useState("");
+
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const [previewMode, setPreviewMode] = useState<"dark" | "light">("dark");
   const [jsonBackupInput, setJsonBackupInput] = useState("");
-  const [saveNotification, setSaveNotification] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Edit Project Modal
-  const [isEditingProject, setIsEditingProject] = useState(false);
-  const [editingProjectData, setEditingProjectData] = useState<Partial<Project>>({});
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
 
-  const showSaveSuccess = (msg: string) => {
-    setSaveNotification(msg);
-    setTimeout(() => setSaveNotification(null), 3000);
+  // Filtered Projects
+  const filteredProjects = projects.filter((p) => {
+    const matchesSearch =
+      p.name.toLowerCase().includes(projectSearch.toLowerCase()) ||
+      p.slug.toLowerCase().includes(projectSearch.toLowerCase()) ||
+      p.description.toLowerCase().includes(projectSearch.toLowerCase());
+    const matchesStatus = projectStatusFilter === "all" || p.status === projectStatusFilter;
+    const matchesCategory = projectCategoryFilter === "all" || p.category === projectCategoryFilter;
+    return matchesSearch && matchesStatus && matchesCategory;
+  });
+
+  const handleOpenNewProjectModal = () => {
+    setEditingProject({
+      ...emptyProject,
+      id: `proj-${Date.now()}`,
+      slug: `project-${Date.now()}`,
+      name: "New Kiwik Project",
+      createdAt: new Date().toISOString().split("T")[0]
+    });
+    setModalSubTab("basic");
+    setIsProjectModalOpen(true);
+  };
+
+  const handleOpenEditProjectModal = (proj: Project) => {
+    setEditingProject({ ...proj });
+    setModalSubTab("basic");
+    setIsProjectModalOpen(true);
+  };
+
+  const handleSaveProject = () => {
+    if (!editingProject.name.trim() || !editingProject.slug.trim()) return;
+    
+    const exists = projects.some((p) => p.id === editingProject.id);
+    if (exists) {
+      updateProject(editingProject.id, editingProject);
+      showToast(`Updated project "${editingProject.name}"!`);
+    } else {
+      addProject(editingProject);
+      showToast(`Added project "${editingProject.name}"!`);
+    }
+    setIsProjectModalOpen(false);
+  };
+
+  const handleAddTechItem = () => {
+    if (!newTechName.trim()) return;
+    const item: TechItem = {
+      name: newTechName.trim(),
+      category: newTechCat
+    };
+    setEditingProject({
+      ...editingProject,
+      techStack: [...(editingProject.techStack || []), item]
+    });
+    setNewTechName("");
+  };
+
+  const handleRemoveTechItem = (idx: number) => {
+    setEditingProject({
+      ...editingProject,
+      techStack: (editingProject.techStack || []).filter((_, i) => i !== idx)
+    });
+  };
+
+  const handleAddFeatureItem = () => {
+    if (!newFeatureTitle.trim()) return;
+    const feat: Feature = {
+      title: newFeatureTitle.trim(),
+      description: newFeatureDesc.trim()
+    };
+    setEditingProject({
+      ...editingProject,
+      features: [...(editingProject.features || []), feat]
+    });
+    setNewFeatureTitle("");
+    setNewFeatureDesc("");
+  };
+
+  const handleRemoveFeatureItem = (title: string) => {
+    setEditingProject({
+      ...editingProject,
+      features: (editingProject.features || []).filter((f) => f.title !== title)
+    });
   };
 
   const handleAddRotatingWord = () => {
@@ -139,13 +276,13 @@ export default function AdminPage() {
     const updated = [...cms.hero.rotatingWords, newRotatingWord.trim()];
     updateHeroRotatingWords(updated);
     setNewRotatingWord("");
-    showSaveSuccess("Added rotating phrase!");
+    showToast("Added rotating phrase!");
   };
 
   const handleRemoveRotatingWord = (index: number) => {
     const updated = cms.hero.rotatingWords.filter((_, i) => i !== index);
     updateHeroRotatingWords(updated);
-    showSaveSuccess("Removed phrase!");
+    showToast("Removed phrase!");
   };
 
   const handleAddNavItem = () => {
@@ -159,7 +296,7 @@ export default function AdminPage() {
     });
     setNewNavLabel("");
     setNewNavHref("");
-    showSaveSuccess("Added navigation item!");
+    showToast("Added navigation item!");
   };
 
   const handleAddCapability = () => {
@@ -172,7 +309,7 @@ export default function AdminPage() {
     });
     setNewCapTitle("");
     setNewCapDesc("");
-    showSaveSuccess("Added capability card!");
+    showToast("Added capability card!");
   };
 
   const handleAddTrust = () => {
@@ -184,7 +321,7 @@ export default function AdminPage() {
     });
     setNewTrustTitle("");
     setNewTrustDesc("");
-    showSaveSuccess("Added trust assurance item!");
+    showToast("Added trust assurance item!");
   };
 
   const handleExportBackup = () => {
@@ -195,68 +332,26 @@ export default function AdminPage() {
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
-    showSaveSuccess("CMS Backup exported!");
+    showToast("CMS Backup exported!");
   };
 
   const handleImportBackup = () => {
     if (!jsonBackupInput.trim()) return;
     const success = importJSONBackup(jsonBackupInput);
     if (success) {
-      showSaveSuccess("CMS Backup restored!");
+      showToast("CMS Backup restored!");
       setJsonBackupInput("");
     } else {
       alert("Invalid JSON Backup format.");
     }
   };
 
-  const handleSaveProjectForm = () => {
-    if (!editingProjectData.name || !editingProjectData.slug) return;
-    if (editingProjectData.id) {
-      updateProject(editingProjectData.id, editingProjectData);
-      showSaveSuccess("Project updated!");
-    } else {
-      addProject({
-        id: `proj-${Date.now()}`,
-        slug: editingProjectData.slug,
-        name: editingProjectData.name,
-        tagline: editingProjectData.tagline || "",
-        description: editingProjectData.description || "",
-        longDescription: editingProjectData.longDescription || "",
-        status: editingProjectData.status || "in-progress",
-        category: editingProjectData.category || "web",
-        tags: editingProjectData.tags || ["new"],
-        version: editingProjectData.version || "1.0.0",
-        completionPercent: editingProjectData.completionPercent || 50,
-        liveUrl: editingProjectData.liveUrl || "",
-        githubUrl: editingProjectData.githubUrl || "",
-        coverImage: editingProjectData.coverImage || "/images/kiwik-cover.jpg",
-        images: [],
-        techStack: [],
-        features: [],
-        changelog: [],
-        contributors: [],
-        timeline: [],
-        readme: "",
-        architecture: "",
-        lastUpdated: new Date().toISOString().split("T")[0],
-        createdAt: new Date().toISOString().split("T")[0],
-        owner: "Criska",
-        stars: 0,
-        forks: 0,
-        views: 0,
-        deploymentStatus: "live"
-      });
-      showSaveSuccess("Project created!");
-    }
-    setIsEditingProject(false);
-  };
-
   return (
     <div className="min-h-screen bg-bg-primary text-text-primary pt-24 pb-16 px-4 sm:px-6 md:px-8 max-w-[1500px] mx-auto select-none">
       
-      {/* Toast Save Notification */}
+      {/* Toast Notification */}
       <AnimatePresence>
-        {saveNotification && (
+        {toastMessage && (
           <motion.div
             initial={{ opacity: 0, y: -20, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -264,12 +359,12 @@ export default function AdminPage() {
             className="fixed top-6 right-6 z-50 px-5 py-3 rounded-full bg-emerald-600 text-white font-semibold text-xs shadow-2xl flex items-center gap-2 border border-emerald-400/40"
           >
             <CheckCircle2 className="w-4 h-4" />
-            {saveNotification}
+            {toastMessage}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Page Header */}
+      {/* Header */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 border-b border-divider pb-6 text-left">
         <div>
           <div className="flex items-center gap-2">
@@ -279,7 +374,7 @@ export default function AdminPage() {
             </h1>
           </div>
           <p className="text-xs text-text-secondary mt-1 font-medium">
-            Full Interactive Edit Access. Modify text, rotating phrases, navigation links, capabilities, theme, and projects live.
+            Full Interactive Edit Access. Priority ordering, duplicate, status filters, markdown READMEs, rotating phrases, navigation, theme, and projects live.
           </p>
         </div>
 
@@ -287,7 +382,7 @@ export default function AdminPage() {
           <button
             onClick={() => {
               createSnapshot(`Snapshot-${new Date().toLocaleTimeString()}`, "Manual snapshot backup");
-              showSaveSuccess("Saved version snapshot!");
+              showToast("Saved version snapshot!");
             }}
             className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-glass-bg border border-glass-border hover:bg-glass-bg-hover text-xs font-semibold shadow-sm transition-all cursor-pointer"
           >
@@ -312,7 +407,7 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* Admin Navigation Tabs */}
+      {/* Navigation Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar border-b border-divider/60">
         {[
           { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-3.5 h-3.5" /> },
@@ -343,7 +438,7 @@ export default function AdminPage() {
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB 1: DASHBOARD OVERVIEW
+          TAB 1: DASHBOARD
          ───────────────────────────────────────────────────────────── */}
       {activeTab === "dashboard" && (
         <div className="space-y-8 text-left">
@@ -372,9 +467,7 @@ export default function AdminPage() {
               <div className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border font-serif text-lg text-text-primary">
                 "{cms.hero.headlinePrefix} <span className="italic text-accent-blue">{cms.hero.headlineHighlightWord}</span> [Rotating Phrases]"
               </div>
-              <p className="text-xs text-text-secondary">
-                {cms.hero.description}
-              </p>
+              <p className="text-xs text-text-secondary">{cms.hero.description}</p>
               <button
                 onClick={() => setActiveTab("hero")}
                 className="px-4 py-2 rounded-full bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors cursor-pointer"
@@ -406,7 +499,7 @@ export default function AdminPage() {
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB 2: VISUAL EDITOR & LIVE DEVICE PREVIEW
+          TAB 2: VISUAL EDITOR
          ───────────────────────────────────────────────────────────── */}
       {activeTab === "visual-editor" && (
         <div className="space-y-6 text-left">
@@ -455,18 +548,427 @@ export default function AdminPage() {
                 previewMode === "dark" ? "dark" : ""
               )}
             >
-              <iframe
-                src="/"
-                className="w-full h-full border-none"
-                title="Live Website Preview"
-              />
+              <iframe src="/" className="w-full h-full border-none" title="Live Website Preview" />
             </div>
           </div>
         </div>
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB 3: HERO CMS EDITOR (FULLY INTERACTIVE EDIT)
+          TAB 5: PROJECTS CMS (RESTORED PRIORITY REORDERING, FILTERS, DUPLICATE & MULTI-TAB MODAL)
+         ───────────────────────────────────────────────────────────── */}
+      {activeTab === "projects" && (
+        <div className="space-y-6 text-left">
+          
+          {/* Header Controls & Filters */}
+          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-5 rounded-2xl bg-glass-bg border border-glass-border">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
+              <div className="relative flex-1">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                <input
+                  type="text"
+                  placeholder="Search projects by name, slug, or tech..."
+                  value={projectSearch}
+                  onChange={(e) => setProjectSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium text-text-primary focus:outline-none focus:border-accent-blue"
+                />
+              </div>
+
+              {/* Status Filter Pills */}
+              <div className="flex items-center gap-1 bg-bg-secondary p-1 rounded-xl border border-glass-border overflow-x-auto">
+                {["all", "completed", "in-progress", "planning"].map((st) => (
+                  <button
+                    key={st}
+                    onClick={() => setProjectStatusFilter(st)}
+                    className={cn(
+                      "px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap",
+                      projectStatusFilter === st
+                        ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow"
+                        : "text-text-secondary hover:text-text-primary"
+                    )}
+                  >
+                    {st}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={handleOpenNewProjectModal}
+              className="px-5 py-2.5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold text-xs shadow-md transition-all hover:scale-102 flex items-center justify-center gap-2 cursor-pointer shrink-0"
+            >
+              <Plus className="w-4 h-4" /> Add New Project
+            </button>
+          </div>
+
+          {/* Project List Grid with Priority Up/Down Controls */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProjects.map((proj, idx) => (
+              <GlassCard key={proj.id} className="p-5 space-y-4 flex flex-col justify-between group relative">
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono font-bold text-accent-blue bg-accent-blue/10 px-2 py-0.5 rounded-full">
+                        #{idx + 1} Priority
+                      </span>
+                      <span className="text-[10px] font-mono font-bold uppercase text-text-muted">
+                        {proj.category}
+                      </span>
+                    </div>
+
+                    {/* Priority Move Controls */}
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => movePriority(proj.id, "up")}
+                        disabled={idx === 0}
+                        className="p-1 rounded bg-bg-secondary hover:bg-glass-bg-hover text-text-secondary disabled:opacity-30 cursor-pointer"
+                        title="Move Priority Up"
+                      >
+                        <ArrowUp className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => movePriority(proj.id, "down")}
+                        disabled={idx === projects.length - 1}
+                        className="p-1 rounded bg-bg-secondary hover:bg-glass-bg-hover text-text-secondary disabled:opacity-30 cursor-pointer"
+                        title="Move Priority Down"
+                      >
+                        <ArrowDown className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <h4 className="text-base font-bold text-text-primary tracking-tight">{proj.name}</h4>
+                  <p className="text-xs text-text-secondary mt-1.5 line-clamp-2 leading-relaxed">{proj.tagline || proj.description}</p>
+                </div>
+
+                <div className="space-y-3 pt-4 border-t border-divider">
+                  <div className="flex items-center justify-between text-[10px] font-mono">
+                    <span className={cn(
+                      "font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border",
+                      proj.status === "completed" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                    )}>
+                      ● {proj.status}
+                    </span>
+                    <span className="text-text-muted">{proj.version}</span>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-end gap-2">
+                    <button
+                      onClick={() => handleOpenEditProjectModal(proj)}
+                      className="p-2 rounded-lg bg-bg-secondary hover:bg-glass-bg-hover text-accent-blue transition-colors cursor-pointer"
+                      title="Edit Full Project Specs"
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        duplicateProject(proj.id);
+                        showToast(`Duplicated ${proj.name}!`);
+                      }}
+                      className="p-2 rounded-lg bg-bg-secondary hover:bg-glass-bg-hover text-text-secondary transition-colors cursor-pointer"
+                      title="Duplicate Project"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        deleteProject(proj.id);
+                        showToast(`Deleted ${proj.name}`);
+                      }}
+                      className="p-2 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-colors cursor-pointer"
+                      title="Delete Project"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </GlassCard>
+            ))}
+          </div>
+
+          {/* Full Multi-Tab Edit Project Modal */}
+          {isProjectModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md overflow-y-auto">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="w-full max-w-3xl rounded-2xl bg-glass-bg border border-glass-border p-6 shadow-2xl space-y-5 text-left max-h-[90vh] flex flex-col my-auto"
+              >
+                {/* Modal Header */}
+                <div className="flex items-center justify-between border-b border-divider pb-3 shrink-0">
+                  <div>
+                    <h3 className="text-lg font-bold text-text-primary">{editingProject.name || "Project Specs"}</h3>
+                    <p className="text-xs text-text-secondary font-mono">ID: {editingProject.id || "new"}</p>
+                  </div>
+                  <button onClick={() => setIsProjectModalOpen(false)} className="p-1 rounded-lg hover:bg-white/10 text-text-secondary hover:text-text-primary">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Sub-Tabs */}
+                <div className="flex items-center gap-2 border-b border-divider pb-2 shrink-0 overflow-x-auto">
+                  {[
+                    { id: "basic", label: "Basic Info" },
+                    { id: "details", label: "Metadata & Stats" },
+                    { id: "tech", label: "Tech Stack" },
+                    { id: "features", label: "Features" },
+                    { id: "readme", label: "README Markdown" }
+                  ].map((tb) => (
+                    <button
+                      key={tb.id}
+                      onClick={() => setModalSubTab(tb.id as any)}
+                      className={cn(
+                        "px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer",
+                        modalSubTab === tb.id ? "bg-accent-blue text-white" : "bg-bg-secondary text-text-secondary hover:text-text-primary"
+                      )}
+                    >
+                      {tb.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Modal Body Scroll */}
+                <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+                  
+                  {/* Basic Info Tab */}
+                  {modalSubTab === "basic" && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs font-bold text-text-secondary block mb-1">Project Name</label>
+                          <input
+                            type="text"
+                            value={editingProject.name}
+                            onChange={(e) => setEditingProject({ ...editingProject, name: e.target.value })}
+                            className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-text-secondary block mb-1">Slug (URL Path)</label>
+                          <input
+                            type="text"
+                            value={editingProject.slug}
+                            onChange={(e) => setEditingProject({ ...editingProject, slug: e.target.value })}
+                            className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold text-text-secondary block mb-1">Tagline</label>
+                        <input
+                          type="text"
+                          value={editingProject.tagline}
+                          onChange={(e) => setEditingProject({ ...editingProject, tagline: e.target.value })}
+                          className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <label className="text-xs font-bold text-text-secondary block mb-1">Category</label>
+                          <select
+                            value={editingProject.category}
+                            onChange={(e) => setEditingProject({ ...editingProject, category: e.target.value as any })}
+                            className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary"
+                          >
+                            <option value="web">Web</option>
+                            <option value="ai">AI</option>
+                            <option value="devops">DevOps</option>
+                            <option value="saas">SaaS</option>
+                            <option value="research">Research</option>
+                            <option value="automation">Automation</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-bold text-text-secondary block mb-1">Status</label>
+                          <select
+                            value={editingProject.status}
+                            onChange={(e) => setEditingProject({ ...editingProject, status: e.target.value as any })}
+                            className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary"
+                          >
+                            <option value="completed font-bold">Completed (Live)</option>
+                            <option value="in-progress">In Progress (Beta)</option>
+                            <option value="planning">Planning</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-bold text-text-secondary block mb-1">Version</label>
+                          <input
+                            type="text"
+                            value={editingProject.version}
+                            onChange={(e) => setEditingProject({ ...editingProject, version: e.target.value })}
+                            className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold text-text-secondary block mb-1">Short Description</label>
+                        <textarea
+                          rows={3}
+                          value={editingProject.description}
+                          onChange={(e) => setEditingProject({ ...editingProject, description: e.target.value })}
+                          className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Metadata Tab */}
+                  {modalSubTab === "details" && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs font-bold text-text-secondary block mb-1">Live URL</label>
+                          <input
+                            type="text"
+                            value={editingProject.liveUrl || ""}
+                            onChange={(e) => setEditingProject({ ...editingProject, liveUrl: e.target.value })}
+                            className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-text-secondary block mb-1">GitHub Repo URL</label>
+                          <input
+                            type="text"
+                            value={editingProject.githubUrl || ""}
+                            onChange={(e) => setEditingProject({ ...editingProject, githubUrl: e.target.value })}
+                            className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold text-text-secondary block mb-1">Cover Image URL</label>
+                        <input
+                          type="text"
+                          value={editingProject.coverImage || ""}
+                          onChange={(e) => setEditingProject({ ...editingProject, coverImage: e.target.value })}
+                          className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tech Stack Tab */}
+                  {modalSubTab === "tech" && (
+                    <div className="space-y-4">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Tech Name (e.g. Next.js 15)"
+                          value={newTechName}
+                          onChange={(e) => setNewTechName(e.target.value)}
+                          className="flex-1 px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+                        />
+                        <button
+                          onClick={handleAddTechItem}
+                          className="px-4 py-2 rounded-xl bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors"
+                        >
+                          Add Tech
+                        </button>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        {(editingProject.techStack || []).map((t, idx) => (
+                          <span key={idx} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-bg-secondary border border-glass-border text-xs font-semibold">
+                            {t.name}
+                            <button onClick={() => handleRemoveTechItem(idx)} className="text-rose-500 hover:text-rose-600">
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Features Tab */}
+                  {modalSubTab === "features" && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          type="text"
+                          placeholder="Feature Title"
+                          value={newFeatureTitle}
+                          onChange={(e) => setNewFeatureTitle(e.target.value)}
+                          className="px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Feature Description"
+                          value={newFeatureDesc}
+                          onChange={(e) => setNewFeatureDesc(e.target.value)}
+                          className="px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+                        />
+                      </div>
+                      <button
+                        onClick={handleAddFeatureItem}
+                        className="w-full py-2 rounded-xl bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors"
+                      >
+                        + Add Feature
+                      </button>
+
+                      <div className="space-y-2">
+                        {(editingProject.features || []).map((f, idx) => (
+                          <div key={idx} className="p-3 rounded-xl bg-bg-secondary border border-glass-border flex items-center justify-between">
+                            <div>
+                              <h4 className="text-xs font-bold text-text-primary">{f.title}</h4>
+                              <p className="text-[10px] text-text-secondary">{f.description}</p>
+                            </div>
+                            <button onClick={() => handleRemoveFeatureItem(f.title)} className="text-rose-500 p-1 cursor-pointer">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* README Tab */}
+                  {modalSubTab === "readme" && (
+                    <div className="space-y-4">
+                      <label className="text-xs font-bold text-text-secondary block mb-1">Markdown Documentation / README</label>
+                      <textarea
+                        rows={10}
+                        value={editingProject.readme || ""}
+                        onChange={(e) => setEditingProject({ ...editingProject, readme: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono leading-relaxed"
+                        placeholder="# Project Documentation..."
+                      />
+                    </div>
+                  )}
+
+                </div>
+
+                {/* Modal Footer */}
+                <div className="flex justify-end gap-3 pt-3 border-t border-divider shrink-0">
+                  <button
+                    onClick={() => setIsProjectModalOpen(false)}
+                    className="px-5 py-2 rounded-full bg-glass-bg border border-glass-border text-xs font-semibold cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveProject}
+                    className="px-6 py-2 rounded-full bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors cursor-pointer"
+                  >
+                    Save Project Specs
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TAB 3: HERO CMS EDITOR
          ───────────────────────────────────────────────────────────── */}
       {activeTab === "hero" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-left">
@@ -484,9 +986,9 @@ export default function AdminPage() {
                     value={cms.hero.versionBadge}
                     onChange={(e) => {
                       updateHero({ versionBadge: e.target.value });
-                      showSaveSuccess("Updated version badge!");
+                      showToast("Updated version badge!");
                     }}
-                    className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary focus:border-accent-blue focus:outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary"
                   />
                 </div>
 
@@ -498,9 +1000,9 @@ export default function AdminPage() {
                       value={cms.hero.headlinePrefix}
                       onChange={(e) => {
                         updateHero({ headlinePrefix: e.target.value });
-                        showSaveSuccess("Updated headline prefix!");
+                        showToast("Updated headline prefix!");
                       }}
-                      className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary focus:border-accent-blue focus:outline-none"
+                      className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary"
                     />
                   </div>
                   <div>
@@ -510,9 +1012,9 @@ export default function AdminPage() {
                       value={cms.hero.headlineHighlightWord}
                       onChange={(e) => {
                         updateHero({ headlineHighlightWord: e.target.value });
-                        showSaveSuccess("Updated highlight word!");
+                        showToast("Updated highlight word!");
                       }}
-                      className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary focus:border-accent-blue focus:outline-none"
+                      className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary"
                     />
                   </div>
                 </div>
@@ -524,15 +1026,14 @@ export default function AdminPage() {
                     value={cms.hero.description}
                     onChange={(e) => {
                       updateHero({ description: e.target.value });
-                      showSaveSuccess("Updated hero description!");
+                      showToast("Updated hero description!");
                     }}
-                    className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium text-text-primary focus:border-accent-blue focus:outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium text-text-primary"
                   />
                 </div>
               </div>
             </GlassCard>
 
-            {/* Rotating Phrases Manager */}
             <GlassCard className="p-6 space-y-4">
               <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
                 <RotateCcw className="w-4 h-4 text-indigo-400" /> Animated Rotating Phrases ({cms.hero.rotatingWords.length})
@@ -564,7 +1065,7 @@ export default function AdminPage() {
                         const updated = [...cms.hero.rotatingWords];
                         updated[idx] = e.target.value;
                         updateHeroRotatingWords(updated);
-                        showSaveSuccess("Updated phrase!");
+                        showToast("Updated phrase!");
                       }}
                       className="flex-1 bg-transparent text-xs font-bold font-serif italic text-accent-blue focus:outline-none"
                     />
@@ -580,7 +1081,6 @@ export default function AdminPage() {
             </GlassCard>
           </div>
 
-          {/* Telemetry Metrics & CTA Buttons */}
           <div className="lg:col-span-5 space-y-6">
             <GlassCard className="p-6 space-y-4">
               <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
@@ -599,7 +1099,7 @@ export default function AdminPage() {
                       value={m.val}
                       onChange={(e) => {
                         updateHeroMetric(m.id, { val: parseFloat(e.target.value) || 0 });
-                        showSaveSuccess(`Updated ${m.label} value!`);
+                        showToast(`Updated ${m.label} value!`);
                       }}
                       className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono"
                     />
@@ -608,7 +1108,7 @@ export default function AdminPage() {
                       value={m.suffix}
                       onChange={(e) => {
                         updateHeroMetric(m.id, { suffix: e.target.value });
-                        showSaveSuccess(`Updated ${m.label} suffix!`);
+                        showToast(`Updated ${m.label} suffix!`);
                       }}
                       className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono"
                     />
@@ -617,7 +1117,7 @@ export default function AdminPage() {
                       value={m.label}
                       onChange={(e) => {
                         updateHeroMetric(m.id, { label: e.target.value });
-                        showSaveSuccess(`Updated metric label!`);
+                        showToast(`Updated metric label!`);
                       }}
                       className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono"
                     />
@@ -625,76 +1125,18 @@ export default function AdminPage() {
                 </div>
               ))}
             </GlassCard>
-
-            <GlassCard className="p-6 space-y-4">
-              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-accent-blue" /> CTA Buttons Configuration
-              </h3>
-
-              <div className="space-y-3">
-                <div className="p-3 rounded-xl bg-bg-secondary border border-glass-border space-y-2">
-                  <span className="text-xs font-bold text-text-primary block">Primary CTA Button</span>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="text"
-                      value={cms.hero.primaryButton.text}
-                      onChange={(e) => {
-                        updateHero({ primaryButton: { ...cms.hero.primaryButton, text: e.target.value } });
-                        showSaveSuccess("Updated Primary CTA Text!");
-                      }}
-                      className="px-3 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-semibold"
-                    />
-                    <input
-                      type="text"
-                      value={cms.hero.primaryButton.link}
-                      onChange={(e) => {
-                        updateHero({ primaryButton: { ...cms.hero.primaryButton, link: e.target.value } });
-                        showSaveSuccess("Updated Primary CTA Link!");
-                      }}
-                      className="px-3 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono"
-                    />
-                  </div>
-                </div>
-
-                <div className="p-3 rounded-xl bg-bg-secondary border border-glass-border space-y-2">
-                  <span className="text-xs font-bold text-text-primary block">Secondary CTA Button</span>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="text"
-                      value={cms.hero.secondaryButton.text}
-                      onChange={(e) => {
-                        updateHero({ secondaryButton: { ...cms.hero.secondaryButton, text: e.target.value } });
-                        showSaveSuccess("Updated Secondary CTA Text!");
-                      }}
-                      className="px-3 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-semibold"
-                    />
-                    <input
-                      type="text"
-                      value={cms.hero.secondaryButton.link}
-                      onChange={(e) => {
-                        updateHero({ secondaryButton: { ...cms.hero.secondaryButton, link: e.target.value } });
-                        showSaveSuccess("Updated Secondary CTA Link!");
-                      }}
-                      className="px-3 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono"
-                    />
-                  </div>
-                </div>
-              </div>
-            </GlassCard>
           </div>
         </div>
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB 4: PAGE SECTIONS CMS (FEATURED, CAPABILITIES, TRUST, HOW WE WORK)
+          TAB 4: SECTIONS CMS
          ───────────────────────────────────────────────────────────── */}
       {activeTab === "sections" && (
         <div className="space-y-8 text-left">
-          
-          {/* Featured Products Section Editor */}
           <GlassCard className="p-6 space-y-4">
             <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-              <Layers className="w-4 h-4 text-accent-blue" /> Featured Products Section Headings
+              <Layers className="w-4 h-4 text-accent-blue" /> Featured Products Headings
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -704,19 +1146,19 @@ export default function AdminPage() {
                   value={cms.featuredSection.title}
                   onChange={(e) => {
                     updateFeaturedSection({ title: e.target.value });
-                    showSaveSuccess("Updated Featured Products Title!");
+                    showToast("Updated Featured Title!");
                   }}
                   className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
                 />
               </div>
               <div>
-                <label className="text-xs font-bold text-text-secondary block mb-1">Section Subtitle / Description</label>
+                <label className="text-xs font-bold text-text-secondary block mb-1">Section Subtitle</label>
                 <input
                   type="text"
                   value={cms.featuredSection.subtitle}
                   onChange={(e) => {
                     updateFeaturedSection({ subtitle: e.target.value });
-                    showSaveSuccess("Updated Featured Products Subtitle!");
+                    showToast("Updated Featured Subtitle!");
                   }}
                   className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
                 />
@@ -724,18 +1166,17 @@ export default function AdminPage() {
             </div>
           </GlassCard>
 
-          {/* Capabilities Grid Editor */}
           <GlassCard className="p-6 space-y-5">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-purple-400" /> Our Capabilities ({cms.capabilities.items.length})
+                <Sparkles className="w-4 h-4 text-purple-400" /> Capabilities ({cms.capabilities.items.length})
               </h3>
               <input
                 type="text"
                 value={cms.capabilities.sectionTitle}
                 onChange={(e) => {
                   updateCapabilities({ sectionTitle: e.target.value });
-                  showSaveSuccess("Updated Capabilities Title!");
+                  showToast("Updated Capabilities Title!");
                 }}
                 className="px-3 py-1 rounded-lg bg-bg-secondary border border-glass-border text-xs font-bold"
               />
@@ -773,7 +1214,7 @@ export default function AdminPage() {
                       value={cap.title}
                       onChange={(e) => {
                         updateCapabilityItem(cap.id, { title: e.target.value });
-                        showSaveSuccess("Updated capability title!");
+                        showToast("Updated capability title!");
                       }}
                       className="bg-transparent font-bold text-xs text-text-primary focus:outline-none"
                     />
@@ -789,7 +1230,7 @@ export default function AdminPage() {
                     value={cap.desc}
                     onChange={(e) => {
                       updateCapabilityItem(cap.id, { desc: e.target.value });
-                      showSaveSuccess("Updated capability description!");
+                      showToast("Updated capability description!");
                     }}
                     className="w-full bg-bg-primary px-3 py-1.5 rounded-lg border border-glass-border text-[11px] text-text-secondary focus:outline-none"
                   />
@@ -797,224 +1238,6 @@ export default function AdminPage() {
               ))}
             </div>
           </GlassCard>
-
-          {/* Trust & Delivery Editor */}
-          <GlassCard className="p-6 space-y-5">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Trust & Delivery ({cms.trust.items.length})
-              </h3>
-              <input
-                type="text"
-                value={cms.trust.sectionTitle}
-                onChange={(e) => {
-                  updateTrust({ sectionTitle: e.target.value });
-                  showSaveSuccess("Updated Trust Title!");
-                }}
-                className="px-3 py-1 rounded-lg bg-bg-secondary border border-glass-border text-xs font-bold"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-              <input
-                type="text"
-                placeholder="Trust Item Title"
-                value={newTrustTitle}
-                onChange={(e) => setNewTrustTitle(e.target.value)}
-                className="px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
-              />
-              <input
-                type="text"
-                placeholder="Description"
-                value={newTrustDesc}
-                onChange={(e) => setNewTrustDesc(e.target.value)}
-                className="px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
-              />
-              <button
-                onClick={handleAddTrust}
-                className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold shadow-md hover:bg-emerald-500 transition-colors cursor-pointer"
-              >
-                + Add Trust Item
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {cms.trust.items.map((tr) => (
-                <div key={tr.id} className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-2">
-                  <div className="flex items-center justify-between">
-                    <input
-                      type="text"
-                      value={tr.title}
-                      onChange={(e) => {
-                        updateTrustItem(tr.id, { title: e.target.value });
-                        showSaveSuccess("Updated trust title!");
-                      }}
-                      className="bg-transparent font-bold text-xs text-text-primary focus:outline-none"
-                    />
-                    <button
-                      onClick={() => deleteTrustItem(tr.id)}
-                      className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition-colors cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                  <textarea
-                    rows={2}
-                    value={tr.desc}
-                    onChange={(e) => {
-                      updateTrustItem(tr.id, { desc: e.target.value });
-                      showSaveSuccess("Updated trust description!");
-                    }}
-                    className="w-full bg-bg-primary px-3 py-1.5 rounded-lg border border-glass-border text-[11px] text-text-secondary focus:outline-none"
-                  />
-                </div>
-              ))}
-            </div>
-          </GlassCard>
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          TAB 5: PROJECTS CMS
-         ───────────────────────────────────────────────────────────── */}
-      {activeTab === "projects" && (
-        <div className="space-y-6 text-left">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-text-primary">Projects CMS Repository ({projects.length})</h3>
-            <button
-              onClick={() => {
-                setEditingProjectData({ name: "New Kiwik Project", slug: `project-${Date.now()}`, tagline: "", description: "", tags: ["new"], status: "in-progress" });
-                setIsEditingProject(true);
-              }}
-              className="px-5 py-2.5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold text-xs shadow-md transition-all hover:scale-102 flex items-center gap-2 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" /> Add New Project
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map((proj) => (
-              <GlassCard key={proj.id} className="p-5 space-y-4 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="text-[10px] font-mono font-bold text-accent-blue bg-accent-blue/10 px-2 py-0.5 rounded-full">
-                      {proj.category}
-                    </span>
-                    <span className="text-[10px] font-mono text-text-muted">{proj.version}</span>
-                  </div>
-                  <h4 className="text-base font-bold text-text-primary tracking-tight">{proj.name}</h4>
-                  <p className="text-xs text-text-secondary mt-1 line-clamp-2">{proj.description}</p>
-                </div>
-
-                <div className="flex items-center justify-between pt-4 border-t border-divider">
-                  <span className="text-[10px] font-mono text-emerald-500 font-bold">● {proj.deploymentStatus}</span>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => {
-                        setEditingProjectData(proj);
-                        setIsEditingProject(true);
-                      }}
-                      className="p-2 rounded-lg bg-bg-secondary hover:bg-glass-bg-hover text-accent-blue transition-colors cursor-pointer"
-                      title="Edit Project"
-                    >
-                      <Edit className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => duplicateProject(proj.id)}
-                      className="p-2 rounded-lg bg-bg-secondary hover:bg-glass-bg-hover text-text-secondary transition-colors cursor-pointer"
-                      title="Duplicate"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => deleteProject(proj.id)}
-                      className="p-2 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-colors cursor-pointer"
-                      title="Delete"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              </GlassCard>
-            ))}
-          </div>
-
-          {/* Project Form Modal */}
-          {isEditingProject && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="w-full max-w-2xl rounded-2xl bg-glass-bg border border-glass-border p-6 shadow-2xl space-y-4 text-left"
-              >
-                <div className="flex items-center justify-between border-b border-divider pb-3">
-                  <h3 className="text-base font-bold text-text-primary">
-                    {editingProjectData.id ? "Edit Project" : "Create New Project"}
-                  </h3>
-                  <button onClick={() => setIsEditingProject(false)} className="p-1 rounded text-text-secondary hover:text-text-primary">
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold text-text-secondary block mb-1">Project Name</label>
-                    <input
-                      type="text"
-                      value={editingProjectData.name || ""}
-                      onChange={(e) => setEditingProjectData({ ...editingProjectData, name: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-text-secondary block mb-1">Slug</label>
-                    <input
-                      type="text"
-                      value={editingProjectData.slug || ""}
-                      onChange={(e) => setEditingProjectData({ ...editingProjectData, slug: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold text-text-secondary block mb-1">Tagline / Short Description</label>
-                  <input
-                    type="text"
-                    value={editingProjectData.tagline || ""}
-                    onChange={(e) => setEditingProjectData({ ...editingProjectData, tagline: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold text-text-secondary block mb-1">Description</label>
-                  <textarea
-                    rows={3}
-                    value={editingProjectData.description || ""}
-                    onChange={(e) => setEditingProjectData({ ...editingProjectData, description: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium"
-                  />
-                </div>
-
-                <div className="flex justify-end gap-3 pt-4 border-t border-divider">
-                  <button
-                    onClick={() => setIsEditingProject(false)}
-                    className="px-4 py-2 rounded-full bg-glass-bg border border-glass-border text-xs font-semibold"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSaveProjectForm}
-                    className="px-5 py-2 rounded-full bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors"
-                  >
-                    Save Project
-                  </button>
-                </div>
-              </motion.div>
-            </div>
-          )}
         </div>
       )}
 
@@ -1044,7 +1267,7 @@ export default function AdminPage() {
                     tags: ["custom"],
                     createdAt: new Date().toISOString()
                   });
-                  showSaveSuccess("Added asset to Media Library!");
+                  showToast("Added asset to Media Library!");
                 }
               }}
               className="px-5 py-2.5 rounded-full bg-accent-blue text-white font-bold text-xs shadow-md transition-all hover:bg-blue-600 flex items-center gap-2 cursor-pointer"
@@ -1075,12 +1298,10 @@ export default function AdminPage() {
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB 7: NAVIGATION & FOOTER (FULL EDITABLE INPUTS)
+          TAB 7: NAV & FOOTER
          ───────────────────────────────────────────────────────────── */}
       {activeTab === "navigation" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-left">
-          
-          {/* Navbar Items Editor */}
           <GlassCard className="p-6 space-y-5">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
@@ -1120,7 +1341,7 @@ export default function AdminPage() {
                       value={item.label}
                       onChange={(e) => {
                         updateNavItem(item.id, { label: e.target.value });
-                        showSaveSuccess("Updated nav label!");
+                        showToast("Updated nav label!");
                       }}
                       className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-semibold"
                     />
@@ -1129,7 +1350,7 @@ export default function AdminPage() {
                       value={item.href}
                       onChange={(e) => {
                         updateNavItem(item.id, { href: e.target.value });
-                        showSaveSuccess("Updated nav link!");
+                        showToast("Updated nav link!");
                       }}
                       className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono"
                     />
@@ -1145,7 +1366,6 @@ export default function AdminPage() {
             </div>
           </GlassCard>
 
-          {/* Footer Editor */}
           <GlassCard className="p-6 space-y-5">
             <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
               <FileText className="w-4 h-4 text-indigo-400" /> Footer Newsletter & Copyright
@@ -1158,7 +1378,7 @@ export default function AdminPage() {
                   value={cms.footer.newsletterHeadline}
                   onChange={(e) => {
                     updateFooter({ newsletterHeadline: e.target.value });
-                    showSaveSuccess("Updated Newsletter Headline!");
+                    showToast("Updated Newsletter Headline!");
                   }}
                   className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
                 />
@@ -1171,7 +1391,7 @@ export default function AdminPage() {
                   value={cms.footer.newsletterDescription}
                   onChange={(e) => {
                     updateFooter({ newsletterDescription: e.target.value });
-                    showSaveSuccess("Updated Newsletter Description!");
+                    showToast("Updated Newsletter Description!");
                   }}
                   className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium"
                 />
@@ -1184,7 +1404,7 @@ export default function AdminPage() {
                   value={cms.footer.copyrightText}
                   onChange={(e) => {
                     updateFooter({ copyrightText: e.target.value });
-                    showSaveSuccess("Updated Copyright Text!");
+                    showToast("Updated Copyright Text!");
                   }}
                   className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
                 />
@@ -1195,7 +1415,7 @@ export default function AdminPage() {
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB 8: THEME & STYLING (INTERACTIVE COLOR PICKERS)
+          TAB 8: THEME & STYLING
          ───────────────────────────────────────────────────────────── */}
       {activeTab === "theme" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-left">
@@ -1217,7 +1437,7 @@ export default function AdminPage() {
                       value={c.val}
                       onChange={(e) => {
                         updateTheme({ colors: { ...cms.theme.colors, [c.key]: e.target.value } });
-                        showSaveSuccess(`Updated ${c.label} color!`);
+                        showToast(`Updated ${c.label} color!`);
                       }}
                       className="w-10 h-10 rounded-lg cursor-pointer border-none bg-transparent"
                     />
@@ -1226,7 +1446,7 @@ export default function AdminPage() {
                       value={c.val}
                       onChange={(e) => {
                         updateTheme({ colors: { ...cms.theme.colors, [c.key]: e.target.value } });
-                        showSaveSuccess(`Updated ${c.label} hex!`);
+                        showToast(`Updated ${c.label} hex!`);
                       }}
                       className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono w-24"
                     />
@@ -1248,7 +1468,7 @@ export default function AdminPage() {
                   value={cms.theme.glassBlurPx}
                   onChange={(e) => {
                     updateTheme({ glassBlurPx: parseInt(e.target.value) || 20 });
-                    showSaveSuccess("Updated Glass Blur!");
+                    showToast("Updated Glass Blur!");
                   }}
                   className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
                 />
@@ -1260,7 +1480,7 @@ export default function AdminPage() {
                   value={cms.theme.borderRadiusPx}
                   onChange={(e) => {
                     updateTheme({ borderRadiusPx: parseInt(e.target.value) || 16 });
-                    showSaveSuccess("Updated Border Radius!");
+                    showToast("Updated Border Radius!");
                   }}
                   className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
                 />
@@ -1286,7 +1506,7 @@ export default function AdminPage() {
                 value={cms.seo.defaultTitle}
                 onChange={(e) => {
                   updateSEO({ defaultTitle: e.target.value });
-                  showSaveSuccess("Updated Meta Title!");
+                  showToast("Updated Meta Title!");
                 }}
                 className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
               />
@@ -1298,7 +1518,7 @@ export default function AdminPage() {
                 value={cms.seo.defaultDescription}
                 onChange={(e) => {
                   updateSEO({ defaultDescription: e.target.value });
-                  showSaveSuccess("Updated Meta Description!");
+                  showToast("Updated Meta Description!");
                 }}
                 className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium"
               />
@@ -1308,7 +1528,7 @@ export default function AdminPage() {
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB 10: AUDIT LOGS & VERSION SNAPSHOTS
+          TAB 10: AUDIT & VERSION SNAPSHOTS
          ───────────────────────────────────────────────────────────── */}
       {activeTab === "audit-snapshots" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-left">
@@ -1327,7 +1547,7 @@ export default function AdminPage() {
                     <button
                       onClick={() => {
                         rollbackSnapshot(snap.id);
-                        showSaveSuccess(`Rolled back to [${snap.versionName}]`);
+                        showToast(`Rolled back to [${snap.versionName}]`);
                       }}
                       className="px-3 py-1.5 rounded-full bg-accent-blue text-white text-[10px] font-bold hover:bg-blue-600 transition-colors cursor-pointer"
                     >
