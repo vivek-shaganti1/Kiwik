@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Command, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeSwitcher } from './theme-switcher';
+import { Logo } from './logo';
 
 export function Navbar() {
   const [scrolled, setScrolled] = React.useState(false);
@@ -26,12 +27,19 @@ export function Navbar() {
       transition={{ duration: 0.5, ease: 'easeOut' }}
       className={cn(
         'fixed top-0 inset-x-0 z-50 h-[72px] flex items-center justify-center px-4 sm:px-6 md:px-8 transition-all duration-300',
-        scrolled ? 'backdrop-blur-xl bg-white/70 dark:bg-black/50 border-b border-black/10 dark:border-white/10 shadow-sm' : 'bg-transparent border-b border-transparent'
+        scrolled ? 'backdrop-blur-xl bg-glass-bg border-b border-glass-border shadow-sm' : 'bg-transparent border-b border-transparent'
       )}
     >
       <div className="w-full max-w-[1400px] flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group">
-          <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-neutral-900 to-neutral-500 dark:from-white dark:to-neutral-400 group-hover:opacity-80 transition-opacity">
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <motion.div
+            whileHover={{ scale: 1.1, rotate: 6 }}
+            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+            className="w-8 h-8 flex items-center justify-center overflow-hidden"
+          >
+            <img src="/logo.png" alt="Kiwik Logo" className="w-full h-full object-contain" style={{ imageRendering: "auto" }} />
+          </motion.div>
+          <span className="text-xl font-serif font-bold bg-clip-text text-transparent bg-gradient-to-r from-text-primary to-text-secondary group-hover:opacity-80 transition-opacity">
             Kiwik.1
           </span>
         </Link>

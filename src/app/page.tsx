@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { ArrowRight, ExternalLink, Sparkles, Terminal, Activity, Layers } from "lucide-react";
@@ -12,6 +12,8 @@ import { ProjectCard } from "@/components/projects/project-card";
 import { HeroCockpit } from "@/components/home/hero-cockpit";
 import { BentoGrid } from "@/components/effects/bento-grid";
 import { TechRadar } from "@/components/home/tech-radar";
+import { AIChatbot } from "@/components/home/ai-chatbot";
+import { Logo } from "@/components/layout/logo";
 
 const stats = [
   { label: "Active Projects", value: 6 },
@@ -28,8 +30,8 @@ function StatItem({ label, value }: { label: string; value: string | number }) {
   const displayValue = useCounter(isInView ? value : 0, 2000);
 
   return (
-    <div ref={ref} className="flex flex-col items-center justify-center p-6 text-center border border-white/10 rounded-2xl bg-neutral-900/40 backdrop-blur-xl hover:border-white/20 transition-all shadow-xl group">
-      <div className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-neutral-100 to-neutral-400 group-hover:scale-105 transition-transform mb-2">
+    <div ref={ref} className="flex flex-col items-center justify-center p-6 text-center border border-glass-border rounded-2xl bg-glass-bg backdrop-blur-xl hover:border-glass-border-hover transition-all shadow-xl group">
+      <div className="text-4xl md:text-5xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-br from-text-primary via-text-primary/90 to-text-secondary group-hover:scale-105 transition-transform mb-2">
         {displayValue}
       </div>
       <div className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
@@ -42,6 +44,12 @@ function StatItem({ label, value }: { label: string; value: string | number }) {
 export default function HomePage() {
   const projects = useProjects();
   const featuredProjects = projects.slice(0, 4);
+
+  useEffect(() => {
+    fetch("/api/visitors", { method: "POST" }).catch((err) =>
+      console.error("Error logging visitor session", err)
+    );
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -69,17 +77,27 @@ export default function HomePage() {
           className="relative z-10 flex flex-col items-center text-center max-w-5xl mx-auto"
         >
           {/* Version Badge */}
-          <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900/80 border border-white/15 backdrop-blur-xl mb-8 shadow-xl">
+          <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-glass-bg border border-glass-border backdrop-blur-xl mb-8 shadow-xl">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span className="text-xs font-mono font-medium text-neutral-300">
+            <span className="text-xs font-mono font-medium text-text-primary">
               Kiwik.1 v1.0.0-beta • Next.js 15 & React 19 Engine
             </span>
+          </motion.div>
+
+          {/* Main Logo Image */}
+          <motion.div
+            variants={itemVariants}
+            animate={{ y: [0, -8, 0] }}
+            transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
+            className="w-24 h-24 mb-4 flex items-center justify-center filter drop-shadow-lg"
+          >
+            <img src="/logo.png" alt="Kiwik Logo" className="w-full h-full object-contain" style={{ imageRendering: "auto" }} />
           </motion.div>
 
           {/* Main Title */}
           <motion.h1
             variants={itemVariants}
-            className="text-6xl sm:text-7xl md:text-9xl font-black tracking-tighter mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white via-neutral-100 to-neutral-500"
+            className="text-6xl sm:text-7xl md:text-9xl font-serif font-semibold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-b from-text-primary via-text-primary/95 to-text-secondary"
           >
             Kiwik.1
           </motion.h1>
@@ -103,7 +121,7 @@ export default function HomePage() {
             </Link>
             <Link
               href="/admin"
-              className="flex items-center gap-2 px-8 py-4 rounded-xl bg-neutral-900/80 border border-white/15 font-bold hover:bg-white/10 transition-all active:scale-95 backdrop-blur-xl text-white"
+              className="flex items-center gap-2 px-8 py-4 rounded-xl bg-glass-bg border border-glass-border font-bold hover:bg-glass-bg-hover transition-all active:scale-95 backdrop-blur-xl text-text-primary"
             >
               <Layers className="w-5 h-5 text-emerald-400" />
               Open Admin CMS
@@ -118,7 +136,7 @@ export default function HomePage() {
       </section>
 
       {/* Live Metrics Ticker Section */}
-      <section className="py-12 md:py-20 px-4 sm:px-6 md:px-8 relative z-10 border-t border-b border-white/5 bg-black/40 backdrop-blur-md">
+      <section className="py-12 md:py-20 px-4 sm:px-6 md:px-8 relative z-10 border-t border-b border-glass-border bg-glass-bg backdrop-blur-md">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {stats.map((stat, i) => (
@@ -134,7 +152,7 @@ export default function HomePage() {
       </section>
 
       {/* Tech Ecosystem Radar */}
-      <section className="relative z-10 bg-neutral-950/60 border-t border-b border-white/5">
+      <section className="relative z-10 bg-bg-secondary/40 border-t border-b border-divider">
         <TechRadar />
       </section>
 
@@ -146,7 +164,7 @@ export default function HomePage() {
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-2">
                 <Sparkles className="w-3.5 h-3.5" /> Handcrafted Works
               </div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white">Featured Showcase</h2>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-semibold text-text-primary">Featured Showcase</h2>
             </div>
 
             <Link
@@ -168,6 +186,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      <AIChatbot />
     </div>
   );
 }

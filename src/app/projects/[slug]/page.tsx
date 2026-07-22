@@ -84,7 +84,7 @@ export default function ProjectDetailPage() {
                 </div>
               </div>
               
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">{project.name}</h1>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-semibold mb-4">{project.name}</h1>
               <p className="text-xl text-text-secondary max-w-2xl">{project.tagline}</p>
             </div>
             
@@ -131,7 +131,7 @@ export default function ProjectDetailPage() {
         {/* Overview */}
         <section id="overview" className="scroll-mt-32">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <h2 className="text-2xl font-bold mb-6">Overview</h2>
+            <h2 className="text-2xl font-serif font-semibold mb-6">Overview</h2>
             <div className="grid md:grid-cols-3 gap-6">
               <div className="md:col-span-2">
                 <GlassCard className="p-6 h-full">
@@ -166,7 +166,7 @@ export default function ProjectDetailPage() {
         {project.features && project.features.length > 0 && (
           <section id="features" className="scroll-mt-32">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-              <h2 className="text-2xl font-bold mb-6">Key Features</h2>
+              <h2 className="text-2xl font-serif font-semibold mb-6">Key Features</h2>
               <div className="grid md:grid-cols-2 gap-4">
                 {project.features.map((feature, i) => (
                   <GlassCard key={i} className="p-6">
@@ -183,7 +183,7 @@ export default function ProjectDetailPage() {
         {project.techStack && project.techStack.length > 0 && (
           <section id="tech-stack" className="scroll-mt-32">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-              <h2 className="text-2xl font-bold mb-6">Tech Stack</h2>
+              <h2 className="text-2xl font-serif font-semibold mb-6">Tech Stack</h2>
               <GlassCard className="p-8">
                 <div className="flex flex-wrap gap-3">
                   {project.techStack.map((tech, i) => (
@@ -201,7 +201,7 @@ export default function ProjectDetailPage() {
         {project.readme && (
           <section id="readme" className="scroll-mt-32">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-              <h2 className="text-2xl font-bold mb-6">README.md</h2>
+              <h2 className="text-2xl font-serif font-semibold mb-6">README.md</h2>
               <GlassCard className="p-8 overflow-hidden">
                 <div className="markdown-body">
                   <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>
@@ -217,7 +217,7 @@ export default function ProjectDetailPage() {
         {project.images && project.images.length > 0 && (
           <section id="gallery" className="scroll-mt-32">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-              <h2 className="text-2xl font-bold mb-6">Gallery</h2>
+              <h2 className="text-2xl font-serif font-semibold mb-6">Gallery</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {project.images.map((img, i) => (
                   <div key={i} className="aspect-video relative rounded-xl overflow-hidden cursor-pointer bg-glass-bg border border-glass-border group" onClick={() => setLightboxImage(img.src)}>
@@ -251,7 +251,7 @@ export default function ProjectDetailPage() {
         {project.timeline && project.timeline.length > 0 && (
           <section id="timeline" className="scroll-mt-32">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-              <h2 className="text-2xl font-bold mb-6">Timeline</h2>
+              <h2 className="text-2xl font-serif font-semibold mb-6">Timeline</h2>
               <div className="relative pl-6 border-l border-divider space-y-8">
                 {project.timeline.map((item, i) => (
                   <div key={i} className="relative">
@@ -270,7 +270,7 @@ export default function ProjectDetailPage() {
         {project.changelog && project.changelog.length > 0 && (
           <section id="changelog" className="scroll-mt-32">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-              <h2 className="text-2xl font-bold mb-6">Changelog</h2>
+              <h2 className="text-2xl font-serif font-semibold mb-6">Changelog</h2>
               <div className="space-y-4">
                 {project.changelog.map((log, i) => (
                   <GlassCard key={i} className="p-6">
@@ -299,7 +299,7 @@ export default function ProjectDetailPage() {
         {project.contributors && project.contributors.length > 0 && (
           <section id="contributors" className="scroll-mt-32">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-              <h2 className="text-2xl font-bold mb-6">Contributors</h2>
+              <h2 className="text-2xl font-serif font-semibold mb-6">Contributors</h2>
               <div className="flex flex-wrap gap-6">
                 {project.contributors.map((user, i) => (
                   <div key={i} className="flex flex-col items-center gap-2">

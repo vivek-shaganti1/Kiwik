@@ -137,27 +137,27 @@ export function HeroCockpit() {
 
   return (
     <div className="w-full max-w-5xl mx-auto my-8">
-      <GlassSpotlightCard className="overflow-hidden border border-white/15 bg-neutral-950/80 shadow-2xl">
+      <GlassSpotlightCard className="overflow-hidden border border-glass-border bg-glass-bg shadow-2xl">
         {/* Cockpit Window Header */}
-        <div className="px-4 py-3 bg-neutral-900/90 border-b border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="px-4 py-3 bg-bg-secondary/60 border-b border-divider flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-full bg-rose-500/80" />
               <span className="w-3 h-3 rounded-full bg-amber-500/80" />
               <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
             </div>
-            <span className="ml-2 text-xs font-mono text-neutral-400">kiwik-os://cockpit-v1</span>
+            <span className="ml-2 text-xs font-mono text-text-secondary">kiwik-os://cockpit-v1</span>
           </div>
 
           {/* Mode Switcher Tabs */}
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-neutral-900 border border-white/10">
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-bg-primary/40 border border-glass-border">
             <button
               onClick={() => setActiveMode("preview")}
               className={cn(
                 "px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5",
                 activeMode === "preview"
-                  ? "bg-accent-blue/20 text-accent-blue border border-accent-blue/30 shadow-sm"
-                  : "text-neutral-400 hover:text-white"
+                  ? "bg-[var(--accent)]/20 text-text-primary border border-[var(--accent)]/30 shadow-sm"
+                  : "text-text-secondary hover:text-text-primary"
               )}
             >
               <Layout className="w-3.5 h-3.5" />
@@ -169,8 +169,8 @@ export function HeroCockpit() {
               className={cn(
                 "px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5",
                 activeMode === "terminal"
-                  ? "bg-accent-blue/20 text-accent-blue border border-accent-blue/30 shadow-sm"
-                  : "text-neutral-400 hover:text-white"
+                  ? "bg-[var(--accent)]/20 text-text-primary border border-[var(--accent)]/30 shadow-sm"
+                  : "text-text-secondary hover:text-text-primary"
               )}
             >
               <Terminal className="w-3.5 h-3.5" />
@@ -182,8 +182,8 @@ export function HeroCockpit() {
               className={cn(
                 "px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5",
                 activeMode === "architecture"
-                  ? "bg-accent-blue/20 text-accent-blue border border-accent-blue/30 shadow-sm"
-                  : "text-neutral-400 hover:text-white"
+                  ? "bg-[var(--accent)]/20 text-text-primary border border-[var(--accent)]/30 shadow-sm"
+                  : "text-text-secondary hover:text-text-primary"
               )}
             >
               <Layers className="w-3.5 h-3.5" />
@@ -193,45 +193,45 @@ export function HeroCockpit() {
         </div>
 
         {/* Cockpit Window Content */}
-        <div className="p-5 sm:p-8 min-h-[380px] flex flex-col justify-between bg-gradient-to-b from-neutral-950/90 to-black">
+        <div className="p-5 sm:p-8 min-h-[380px] flex flex-col justify-between bg-gradient-to-b from-glass-bg to-glass-bg/60">
           {/* MODE 1: LIVE MONITOR */}
           {activeMode === "preview" && (
             <div className="space-y-6">
               {/* Top Banner Status */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="p-4 rounded-xl bg-neutral-900/60 border border-white/5 flex items-center gap-3">
+                <div className="p-4 rounded-xl bg-bg-secondary/40 border border-glass-border flex items-center gap-3">
                   <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
                     <Activity className="w-5 h-5 animate-pulse" />
                   </div>
                   <div>
                     <p className="text-xs text-text-secondary">System Health</p>
-                    <p className="text-sm font-bold text-white">100% Operational</p>
+                    <p className="text-sm font-bold text-text-primary">100% Operational</p>
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-neutral-900/60 border border-white/5 flex items-center gap-3">
+                <div className="p-4 rounded-xl bg-bg-secondary/40 border border-glass-border flex items-center gap-3">
                   <div className="p-2.5 rounded-lg bg-accent-blue/10 border border-accent-blue/20 text-accent-blue">
                     <Zap className="w-5 h-5" />
                   </div>
                   <div>
                     <p className="text-xs text-text-secondary">Global Edge Latency</p>
-                    <p className="text-sm font-bold text-white">14ms Average</p>
+                    <p className="text-sm font-bold text-text-primary">14ms Average</p>
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-neutral-900/60 border border-white/5 flex items-center gap-3">
+                <div className="p-4 rounded-xl bg-bg-secondary/40 border border-glass-border flex items-center gap-3">
                   <div className="p-2.5 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-400">
                     <Cpu className="w-5 h-5" />
                   </div>
                   <div>
                     <p className="text-xs text-text-secondary">Render Engine</p>
-                    <p className="text-sm font-bold text-white">Next.js 15 + React 19</p>
+                    <p className="text-sm font-bold text-text-primary">Next.js 15 + React 19</p>
                   </div>
                 </div>
               </div>
 
               {/* Real-time Project Live Monitor Grid */}
-              <div className="p-5 rounded-xl bg-neutral-900/40 border border-white/10 space-y-4">
+              <div className="p-5 rounded-xl bg-bg-secondary/20 border border-glass-border space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-mono text-text-secondary uppercase tracking-wider">Active Deployments</span>
                   <span className="text-xs font-mono text-emerald-400 flex items-center gap-1">
@@ -246,19 +246,19 @@ export function HeroCockpit() {
                     { name: "CriskaCloud", status: "In Progress", percent: 65, category: "DevOps", color: "from-emerald-500 to-teal-500" },
                     { name: "FlowEngine", status: "Completed", percent: 90, category: "Automation", color: "from-amber-500 to-orange-500" },
                   ].map((item, idx) => (
-                    <div key={idx} className="p-3 rounded-lg bg-black/60 border border-white/5 flex items-center justify-between gap-3">
+                    <div key={idx} className="p-3 rounded-lg bg-glass-bg border border-glass-border flex items-center justify-between gap-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-white">{item.name}</span>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-neutral-400">
+                          <span className="text-xs font-bold text-text-primary">{item.name}</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-bg-secondary border border-glass-border text-text-secondary">
                             {item.category}
                           </span>
                         </div>
-                        <div className="w-32 bg-neutral-800 h-1.5 rounded-full overflow-hidden mt-2">
+                        <div className="w-32 bg-divider h-1.5 rounded-full overflow-hidden mt-2">
                           <div className={cn("h-full bg-gradient-to-r", item.color)} style={{ width: `${item.percent}%` }} />
                         </div>
                       </div>
-                      <span className="text-xs font-mono font-semibold text-neutral-300">{item.percent}%</span>
+                      <span className="text-xs font-mono font-semibold text-text-primary">{item.percent}%</span>
                     </div>
                   ))}
                 </div>
@@ -274,14 +274,14 @@ export function HeroCockpit() {
 
                 {logs.map((log) => (
                   <div key={log.id} className="space-y-1">
-                    <div className="flex items-center gap-2 text-neutral-400">
-                      <span className="text-emerald-400">guest@kiwik:~$</span>
-                      <span className="text-white font-semibold">{log.command}</span>
+                    <div className="flex items-center gap-2 text-text-secondary">
+                      <span className="text-emerald-500">guest@kiwik:~$</span>
+                      <span className="text-text-primary font-semibold">{log.command}</span>
                     </div>
-                    <div className={cn("pl-4 text-neutral-300", {
-                      "text-emerald-400": log.type === "success",
-                      "text-amber-400": log.type === "warning",
-                      "text-rose-400": log.type === "error",
+                    <div className={cn("pl-4 text-text-secondary", {
+                      "text-emerald-500": log.type === "success",
+                      "text-amber-500": log.type === "warning",
+                      "text-rose-500": log.type === "error",
                     })}>
                       {log.output}
                     </div>
@@ -291,14 +291,14 @@ export function HeroCockpit() {
               </div>
 
               {/* Command Presets & Input */}
-              <div className="space-y-3 pt-3 border-t border-white/10">
+              <div className="space-y-3 pt-3 border-t border-divider">
                 <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                  <span className="text-[10px] text-neutral-500 uppercase tracking-wider">Presets:</span>
+                  <span className="text-[10px] text-text-secondary uppercase tracking-wider">Presets:</span>
                   {["projects", "stats", "build", "about", "help", "clear"].map((p) => (
                     <button
                       key={p}
                       onClick={() => handleCommand(p)}
-                      className="px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-neutral-300 hover:text-white transition-colors text-[11px]"
+                      className="px-2.5 py-1 rounded-md bg-glass-bg hover:bg-glass-bg-hover border border-glass-border text-text-secondary hover:text-text-primary transition-colors text-[11px]"
                     >
                       {p}
                     </button>
@@ -306,13 +306,13 @@ export function HeroCockpit() {
                 </div>
 
                 <form onSubmit={onFormSubmit} className="flex items-center gap-2">
-                  <span className="text-emerald-400 font-bold">guest@kiwik:~$</span>
+                  <span className="text-emerald-500 font-bold">guest@kiwik:~$</span>
                   <input
                     type="text"
                     value={inputVal}
                     onChange={(e) => setInputVal(e.target.value)}
                     placeholder="type command (e.g. 'projects')..."
-                    className="flex-1 bg-transparent border-none text-white focus:outline-none font-mono text-xs"
+                    className="flex-1 bg-transparent border-none text-text-primary focus:outline-none font-mono text-xs"
                   />
                   <button type="submit" className="p-1 rounded bg-accent-blue text-white hover:bg-blue-600 transition-colors">
                     <Play className="w-3.5 h-3.5" />
@@ -326,35 +326,35 @@ export function HeroCockpit() {
           {activeMode === "architecture" && (
             <div className="space-y-6">
               <div className="text-center space-y-1">
-                <h4 className="text-sm font-bold text-white">System Architecture & Data Flow</h4>
+                <h4 className="text-sm font-bold text-text-primary">System Architecture & Data Flow</h4>
                 <p className="text-xs text-text-secondary">High-performance serverless pipeline with client hydration safety.</p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 items-center text-center">
-                <div className="p-3 rounded-xl bg-neutral-900/80 border border-white/10">
+                <div className="p-3 rounded-xl bg-glass-bg border border-glass-border">
                   <Globe className="w-5 h-5 text-accent-blue mx-auto mb-1" />
-                  <p className="text-xs font-bold text-white">Client</p>
-                  <p className="text-[10px] text-neutral-400">React 19 Hydration</p>
+                  <p className="text-xs font-bold text-text-primary">Client</p>
+                  <p className="text-[10px] text-text-secondary">React 19 Hydration</p>
                 </div>
 
                 <div className="hidden sm:flex justify-center text-neutral-600">
                   <ArrowRight className="w-4 h-4 animate-pulse text-accent-blue" />
                 </div>
 
-                <div className="p-3 rounded-xl bg-neutral-900/80 border border-accent-blue/30 bg-accent-blue/5">
+                <div className="p-3 rounded-xl bg-glass-bg border border-accent-blue/30 bg-accent-blue/5">
                   <Zap className="w-5 h-5 text-amber-400 mx-auto mb-1" />
-                  <p className="text-xs font-bold text-white">Next.js 15</p>
-                  <p className="text-[10px] text-neutral-400">App Router Edge</p>
+                  <p className="text-xs font-bold text-text-primary">Next.js 15</p>
+                  <p className="text-[10px] text-text-secondary">App Router Edge</p>
                 </div>
 
                 <div className="hidden sm:flex justify-center text-neutral-600">
                   <ArrowRight className="w-4 h-4 animate-pulse text-accent-blue" />
                 </div>
 
-                <div className="p-3 rounded-xl bg-neutral-900/80 border border-white/10">
+                <div className="p-3 rounded-xl bg-glass-bg border border-glass-border">
                   <Database className="w-5 h-5 text-emerald-400 mx-auto mb-1" />
-                  <p className="text-xs font-bold text-white">State Store</p>
-                  <p className="text-[10px] text-neutral-400">Zustand + Persist</p>
+                  <p className="text-xs font-bold text-text-primary">State Store</p>
+                  <p className="text-[10px] text-text-secondary">Zustand + Persist</p>
                 </div>
               </div>
             </div>

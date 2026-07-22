@@ -58,7 +58,7 @@ export function Portfolio() {
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-blue/10 border border-accent-blue/20 text-accent-blue text-xs font-semibold uppercase tracking-wider">
           <Sparkles className="w-3.5 h-3.5" /> Platform Superpowers
         </div>
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-neutral-100 to-neutral-400">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-semibold bg-clip-text text-transparent bg-gradient-to-r from-text-primary via-text-primary/95 to-text-secondary">
           Engineered for Visual Excellence & Speed
         </h2>
         <p className="text-text-secondary text-base sm:text-lg">
@@ -76,7 +76,7 @@ export function Portfolio() {
                 <Sparkles className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white">Glassmorphism 2.0 Engine</h3>
+                <h3 className="text-xl font-bold text-text-primary">Glassmorphism 2.0 Engine</h3>
                 <p className="text-xs text-text-secondary">Specular lighting, mouse-reactive spotlights & depth layers</p>
               </div>
             </div>
@@ -86,13 +86,13 @@ export function Portfolio() {
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-black/40 border border-white/10 flex flex-wrap items-center justify-between gap-4">
+          <div className="p-4 rounded-xl bg-bg-secondary/40 border border-glass-border flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-              <span className="text-xs font-mono text-neutral-300">Backdrop-Blur: 24px</span>
+              <span className="text-xs font-mono text-text-secondary">Backdrop-Blur: 24px</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-neutral-300 font-mono">
+              <span className="text-xs px-2.5 py-1 rounded-full bg-glass-bg border border-glass-border text-text-secondary font-mono">
                 Specular Spotlight: Active
               </span>
             </div>
@@ -105,17 +105,17 @@ export function Portfolio() {
             <div className="p-3 rounded-xl bg-violet-500/10 border border-violet-500/20 text-violet-400 w-fit mb-4">
               <Command className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">⌘K Command Palette</h3>
+            <h3 className="text-xl font-bold text-text-primary mb-2">⌘K Command Palette</h3>
             <p className="text-sm text-text-secondary">
               Instant fuzzy search across projects, documentation, tech stack, and theme settings.
             </p>
           </div>
 
-          <div className="p-3 rounded-xl bg-black/60 border border-white/10 flex items-center justify-between text-xs text-neutral-400">
+          <div className="p-3 rounded-xl bg-bg-secondary/40 border border-glass-border flex items-center justify-between text-xs text-text-secondary">
             <span className="flex items-center gap-2">
               <Terminal className="w-4 h-4 text-violet-400" /> Fuzzy Search
             </span>
-            <kbd className="px-2 py-1 rounded bg-white/10 border border-white/20 text-white font-mono text-[11px]">
+            <kbd className="px-2 py-1 rounded bg-glass-bg border border-glass-border text-text-primary font-mono text-[11px]">
               ⌘ + K
             </kbd>
           </div>
@@ -127,13 +127,13 @@ export function Portfolio() {
             <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 w-fit mb-4">
               <Layers className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Instant Admin CMS</h3>
+            <h3 className="text-xl font-bold text-text-primary mb-2">Instant Admin CMS</h3>
             <p className="text-sm text-text-secondary">
               Add, edit, duplicate, and reorder projects by priority with real-time state persistence.
             </p>
           </div>
 
-          <div className="p-3 rounded-xl bg-black/60 border border-white/10 flex items-center justify-between text-xs">
+          <div className="p-3 rounded-xl bg-bg-secondary/40 border border-glass-border flex items-center justify-between text-xs">
             <span className="text-emerald-400 font-semibold flex items-center gap-1.5">
               <Check className="w-4 h-4" /> Priority Ranking
             </span>
@@ -151,7 +151,7 @@ export function Portfolio() {
                 <Globe className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white">Global Edge Deployment</h3>
+                <h3 className="text-xl font-bold text-text-primary">Global Edge Deployment</h3>
                 <p className="text-xs text-text-secondary">Sub-20ms response times served from 300+ global edge locations</p>
               </div>
             </div>
@@ -169,8 +169,8 @@ export function Portfolio() {
               { region: "LHR1 (London)", latency: "24ms" },
               { region: "TYO1 (Tokyo)", latency: "42ms" },
             ].map((node, i) => (
-              <div key={i} className="p-2.5 rounded-lg bg-black/50 border border-white/5 flex items-center justify-between text-xs">
-                <span className="text-neutral-400 font-mono">{node.region}</span>
+              <div key={i} className="p-2.5 rounded-lg bg-bg-secondary/40 border border-glass-border flex items-center justify-between text-xs">
+                <span className="text-text-secondary font-mono">{node.region}</span>
                 <span className="text-cyan-400 font-bold font-mono">{node.latency}</span>
               </div>
             ))}
@@ -183,7 +183,7 @@ export function Portfolio() {
             <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 w-fit mb-4">
               <Palette className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Dynamic Theme Engine</h3>
+            <h3 className="text-xl font-bold text-text-primary mb-2">Dynamic Theme Engine</h3>
             <p className="text-sm text-text-secondary">
               Seamless Dark & Light modes paired with 7 curated accent color presets.
             </p>
@@ -191,7 +191,7 @@ export function Portfolio() {
 
           <div className="flex items-center gap-2 pt-4">
             {["#3B82F6", "#8B5CF6", "#10B981", "#F59E0B", "#EF4444", "#06B6D4"].map((color, i) => (
-              <span key={i} className="w-6 h-6 rounded-full border border-white/20 shadow-md" style={{ backgroundColor: color }} />
+              <span key={i} className="w-6 h-6 rounded-full border border-glass-border shadow-md" style={{ backgroundColor: color }} />
             ))}
           </div>
         </GlassSpotlightCard>
@@ -204,7 +204,7 @@ export function Portfolio() {
                 <FileCode className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white">Full Markdown & Code Engine</h3>
+                <h3 className="text-xl font-bold text-text-primary">Full Markdown & Code Engine</h3>
                 <p className="text-xs text-text-secondary">Built-in syntax highlighting, ToC, and Mermaid diagram support</p>
               </div>
             </div>
@@ -219,7 +219,7 @@ export function Portfolio() {
                     "px-3 py-1.5 rounded-lg text-xs font-mono uppercase font-semibold transition-colors",
                     activeTab === tab
                       ? "bg-accent-blue text-white"
-                      : "bg-white/5 text-neutral-400 hover:text-white"
+                      : "bg-glass-bg border border-glass-border text-text-secondary hover:text-text-primary"
                   )}
                 >
                   {tab}
@@ -227,7 +227,7 @@ export function Portfolio() {
               ))}
               <button
                 onClick={handleCopy}
-                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-400 hover:text-white transition-colors"
+                className="p-2 rounded-lg bg-glass-bg border border-glass-border text-text-secondary hover:text-text-primary transition-colors"
                 title="Copy Code"
               >
                 {copiedCode ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
@@ -235,7 +235,7 @@ export function Portfolio() {
             </div>
           </div>
 
-          <pre className="p-4 rounded-xl bg-black/80 border border-white/10 font-mono text-xs text-neutral-200 overflow-x-auto">
+          <pre className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border font-mono text-xs text-text-primary overflow-x-auto">
             <code>{sampleCode[activeTab]}</code>
           </pre>
         </GlassSpotlightCard>

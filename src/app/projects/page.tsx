@@ -50,7 +50,7 @@ export default function ProjectsPage() {
   return (
     <div className="min-h-screen pt-24 pb-16 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
       <div className="mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">All Projects</h1>
+        <h1 className="text-4xl md:text-5xl font-serif font-semibold mb-4">All Projects</h1>
         <p className="text-text-secondary text-lg">Showing {filteredAndSorted.length} project{filteredAndSorted.length !== 1 ? 's' : ''}</p>
       </div>
       

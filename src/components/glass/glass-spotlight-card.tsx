@@ -37,7 +37,7 @@ export function GlassSpotlightCard({
       onMouseLeave={handleMouseLeave}
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
       className={cn(
-        "relative overflow-hidden rounded-2xl bg-neutral-900/60 border border-white/10 backdrop-blur-xl shadow-xl transition-colors hover:border-white/20",
+        "relative overflow-hidden rounded-2xl bg-glass-bg border border-glass-border backdrop-blur-xl shadow-xl transition-colors hover:border-glass-border-hover",
         className
       )}
       {...(props as any)}
@@ -52,7 +52,7 @@ export function GlassSpotlightCard({
       />
 
       {/* Top subtle highlight border */}
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent z-20" />
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-glass-border to-transparent z-20" />
 
       {/* Card Content */}
       <div className="relative z-20 h-full">{children}</div>

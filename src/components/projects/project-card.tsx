@@ -39,9 +39,9 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
   return (
     <Link href={`/projects/${project.slug}`} className="block h-full outline-none group rounded-2xl">
-      <GlassSpotlightCard className="h-full flex flex-col p-0 overflow-hidden border border-white/10 group-hover:border-white/25 transition-all">
+      <GlassSpotlightCard className="h-full flex flex-col p-0 overflow-hidden border border-glass-border group-hover:border-glass-border-hover transition-all">
         {/* Cover Image & Category Gradient Overlay */}
-        <div className={cn("relative h-[190px] w-full bg-gradient-to-br overflow-hidden border-b border-white/10", gradient)}>
+        <div className={cn("relative h-[190px] w-full bg-gradient-to-br overflow-hidden border-b border-glass-border", gradient)}>
           {project.coverImage && (
             <img
               src={project.coverImage}
@@ -50,24 +50,24 @@ export function ProjectCard({ project }: ProjectCardProps) {
             />
           )}
 
-          <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/80 via-bg-primary/20 to-transparent" />
 
           {/* Status & Version Badges */}
           <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/15">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-glass-bg backdrop-blur-md border border-glass-border">
               <div
-                className={cn("w-2 h-2 rounded-full", {
+                className={cn("w-2.5 h-2.5 rounded-full", {
                   "bg-emerald-500": project.status === "completed",
                   "bg-amber-500": project.status === "in-progress",
                   "bg-rose-500": project.status === "archived",
                 })}
               />
-              <span className="text-[11px] font-semibold text-white capitalize">{project.status.replace("-", " ")}</span>
+              <span className="text-[11px] font-semibold text-text-primary capitalize">{project.status.replace("-", " ")}</span>
             </div>
 
             {project.version && (
-              <div className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/15">
-                <span className="text-[11px] font-mono font-medium text-neutral-300">{project.version}</span>
+              <div className="px-2.5 py-1 rounded-full bg-glass-bg backdrop-blur-md border border-glass-border">
+                <span className="text-[11px] font-mono font-medium text-text-secondary">{project.version}</span>
               </div>
             )}
           </div>
@@ -77,10 +77,10 @@ export function ProjectCard({ project }: ProjectCardProps) {
         <div className="p-5 flex flex-col flex-grow justify-between">
           <div>
             <div className="flex items-center justify-between gap-2 mb-1.5">
-              <h3 className="text-lg font-bold text-white group-hover:text-accent-blue transition-colors line-clamp-1">
+              <h3 className="text-lg font-bold text-text-primary group-hover:text-accent-blue transition-colors line-clamp-1">
                 {project.name}
               </h3>
-              <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-neutral-400">
+              <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-glass-bg border border-glass-border text-text-secondary">
                 {project.category}
               </span>
             </div>
@@ -94,21 +94,21 @@ export function ProjectCard({ project }: ProjectCardProps) {
             {/* Tech Stack Pills */}
             <div className="flex flex-wrap gap-1.5 mb-4">
               {project.techStack.slice(0, 4).map((tech) => (
-                <span key={tech.name} className="px-2 py-0.5 text-[10px] font-mono rounded bg-black/40 border border-white/10 text-neutral-300">
+                <span key={tech.name} className="px-2 py-0.5 text-[10px] font-mono rounded bg-glass-bg border border-glass-border text-text-secondary">
                   {tech.name}
                 </span>
               ))}
               {project.techStack.length > 4 && (
-                <span className="px-2 py-0.5 text-[10px] font-mono rounded bg-black/40 border border-white/10 text-neutral-400">
+                <span className="px-2 py-0.5 text-[10px] font-mono rounded bg-glass-bg border border-glass-border text-text-secondary">
                   +{project.techStack.length - 4}
                 </span>
               )}
             </div>
 
             {/* Progress Bar & Favorite Button */}
-            <div className="flex items-center justify-between gap-3 pt-3 border-t border-white/10">
+            <div className="flex items-center justify-between gap-3 pt-3 border-t border-divider">
               <div className="flex-1">
-                <div className="h-1.5 w-full bg-neutral-800 rounded-full overflow-hidden">
+                <div className="h-1.5 w-full bg-bg-secondary rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     whileInView={{ width: `${project.completionPercent}%` }}
@@ -125,11 +125,11 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
               <button
                 onClick={handleFavoriteClick}
-                className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                className="p-2 rounded-full hover:bg-glass-bg-hover transition-colors"
                 aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
               >
                 <motion.div animate={favorite ? { scale: [1, 1.2, 1] } : {}}>
-                  <Heart className={cn("w-4 h-4 transition-colors", favorite ? "fill-rose-500 text-rose-500" : "text-neutral-400")} />
+                  <Heart className={cn("w-4 h-4 transition-colors", favorite ? "fill-rose-500 text-rose-500" : "text-text-secondary")} />
                 </motion.div>
               </button>
             </div>

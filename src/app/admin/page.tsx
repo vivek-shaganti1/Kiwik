@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -106,6 +106,24 @@ export default function AdminPage() {
   const [showJsonModal, setShowJsonModal] = useState(false);
   const [jsonInput, setJsonInput] = useState("");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [visitorStats, setVisitorStats] = useState({ total: 35247, active: 4 });
+
+  useEffect(() => {
+    fetch("/api/visitors")
+      .then((res) => res.json())
+      .then((data) => setVisitorStats(data))
+      .catch((err) => console.error("Error loading visitors telemetry", err));
+
+    // Poll every 10 seconds for real-time live active updates
+    const interval = setInterval(() => {
+      fetch("/api/visitors")
+        .then((res) => res.json())
+        .then((data) => setVisitorStats(data))
+        .catch((err) => console.error("Error polling visitors telemetry", err));
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -242,7 +260,7 @@ export default function AdminPage() {
             <div className="p-2 rounded-xl bg-accent-blue/10 border border-accent-blue/30 text-accent-blue">
               <Layers className="w-6 h-6" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-neutral-200 to-neutral-400">
+            <h1 className="text-3xl md:text-4xl font-serif font-semibold bg-clip-text text-transparent bg-gradient-to-r from-text-primary via-text-primary/95 to-text-secondary">
               Admin Project CMS
             </h1>
           </div>
@@ -280,22 +298,35 @@ export default function AdminPage() {
       </div>
 
       {/* Stats Summary Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
         <GlassCard className="p-4 flex flex-col justify-between">
           <span className="text-xs text-text-secondary font-medium uppercase tracking-wider">Total Projects</span>
-          <span className="text-2xl sm:text-3xl font-bold text-white mt-2">{totalProjects}</span>
+          <span className="text-2xl font-bold text-text-primary mt-2">{totalProjects}</span>
         </GlassCard>
         <GlassCard className="p-4 flex flex-col justify-between">
           <span className="text-xs text-text-secondary font-medium uppercase tracking-wider">In Progress</span>
-          <span className="text-2xl sm:text-3xl font-bold text-amber-400 mt-2">{inProgressCount}</span>
+          <span className="text-2xl font-bold text-amber-400 mt-2">{inProgressCount}</span>
         </GlassCard>
         <GlassCard className="p-4 flex flex-col justify-between">
           <span className="text-xs text-text-secondary font-medium uppercase tracking-wider">Completed</span>
-          <span className="text-2xl sm:text-3xl font-bold text-emerald-400 mt-2">{completedCount}</span>
+          <span className="text-2xl font-bold text-emerald-400 mt-2">{completedCount}</span>
         </GlassCard>
         <GlassCard className="p-4 flex flex-col justify-between">
           <span className="text-xs text-text-secondary font-medium uppercase tracking-wider">Avg Completion</span>
-          <span className="text-2xl sm:text-3xl font-bold text-accent-blue mt-2">{avgCompletion}%</span>
+          <span className="text-2xl font-bold text-accent-blue mt-2">{avgCompletion}%</span>
+        </GlassCard>
+
+        {/* Visitors Analytics Dashboard Cards */}
+        <GlassCard className="p-4 flex flex-col justify-between border-accent-blue/30 bg-accent-blue/5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-text-secondary font-medium uppercase tracking-wider">Live Visitors</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+          </div>
+          <span className="text-2xl font-bold text-text-primary mt-2">{visitorStats.active} active</span>
+        </GlassCard>
+        <GlassCard className="p-4 flex flex-col justify-between border-violet-500/30 bg-violet-500/5">
+          <span className="text-xs text-text-secondary font-medium uppercase tracking-wider">Total Visits</span>
+          <span className="text-2xl font-bold text-text-primary mt-2">{visitorStats.total.toLocaleString()}</span>
         </GlassCard>
       </div>
 
@@ -386,7 +417,7 @@ export default function AdminPage() {
                     </div>
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-bold text-white text-base">{proj.name}</h3>
+                        <h3 className="font-bold text-text-primary text-base">{proj.name}</h3>
                         <span className="text-xs px-2 py-0.5 rounded-full bg-glass-bg border border-glass-border text-text-secondary capitalize">
                           {proj.category}
                         </span>

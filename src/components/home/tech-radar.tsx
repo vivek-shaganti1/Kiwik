@@ -66,7 +66,7 @@ export function TechRadar() {
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-semibold uppercase tracking-wider">
           <Cpu className="w-3.5 h-3.5" /> Tech Ecosystem
         </div>
-        <h2 className="text-3xl sm:text-4xl font-bold text-white">
+        <h2 className="text-3xl sm:text-4xl font-serif font-semibold text-text-primary">
           Powered by Next-Generation Stack
         </h2>
         <p className="text-text-secondary text-sm sm:text-base">
@@ -84,7 +84,7 @@ export function TechRadar() {
               "px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2",
               selectedCat === cat.id
                 ? "bg-accent-blue text-white shadow-lg shadow-blue-500/20"
-                : "bg-neutral-900/80 text-neutral-400 hover:text-white border border-white/5"
+                : "bg-glass-bg text-text-secondary hover:text-text-primary border border-glass-border hover:bg-glass-bg-hover"
             )}
           >
             {cat.name}
@@ -103,7 +103,7 @@ export function TechRadar() {
             onMouseLeave={() => setHoveredTech(null)}
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="text-base font-bold text-white group-hover:text-accent-blue transition-colors">
+              <span className="text-base font-bold text-text-primary group-hover:text-accent-blue transition-colors">
                 {tech.name}
               </span>
               <span

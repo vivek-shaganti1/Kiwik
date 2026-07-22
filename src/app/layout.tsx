@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { CommandPalette } from "@/components/search/command-palette";
 import { CursorGlow } from "@/components/effects/cursor-glow";
+import { IntroSplash } from "@/components/layout/intro-splash";
 
 export const metadata: Metadata = {
   title: "Kiwik.1 — The Operating System of Criska Projects",
@@ -48,6 +49,7 @@ export default function RootLayout({
         }}
       >
         <ThemeProvider>
+          <IntroSplash />
           <CursorGlow />
           <Navbar />
           <CommandPalette />
