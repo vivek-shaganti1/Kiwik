@@ -2,112 +2,148 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Command, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeSwitcher } from './theme-switcher';
-import { Logo } from './logo';
 
 export function Navbar() {
   const [scrolled, setScrolled] = React.useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const pathname = usePathname();
 
   React.useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 30);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const navItems = [
+    { label: 'Home', href: '/' },
+    { label: 'Projects', href: '/projects' },
+    { label: 'Admin', href: '/admin', isBadge: true }
+  ];
+
   return (
-    <motion.header
-      initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      className={cn(
-        'fixed top-0 inset-x-0 z-50 h-[72px] flex items-center justify-center px-4 sm:px-6 md:px-8 transition-all duration-300',
-        scrolled ? 'backdrop-blur-xl bg-glass-bg border-b border-glass-border shadow-sm' : 'bg-transparent border-b border-transparent'
-      )}
-    >
-      <div className="w-full max-w-[1400px] flex items-center justify-between relative">
-        <Link href="/" className="flex items-center gap-2.5 group">
+    <div className="fixed top-0 inset-x-0 z-50 flex justify-center px-4 transition-all duration-500 pt-4">
+      <motion.header
+        initial={{ y: -60, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        className={cn(
+          'w-full transition-all duration-500 border border-glass-border backdrop-blur-xl flex items-center justify-between px-6 relative',
+          scrolled 
+            ? 'max-w-[900px] h-[58px] rounded-full bg-glass-bg/90 shadow-lg border-white/10' 
+            : 'max-w-[1200px] h-[64px] rounded-2xl bg-glass-bg/65 shadow-md border-white/5'
+        )}
+      >
+        {/* Left Side: Brand Logo and Title */}
+        <Link href="/" className="flex items-center gap-2.5 group relative z-10">
           <motion.div
             whileHover={{ scale: 1.1, rotate: 6 }}
             transition={{ type: "spring", stiffness: 400, damping: 15 }}
-            className="w-8 h-8 flex items-center justify-center overflow-hidden"
+            className="w-7 h-7 flex items-center justify-center overflow-hidden rounded-lg bg-bg-secondary/40 border border-glass-border group-hover:border-glass-border-hover transition-colors"
           >
-            <img src="/logo.png" alt="Kiwik Logo" className="w-full h-full object-contain" style={{ imageRendering: "auto" }} />
+            <img src="/logo.png" alt="Kiwik Logo" className="w-5 h-5 object-contain" style={{ imageRendering: "auto" }} />
           </motion.div>
-          <span className="text-xl font-serif font-bold bg-clip-text text-transparent bg-gradient-to-r from-text-primary to-text-secondary group-hover:opacity-80 transition-opacity">
+          <span className="text-base font-serif font-bold bg-clip-text text-transparent bg-gradient-to-r from-text-primary via-text-primary to-text-secondary group-hover:opacity-85 transition-opacity tracking-tight">
             Kiwik.1
           </span>
         </Link>
 
-        {/* Desktop Nav - Absolutely Centered */}
-        <nav className="hidden md:flex items-center gap-6 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <Link href="/" className="text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
-            Home
-          </Link>
-          <Link href="/projects" className="text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
-            Projects
-          </Link>
-          <Link href="/admin" className="text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neutral-100 dark:bg-white/5 border border-black/5 dark:border-white/10 hover:border-black/20 dark:hover:border-white/20">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            Admin
-          </Link>
+        {/* Center: Desktop Menu Navigation with Layout Animation */}
+        <nav className="hidden md:flex items-center gap-1.5 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0">
+          {navItems.map((item) => {
+            const isActive = item.href === '/' 
+              ? pathname === '/' 
+              : pathname.startsWith(item.href);
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "relative text-xs font-semibold px-4 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5",
+                  isActive 
+                    ? "text-text-primary" 
+                    : "text-text-secondary hover:text-text-primary"
+                )}
+              >
+                {isActive && (
+                  <motion.span
+                    layoutId="activeNavBackground"
+                    className="absolute inset-0 bg-neutral-200/50 dark:bg-white/10 rounded-full z-[-1] border border-black/5 dark:border-white/5"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+                {item.isBadge && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                )}
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
 
-        <div className="hidden md:flex items-center gap-4">
+        {/* Right Side: Search and ThemeSwitcher Actions */}
+        <div className="hidden md:flex items-center gap-4 relative z-10">
           <button 
             onClick={() => window.dispatchEvent(new CustomEvent("toggle-command-palette"))}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-100 dark:bg-white/5 border border-black/5 dark:border-white/10 hover:bg-neutral-200 dark:hover:bg-white/10 transition-colors text-sm text-neutral-500 dark:text-neutral-400"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-200/20 dark:bg-white/5 border border-glass-border hover:bg-neutral-200/40 dark:hover:bg-white/10 transition-all duration-300 text-xs text-text-secondary hover:text-text-primary group"
           >
-            <Search className="w-4 h-4" />
+            <Search className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
             <span>Search...</span>
-            <kbd className="ml-2 hidden sm:flex items-center gap-1 font-sans text-xs bg-black/5 dark:bg-white/10 px-1.5 py-0.5 rounded">
-              <Command className="w-3 h-3" /> K
+            <kbd className="ml-2 hidden sm:flex items-center gap-0.5 font-sans text-[10px] bg-black/5 dark:bg-white/10 px-1.5 py-0.5 rounded border border-black/5 dark:border-white/5">
+              <Command className="w-2.5 h-2.5" /> K
             </kbd>
           </button>
           
           <ThemeSwitcher />
         </div>
 
-        {/* Mobile Toggle */}
+        {/* Mobile menu triggers */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
+          className="md:hidden p-2 rounded-full hover:bg-neutral-200/20 dark:hover:bg-white/5 transition-colors relative z-10 border border-transparent hover:border-glass-border"
+          aria-label="Toggle Navigation Drawer"
         >
-          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
         </button>
-      </div>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="absolute top-full left-0 right-0 p-4 sm:p-6 bg-glass-bg border-b border-glass-border backdrop-blur-xl md:hidden flex flex-col gap-4 shadow-xl"
-          >
-            <Link href="/" className="px-4 py-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-white/5 transition-colors font-medium">
-              Home
-            </Link>
-            <Link href="/projects" className="px-4 py-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-white/5 transition-colors font-medium">
-              Projects
-            </Link>
-            <Link href="/admin" className="px-4 py-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-white/5 transition-colors font-medium flex items-center justify-between">
-              <span>Admin Dashboard</span>
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            </Link>
-            <div className="px-4 flex items-center justify-between">
-              <span className="font-medium">Theme</span>
-              <ThemeSwitcher />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.header>
+        {/* Mobile Menu Slide-out Panel */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -15, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -15, scale: 0.98 }}
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              className="absolute top-[110%] left-0 right-0 p-4 rounded-2xl bg-glass-bg border border-glass-border backdrop-blur-2xl md:hidden flex flex-col gap-2 shadow-2xl z-50"
+            >
+              {navItems.map((item) => (
+                <Link 
+                  key={item.href}
+                  href={item.href} 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-4 py-2.5 rounded-xl hover:bg-neutral-200/40 dark:hover:bg-white/5 transition-colors text-xs font-semibold text-text-primary flex items-center justify-between"
+                >
+                  <span>{item.label}</span>
+                  {item.isBadge && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  )}
+                </Link>
+              ))}
+              <div className="px-4 py-2 border-t border-divider mt-2 flex items-center justify-between">
+                <span className="text-xs font-semibold text-text-secondary">Theme</span>
+                <ThemeSwitcher />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.header>
+    </div>
   );
 }

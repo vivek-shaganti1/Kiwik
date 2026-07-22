@@ -347,7 +347,7 @@ export default function AdminPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-glass-bg border border-glass-border text-sm text-text-primary focus:outline-none"
+            className="px-3.5 py-2 rounded-xl bg-glass-bg border border-glass-border text-xs font-bold text-text-primary focus:outline-none hover:bg-glass-bg-hover transition-colors cursor-pointer"
           >
             <option value="all" className="bg-neutral-900">All Statuses</option>
             <option value="completed" className="bg-neutral-900">Completed</option>
@@ -358,7 +358,7 @@ export default function AdminPage() {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-glass-bg border border-glass-border text-sm text-text-primary focus:outline-none"
+            className="px-3.5 py-2 rounded-xl bg-glass-bg border border-glass-border text-xs font-bold text-text-primary focus:outline-none hover:bg-glass-bg-hover transition-colors cursor-pointer"
           >
             <option value="all" className="bg-neutral-900">All Categories</option>
             <option value="web" className="bg-neutral-900">Web</option>
@@ -576,7 +576,7 @@ export default function AdminPage() {
                         type="text"
                         value={currentProject.id}
                         onChange={(e) => setCurrentProject({ ...currentProject, id: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-glass-border text-sm text-white focus:border-accent-blue focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
                         required
                       />
                     </div>
@@ -586,7 +586,7 @@ export default function AdminPage() {
                         type="text"
                         value={currentProject.slug}
                         onChange={(e) => setCurrentProject({ ...currentProject, slug: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-glass-border text-sm text-white focus:border-accent-blue focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
                         required
                       />
                     </div>
@@ -596,7 +596,7 @@ export default function AdminPage() {
                         type="text"
                         value={currentProject.name}
                         onChange={(e) => setCurrentProject({ ...currentProject, name: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-glass-border text-sm text-white focus:border-accent-blue focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
                         required
                       />
                     </div>
@@ -606,7 +606,7 @@ export default function AdminPage() {
                         type="text"
                         value={currentProject.tagline}
                         onChange={(e) => setCurrentProject({ ...currentProject, tagline: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-glass-border text-sm text-white focus:border-accent-blue focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
                       />
                     </div>
                     <div>
@@ -614,7 +614,7 @@ export default function AdminPage() {
                       <select
                         value={currentProject.category}
                         onChange={(e) => setCurrentProject({ ...currentProject, category: e.target.value as ProjectCategory })}
-                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-glass-border text-sm text-white focus:border-accent-blue focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
                       >
                         {["web", "ai", "mobile", "automation", "blockchain", "ml", "devops", "research", "saas", "open-source"].map(c => (
                           <option key={c} value={c} className="bg-neutral-900">{c}</option>
@@ -626,7 +626,7 @@ export default function AdminPage() {
                       <select
                         value={currentProject.status}
                         onChange={(e) => setCurrentProject({ ...currentProject, status: e.target.value as ProjectStatus })}
-                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-glass-border text-sm text-white focus:border-accent-blue focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
                       >
                         {["completed", "in-progress", "archived", "private"].map(s => (
                           <option key={s} value={s} className="bg-neutral-900">{s}</option>
@@ -639,7 +639,7 @@ export default function AdminPage() {
                         type="text"
                         value={currentProject.version}
                         onChange={(e) => setCurrentProject({ ...currentProject, version: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-glass-border text-sm text-white focus:border-accent-blue focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
                       />
                     </div>
                     <div>
@@ -650,7 +650,7 @@ export default function AdminPage() {
                         max="100"
                         value={currentProject.completionPercent}
                         onChange={(e) => setCurrentProject({ ...currentProject, completionPercent: Number(e.target.value) })}
-                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-glass-border text-sm text-white focus:border-accent-blue focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
                       />
                     </div>
                     <div className="sm:col-span-2">
@@ -659,7 +659,7 @@ export default function AdminPage() {
                         rows={3}
                         value={currentProject.description}
                         onChange={(e) => setCurrentProject({ ...currentProject, description: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-glass-border text-sm text-white focus:border-accent-blue focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
                       />
                     </div>
                   </div>
@@ -674,7 +674,7 @@ export default function AdminPage() {
                         type="text"
                         value={currentProject.coverImage}
                         onChange={(e) => setCurrentProject({ ...currentProject, coverImage: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-glass-border text-sm text-white focus:border-accent-blue focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
                       />
                     </div>
                     <div>
@@ -683,7 +683,7 @@ export default function AdminPage() {
                         type="text"
                         value={currentProject.liveUrl || ""}
                         onChange={(e) => setCurrentProject({ ...currentProject, liveUrl: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-glass-border text-sm text-white focus:border-accent-blue focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
                       />
                     </div>
                     <div>
@@ -692,7 +692,7 @@ export default function AdminPage() {
                         type="text"
                         value={currentProject.githubUrl || ""}
                         onChange={(e) => setCurrentProject({ ...currentProject, githubUrl: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-glass-border text-sm text-white focus:border-accent-blue focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
                       />
                     </div>
                   </div>
@@ -1008,7 +1008,7 @@ export default function AdminPage() {
                         value={currentProject.readme || ""}
                         placeholder="# Project Title..."
                         onChange={(e) => setCurrentProject({ ...currentProject, readme: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-glass-border text-xs text-white font-mono focus:border-accent-blue focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-xs text-text-primary font-mono focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all"
                       />
                     </div>
                   </div>
@@ -1057,7 +1057,7 @@ export default function AdminPage() {
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
                 placeholder="[ { 'id': '1', 'name': '...' } ]"
-                className="w-full px-3 py-2 rounded-xl bg-black/50 border border-glass-border text-xs font-mono text-white mb-4 focus:outline-none focus:border-accent-blue"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-xs font-mono text-text-primary mb-4 focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue/30 transition-all"
               />
               <div className="flex items-center justify-end gap-3">
                 <button

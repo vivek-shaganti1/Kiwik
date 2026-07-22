@@ -35,7 +35,7 @@ export function GlassSpotlightCard({
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      whileHover={{ y: -4, transition: { duration: 0.2 } }}
+      whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 25 } }}
       className={cn(
         "relative overflow-hidden rounded-2xl bg-glass-bg border border-glass-border backdrop-blur-xl shadow-xl transition-colors hover:border-glass-border-hover",
         className

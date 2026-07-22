@@ -41,16 +41,18 @@ export function ProjectCard({ project }: ProjectCardProps) {
     <Link href={`/projects/${project.slug}`} className="block h-full outline-none group rounded-2xl">
       <GlassSpotlightCard className="h-full flex flex-col p-0 overflow-hidden border border-glass-border group-hover:border-glass-border-hover transition-all">
         {/* Cover Image & Category Gradient Overlay */}
-        <div className={cn("relative h-[190px] w-full bg-gradient-to-br overflow-hidden border-b border-glass-border", gradient)}>
+        <div className={cn("relative h-[180px] w-full bg-gradient-to-br overflow-hidden border-b border-glass-border", gradient)}>
+          {/* Architectural Grid pattern */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:16px_16px] [mask-image:radial-gradient(ellipse_at_center,black_70%,transparent_100%)] opacity-40 pointer-events-none" />
           {project.coverImage && (
             <img
               src={project.coverImage}
               alt={project.name}
-              className="w-full h-full object-cover opacity-60 group-hover:scale-105 group-hover:opacity-80 transition-all duration-500"
+              className="w-full h-full object-cover opacity-50 group-hover:scale-102 group-hover:opacity-75 transition-all duration-700"
             />
           )}
 
-          <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/80 via-bg-primary/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-bg-primary/10 to-transparent" />
 
           {/* Status & Version Badges */}
           <div className="absolute top-3 left-3 right-3 flex items-center justify-between">

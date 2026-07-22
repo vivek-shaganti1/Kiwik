@@ -66,9 +66,9 @@ export const GlassButton = forwardRef<HTMLButtonElement, GlassButtonProps>(
     };
 
     const variantClasses = {
-      primary: "bg-[var(--accent)] text-white border border-white/20 shadow-lg hover:opacity-90",
-      secondary: "glass glass-noise hover:bg-white/10 dark:hover:bg-white/5 border border-white/10 text-text-primary",
-      ghost: "hover:bg-black/5 dark:hover:bg-white/5 text-text-primary",
+      primary: "bg-accent-blue text-white border border-white/20 shadow-md shadow-blue-500/10 hover:bg-blue-600 transition-colors shadow-md hover:shadow-lg [box-shadow:inset_0_1px_0_rgba(255,255,255,0.25)]",
+      secondary: "glass glass-noise hover:bg-glass-bg-hover border border-glass-border text-text-primary shadow-sm hover:shadow-md [box-shadow:inset_0_1px_0_rgba(255,255,255,0.05)]",
+      ghost: "hover:bg-glass-bg-hover text-text-primary",
     };
 
     return (
@@ -85,6 +85,7 @@ export const GlassButton = forwardRef<HTMLButtonElement, GlassButtonProps>(
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         onClick={handleClick}
+        whileTap={{ scale: 0.96 }}
         className={cn(
           "relative inline-flex items-center justify-center font-medium rounded-full overflow-hidden transition-colors duration-300",
           "focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2",
