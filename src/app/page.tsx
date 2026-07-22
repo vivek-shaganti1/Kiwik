@@ -3,35 +3,36 @@
 import { useRef } from "react";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
-import { ArrowRight, ExternalLink } from "lucide-react";
+import { ArrowRight, ExternalLink, Sparkles, Terminal, Activity, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useProjects } from "@/stores/projects-store";
 import { useCounter } from "@/hooks/use-counter";
 import { AuroraBackground } from "@/components/effects/aurora-background";
 import { ProjectCard } from "@/components/projects/project-card";
+import { HeroCockpit } from "@/components/home/hero-cockpit";
+import { BentoGrid } from "@/components/effects/bento-grid";
+import { TechRadar } from "@/components/home/tech-radar";
 
 const stats = [
-  { label: "Projects", value: 6 },
+  { label: "Active Projects", value: 6 },
   { label: "Deployments", value: 47 },
-  { label: "Visitors", value: "35.2K" },
-  { label: "Clients", value: 12 },
-  { label: "Open Source Stars", value: 1316 },
+  { label: "Global Visitors", value: "35.2K" },
+  { label: "Enterprise Clients", value: 12 },
+  { label: "GitHub Stars", value: 1316 },
   { label: "Contributors", value: 8 },
 ];
 
 function StatItem({ label, value }: { label: string; value: string | number }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
-  
-  // Only start counting when in view
   const displayValue = useCounter(isInView ? value : 0, 2000);
 
   return (
-    <div ref={ref} className="flex flex-col items-center justify-center p-6 text-center border border-glass-border rounded-2xl bg-glass-bg backdrop-blur-md hover:bg-glass-bg-hover transition-colors shadow-lg">
-      <div className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-text-primary to-text-secondary mb-2">
+    <div ref={ref} className="flex flex-col items-center justify-center p-6 text-center border border-white/10 rounded-2xl bg-neutral-900/40 backdrop-blur-xl hover:border-white/20 transition-all shadow-xl group">
+      <div className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-neutral-100 to-neutral-400 group-hover:scale-105 transition-transform mb-2">
         {displayValue}
       </div>
-      <div className="text-sm font-medium text-text-secondary uppercase tracking-wider">
+      <div className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
         {label}
       </div>
     </div>
@@ -56,61 +57,70 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen text-text-primary">
-      <AuroraBackground intensity="medium" />
-      
+    <div className="min-h-screen text-text-primary overflow-x-hidden">
+      <AuroraBackground intensity="high" />
+
       {/* Hero Section */}
-      <section className="relative min-h-[100svh] flex flex-col items-center justify-center overflow-hidden px-4 sm:px-6 md:px-8">
-        <motion.div 
+      <section className="relative min-h-[90svh] flex flex-col items-center justify-center pt-28 pb-16 px-4 sm:px-6 md:px-8">
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="relative z-10 flex flex-col items-center text-center max-w-5xl mx-auto mt-12 md:mt-20"
+          className="relative z-10 flex flex-col items-center text-center max-w-5xl mx-auto"
         >
-          <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-glass-bg border border-glass-border backdrop-blur-md mb-8">
-            <span className="w-2 h-2 rounded-full bg-[var(--accent)] animate-pulse" />
-            <span className="text-sm font-medium text-text-secondary">Introducing Kiwik.1</span>
+          {/* Version Badge */}
+          <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900/80 border border-white/15 backdrop-blur-xl mb-8 shadow-xl">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <span className="text-xs font-mono font-medium text-neutral-300">
+              Kiwik.1 v1.0.0-beta • Next.js 15 & React 19 Engine
+            </span>
           </motion.div>
 
-          <motion.h1 
+          {/* Main Title */}
+          <motion.h1
             variants={itemVariants}
-            className="text-7xl md:text-9xl font-black tracking-tighter mb-6 gradient-text"
+            className="text-6xl sm:text-7xl md:text-9xl font-black tracking-tighter mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white via-neutral-100 to-neutral-500"
           >
             Kiwik.1
           </motion.h1>
 
-          <motion.p 
+          {/* Tagline */}
+          <motion.p
             variants={itemVariants}
-            className="text-xl md:text-2xl text-text-secondary font-medium mb-12 max-w-2xl"
+            className="text-lg sm:text-2xl text-text-secondary font-medium mb-8 max-w-3xl leading-relaxed"
           >
-            The Operating System of Criska Projects
+            The Operating System of Criska Projects. Designed with linear precision, cinematic glassmorphism, and enterprise-grade architecture.
           </motion.p>
 
-          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-4">
-            <Link 
+          {/* Action CTA Buttons */}
+          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-4 mb-12">
+            <Link
               href="/projects"
-              className="flex items-center gap-2 px-8 py-4 rounded-xl bg-[var(--accent)] text-white font-bold hover:opacity-90 transition-opacity active:scale-95"
+              className="flex items-center gap-2 px-8 py-4 rounded-xl bg-accent-blue text-white font-bold hover:bg-blue-600 transition-all active:scale-95 shadow-lg shadow-blue-500/25"
             >
               Explore Projects
               <ArrowRight className="w-5 h-5" />
             </Link>
-            <a 
-              href="https://github.com/criska"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-8 py-4 rounded-xl bg-glass-bg border border-glass-border font-bold hover:bg-glass-bg-hover transition-colors active:scale-95 backdrop-blur-sm text-text-primary"
+            <Link
+              href="/admin"
+              className="flex items-center gap-2 px-8 py-4 rounded-xl bg-neutral-900/80 border border-white/15 font-bold hover:bg-white/10 transition-all active:scale-95 backdrop-blur-xl text-white"
             >
-              View Source
-              <ExternalLink className="w-5 h-5" />
-            </a>
+              <Layers className="w-5 h-5 text-emerald-400" />
+              Open Admin CMS
+            </Link>
+          </motion.div>
+
+          {/* Interactive Cockpit Window */}
+          <motion.div variants={itemVariants} className="w-full">
+            <HeroCockpit />
           </motion.div>
         </motion.div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16 md:py-24 px-4 sm:px-6 md:px-8 relative z-10">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
+      {/* Live Metrics Ticker Section */}
+      <section className="py-12 md:py-20 px-4 sm:px-6 md:px-8 relative z-10 border-t border-b border-white/5 bg-black/40 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {stats.map((stat, i) => (
               <StatItem key={i} label={stat.label} value={stat.value} />
             ))}
@@ -118,34 +128,42 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured Projects */}
-      <section className="py-16 md:py-24 px-4 sm:px-6 md:px-8 relative z-10 overflow-hidden">
+      {/* Bento Grid 2.0 Superpowers Section */}
+      <section className="relative z-10">
+        <BentoGrid />
+      </section>
+
+      {/* Tech Ecosystem Radar */}
+      <section className="relative z-10 bg-neutral-950/60 border-t border-b border-white/5">
+        <TechRadar />
+      </section>
+
+      {/* Featured Showcase Section */}
+      <section className="py-20 md:py-28 px-4 sm:px-6 md:px-8 relative z-10 overflow-hidden">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-end justify-between mb-12">
-            <h2 className="text-4xl md:text-5xl font-black gradient-text">Featured Projects</h2>
-            <Link 
-              href="/projects" 
-              className="hidden md:flex items-center gap-2 text-text-secondary hover:text-[var(--accent)] transition-colors font-medium"
+          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-12 gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                <Sparkles className="w-3.5 h-3.5" /> Handcrafted Works
+              </div>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white">Featured Showcase</h2>
+            </div>
+
+            <Link
+              href="/projects"
+              className="flex items-center gap-2 text-text-secondary hover:text-accent-blue transition-colors font-semibold text-sm"
             >
               View All Projects <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
-          <div className="flex overflow-x-auto pb-12 -mx-4 px-4 snap-x snap-mandatory hide-scrollbar gap-6">
+          {/* Cards Carousel */}
+          <div className="flex overflow-x-auto pb-8 -mx-4 px-4 snap-x snap-mandatory hide-scrollbar gap-6">
             {featuredProjects.map((project) => (
-              <div key={project.id} className="flex-none w-[85vw] md:w-[400px] h-[500px] snap-center">
+              <div key={project.id} className="flex-none w-[85vw] sm:w-[380px] h-[480px] snap-center">
                 <ProjectCard project={project} />
               </div>
             ))}
-          </div>
-          
-          <div className="mt-4 flex justify-center md:hidden">
-            <Link 
-              href="/projects" 
-              className="flex items-center gap-2 px-6 py-3 rounded-full bg-glass-bg border border-glass-border font-medium hover:bg-glass-bg-hover transition-colors text-text-primary"
-            >
-              View All Projects <ArrowRight className="w-4 h-4" />
-            </Link>
           </div>
         </div>
       </section>
