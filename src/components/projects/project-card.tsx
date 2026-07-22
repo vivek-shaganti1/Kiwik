@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Heart, Sparkles, Check } from "lucide-react";
+import { Heart, Sparkles } from "lucide-react";
 import { Project } from "@/types";
 import { GlassSpotlightCard } from "@/components/glass/glass-spotlight-card";
 import { useFavoritesStore } from "@/stores/favorites-store";
@@ -79,17 +79,10 @@ export function ProjectCard({ project }: ProjectCardProps) {
         <div className="p-5 flex flex-col flex-grow justify-between">
           <div>
             <div className="flex items-center justify-between gap-2 mb-1.5">
-              <div className="flex items-center gap-1.5 min-w-0">
-                <h3 className="text-lg font-bold text-text-primary group-hover:text-accent-blue transition-colors line-clamp-1">
-                  {project.name}
-                </h3>
-                {(project.slug === 'kiwik' || project.slug === 'criska-cloud' || project.slug === 'criskacloud' || project.slug === 'criska-ai' || project.slug === 'criskaai' || project.slug === 'criskaos' || project.slug === 'criska-os') && (
-                  <span className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-blue-500 text-white p-0.5 shadow-sm shrink-0">
-                    <Check className="w-2.5 h-2.5 stroke-[3.5]" />
-                  </span>
-                )}
-              </div>
-              <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-glass-bg border border-glass-border text-text-secondary select-none">
+              <h3 className="text-lg font-bold text-text-primary group-hover:text-accent-blue transition-colors line-clamp-1">
+                {project.name}
+              </h3>
+              <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-glass-bg border border-glass-border text-text-secondary">
                 {project.category}
               </span>
             </div>
