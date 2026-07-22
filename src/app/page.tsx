@@ -1,192 +1,175 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import Link from "next/link";
-import { motion, useInView } from "framer-motion";
-import { ArrowRight, ExternalLink, Sparkles, Terminal, Activity, Layers } from "lucide-react";
+import { motion } from "framer-motion";
+import { 
+  ArrowRight, 
+  Layers, 
+  Play, 
+  Terminal as TerminalIcon,
+  Activity,
+  Cpu,
+  Zap,
+  Globe
+} from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useProjects } from "@/stores/projects-store";
-import { useCounter } from "@/hooks/use-counter";
 import { AuroraBackground } from "@/components/effects/aurora-background";
-import { ProjectCard } from "@/components/projects/project-card";
-import { HeroCockpit } from "@/components/home/hero-cockpit";
-import { BentoGrid } from "@/components/effects/bento-grid";
-import { TechRadar } from "@/components/home/tech-radar";
-import { AIChatbot } from "@/components/home/ai-chatbot";
-import { Logo } from "@/components/layout/logo";
-
-const stats = [
-  { label: "Active Projects", value: 6 },
-  { label: "Deployments", value: 47 },
-  { label: "Global Visitors", value: "35.2K" },
-  { label: "Enterprise Clients", value: 12 },
-  { label: "GitHub Stars", value: 1316 },
-  { label: "Contributors", value: 8 },
-];
-
-function StatItem({ label, value }: { label: string; value: string | number }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
-  const displayValue = useCounter(isInView ? value : 0, 2000);
-
-  return (
-    <div ref={ref} className="flex flex-col items-center justify-center p-6 text-center border border-glass-border rounded-2xl bg-glass-bg backdrop-blur-xl hover:border-glass-border-hover transition-all shadow-xl group">
-      <div className="text-4xl md:text-5xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-br from-text-primary via-text-primary/90 to-text-secondary group-hover:scale-105 transition-transform mb-2">
-        {displayValue}
-      </div>
-      <div className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
-        {label}
-      </div>
-    </div>
-  );
-}
+import { Centerpiece } from "@/components/home/centerpiece";
+import { MacosDashboard } from "@/components/home/macos-dashboard";
+import { AiRaycastPanel } from "@/components/home/ai-raycast-panel";
+import { useCounter } from "@/hooks/use-counter";
 
 export default function HomePage() {
-  const projects = useProjects();
-  const featuredProjects = projects.slice(0, 4);
+  const [bootStep, setBootStep] = useState(0);
+  const bootMessages = [
+    "Connecting to Criska edge...",
+    "Loading Kiwik.1 core projects...",
+    "Synchronizing workspace telemetry...",
+    "Vercel serverless deployments ready...",
+    "Kiwik OS v1.0.0-beta ONLINE."
+  ];
 
   useEffect(() => {
+    // Record visitor session
     fetch("/api/visitors", { method: "POST" }).catch((err) =>
       console.error("Error logging visitor session", err)
     );
+
+    // Boot terminal sequence animation
+    const interval = setInterval(() => {
+      setBootStep((prev) => {
+        if (prev < bootMessages.length - 1) return prev + 1;
+        clearInterval(interval);
+        return prev;
+      });
+    }, 1500);
+
+    return () => clearInterval(interval);
   }, []);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.15 }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } }
-  };
-
   return (
-    <div className="min-h-screen text-text-primary overflow-x-hidden">
-      <AuroraBackground intensity="high" />
+    <div className="min-h-screen text-text-primary overflow-x-hidden relative">
+      <AuroraBackground intensity="medium" />
 
-      {/* Hero Section */}
-      <section className="relative min-h-[90svh] flex flex-col items-center justify-center pt-28 pb-16 px-4 sm:px-6 md:px-8">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="relative z-10 flex flex-col items-center text-center max-w-5xl mx-auto"
-        >
-          {/* Version Badge */}
-          <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-glass-bg border border-glass-border backdrop-blur-xl mb-8 shadow-xl">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span className="text-xs font-mono font-medium text-text-primary">
-              Kiwik.1 v1.0.0-beta • Next.js 15 & React 19 Engine
-            </span>
-          </motion.div>
-
-          {/* Main Logo Image */}
-          <motion.div
-            variants={itemVariants}
-            animate={{ y: [0, -8, 0] }}
-            transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
-            className="w-24 h-24 mb-4 flex items-center justify-center filter drop-shadow-lg"
+      {/* Hero Section: Full Viewport 12-Column Layout */}
+      <section className="relative min-h-[95svh] flex items-center pt-28 pb-12 px-4 sm:px-6 md:px-8 max-w-[1400px] mx-auto overflow-visible">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          
+          {/* LEFT PANEL: Cinematic Headline & Call-to-Actions */}
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="col-span-1 lg:col-span-6 flex flex-col justify-center space-y-6 text-left"
           >
-            <img src="/logo.png" alt="Kiwik Logo" className="w-full h-full object-contain" style={{ imageRendering: "auto" }} />
-          </motion.div>
-
-          {/* Main Title */}
-          <motion.h1
-            variants={itemVariants}
-            className="text-6xl sm:text-7xl md:text-9xl font-serif font-semibold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-b from-text-primary via-text-primary/95 to-text-secondary"
-          >
-            Kiwik.1
-          </motion.h1>
-
-          {/* Tagline */}
-          <motion.p
-            variants={itemVariants}
-            className="text-lg sm:text-2xl text-text-secondary font-medium mb-8 max-w-3xl leading-relaxed"
-          >
-            The Operating System of Criska Projects. Designed with linear precision, cinematic glassmorphism, and enterprise-grade architecture.
-          </motion.p>
-
-          {/* Action CTA Buttons */}
-          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-4 mb-12">
-            <Link
-              href="/projects"
-              className="flex items-center gap-2 px-8 py-4 rounded-xl bg-accent-blue text-white font-bold hover:bg-blue-600 transition-all active:scale-95 shadow-lg shadow-blue-500/25"
-            >
-              Explore Projects
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href="/admin"
-              className="flex items-center gap-2 px-8 py-4 rounded-xl bg-glass-bg border border-glass-border font-bold hover:bg-glass-bg-hover transition-all active:scale-95 backdrop-blur-xl text-text-primary"
-            >
-              <Layers className="w-5 h-5 text-emerald-400" />
-              Open Admin CMS
-            </Link>
-          </motion.div>
-
-          {/* Interactive Cockpit Window */}
-          <motion.div variants={itemVariants} className="w-full">
-            <HeroCockpit />
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* Live Metrics Ticker Section */}
-      <section className="py-12 md:py-20 px-4 sm:px-6 md:px-8 relative z-10 border-t border-b border-glass-border bg-glass-bg backdrop-blur-md">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {stats.map((stat, i) => (
-              <StatItem key={i} label={stat.label} value={stat.value} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Bento Grid 2.0 Superpowers Section */}
-      <section className="relative z-10">
-        <BentoGrid />
-      </section>
-
-      {/* Tech Ecosystem Radar */}
-      <section className="relative z-10 bg-bg-secondary/40 border-t border-b border-divider">
-        <TechRadar />
-      </section>
-
-      {/* Featured Showcase Section */}
-      <section className="py-20 md:py-28 px-4 sm:px-6 md:px-8 relative z-10 overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-12 gap-4">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-2">
-                <Sparkles className="w-3.5 h-3.5" /> Handcrafted Works
-              </div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-semibold text-text-primary">Featured Showcase</h2>
+            {/* Version Pill Badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-glass-bg border border-glass-border shadow-sm w-fit select-none">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent-blue animate-pulse" />
+              <span className="text-[10px] font-mono font-bold text-text-secondary uppercase tracking-wider">
+                Kiwik.1 v1.0.0-beta
+              </span>
             </div>
 
-            <Link
-              href="/projects"
-              className="flex items-center gap-2 text-text-secondary hover:text-accent-blue transition-colors font-semibold text-sm"
+            {/* Title Header with animated gradients */}
+            <h1 className="text-4xl sm:text-5xl md:text-[62px] font-serif font-semibold leading-[1.08] tracking-tight text-text-primary">
+              The Operating System <br />
+              for <span className="bg-clip-text text-transparent bg-gradient-to-r from-accent-blue via-indigo-500 to-accent-cyan bg-[size:200%_auto] animate-[aurora-text_6s_linear_infinite] font-serif font-bold italic">Digital Products.</span>
+            </h1>
+
+            {/* Paragraph Description */}
+            <p className="text-sm md:text-base text-text-secondary leading-relaxed font-medium max-w-[480px]">
+              Build. Ship. Document. Scale. Everything.
+              Unified workspace for projects, documentation, deployments, analytics, and AI assistant layers.
+            </p>
+
+            {/* Primary & Secondary Action CTAs */}
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <Link 
+                href="/projects" 
+                className="flex items-center gap-2 px-6 py-3 text-xs font-semibold rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 border border-neutral-800 dark:border-white/20 shadow-md hover:scale-102 transition-all duration-300"
+              >
+                Explore Projects
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+              <button 
+                onClick={() => window.dispatchEvent(new CustomEvent("toggle-command-palette"))}
+                className="flex items-center gap-2 px-6 py-3 text-xs font-semibold rounded-full bg-glass-bg hover:bg-glass-bg-hover border border-glass-border shadow-sm transition-all duration-300"
+              >
+                <Play className="w-3.5 h-3.5 text-accent-blue fill-accent-blue/20" />
+                Watch Overview
+              </button>
+            </div>
+
+            {/* Core telemetry stats list */}
+            <div className="grid grid-cols-4 gap-3 pt-8 border-t border-divider/60 max-w-[500px]">
+              {[
+                { val: "24+", label: "Projects" },
+                { val: "1.2M+", label: "Visitors" },
+                { val: "99.9%", label: "Uptime" },
+                { val: "42ms", label: "Response" }
+              ].map((st, i) => (
+                <div key={i} className="text-left select-none">
+                  <div className="text-sm sm:text-base font-bold text-text-primary tracking-tight font-mono">
+                    {st.val}
+                  </div>
+                  <div className="text-[9px] text-text-secondary uppercase tracking-widest font-bold mt-0.5">
+                    {st.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* RIGHT PANEL: Centerpiece and Floating Boot Terminal */}
+          <div className="col-span-1 lg:col-span-6 flex flex-col items-center justify-center relative min-h-[460px] overflow-visible">
+            {/* Holographic Centerpiece */}
+            <Centerpiece />
+
+            {/* Dark glass boot terminal overlay */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              className="absolute bottom-[-10px] right-2 sm:right-6 w-[230px] rounded-xl bg-black/85 border border-white/10 p-3.5 shadow-2xl font-mono text-[9px] text-emerald-400/90 leading-relaxed text-left z-30 select-none shadow-emerald-950/20"
             >
-              View All Projects <ArrowRight className="w-4 h-4" />
-            </Link>
+              <div className="flex items-center gap-1.5 border-b border-white/10 pb-1.5 mb-2 text-white/50 select-none">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500/80" />
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500/80" />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80" />
+                <span className="ml-1 text-[8px]">kiwik-os-boot.sh</span>
+              </div>
+
+              <div className="space-y-1 min-h-[70px]">
+                {bootMessages.slice(0, bootStep + 1).map((msg, i) => (
+                  <div key={i} className={cn(
+                    i === bootStep && bootStep < bootMessages.length - 1 ? "animate-pulse" : "",
+                    i === bootMessages.length - 1 ? "text-accent-cyan font-bold" : ""
+                  )}>
+                    {i === bootMessages.length - 1 ? "✔" : "●"} {msg}
+                  </div>
+                ))}
+              </div>
+            </motion.div>
           </div>
 
-          {/* Cards Carousel */}
-          <div className="flex overflow-x-auto pb-8 -mx-4 px-4 snap-x snap-mandatory hide-scrollbar gap-6">
-            {featuredProjects.map((project) => (
-              <div key={project.id} className="flex-none w-[85vw] sm:w-[380px] h-[480px] snap-center">
-                <ProjectCard project={project} />
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
-      <AIChatbot />
+      {/* LOWER GRID SECTION: macOS Control Dashboard & Raycast AI Panel */}
+      <section className="relative z-20 py-8 px-4 sm:px-6 md:px-8 max-w-[1400px] mx-auto">
+        <div className="flex flex-col xl:flex-row gap-6 items-stretch justify-center">
+          {/* Interactive Desktop Workspace Dashboard */}
+          <div className="flex-1">
+            <MacosDashboard />
+          </div>
+
+          {/* Floating Raycast AI side panel */}
+          <div className="xl:mt-12 flex-shrink-0">
+            <AiRaycastPanel />
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
