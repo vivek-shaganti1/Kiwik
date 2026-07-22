@@ -66,7 +66,7 @@ export const GlassButton = forwardRef<HTMLButtonElement, GlassButtonProps>(
     };
 
     const variantClasses = {
-      primary: "bg-accent-blue text-white border border-white/20 shadow-md shadow-blue-500/10 hover:bg-blue-600 transition-colors shadow-md hover:shadow-lg [box-shadow:inset_0_1px_0_rgba(255,255,255,0.25)]",
+      primary: "bg-neutral-950 text-white hover:bg-neutral-800 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100 transition-colors shadow-md border border-black/10 dark:border-white/10",
       secondary: "glass glass-noise hover:bg-glass-bg-hover border border-glass-border text-text-primary shadow-sm hover:shadow-md [box-shadow:inset_0_1px_0_rgba(255,255,255,0.05)]",
       ghost: "hover:bg-glass-bg-hover text-text-primary",
     };
