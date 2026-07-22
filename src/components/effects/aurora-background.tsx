@@ -49,28 +49,28 @@ export function AuroraBackground({ intensity = "medium", className }: AuroraBack
   return (
     <div className={cn("fixed inset-0 overflow-hidden pointer-events-none z-[-1]", className)}>
       <div className={cn("absolute inset-0 filter blur-[80px]", intensityOpacity[intensity])}>
-        {/* Blob 1 */}
+        {/* Blob 1 - Rich Teal/Cyan Wave */}
         <motion.div
           style={{ x: parallaxX1, y: parallaxY1 }}
-          className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[var(--accent)] mix-blend-screen opacity-60 animate-aurora-blob will-change-transform"
+          className="absolute top-[-15%] left-[-15%] w-[70%] h-[70%] rounded-full bg-gradient-to-br from-teal-400/30 via-cyan-500/25 to-blue-600/20 mix-blend-screen opacity-70 animate-aurora-blob will-change-transform"
         />
-        {/* Blob 2 */}
+        {/* Blob 2 - Deep Royal Blue Wave */}
         <motion.div
-          style={{ x: parallaxX2, y: parallaxY2, animationDelay: "2s" }}
-          className="absolute top-[20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-blue-500/40 mix-blend-screen opacity-50 animate-aurora-blob-alt will-change-transform"
+          style={{ x: parallaxX2, y: parallaxY2, animationDelay: "2.5s" }}
+          className="absolute top-[15%] right-[-15%] w-[80%] h-[80%] rounded-full bg-gradient-to-bl from-blue-500/25 via-indigo-600/20 to-cyan-400/15 mix-blend-screen opacity-65 animate-aurora-blob-alt will-change-transform"
         />
-        {/* Blob 3 */}
+        {/* Blob 3 - Radiant Violet Wave */}
         <motion.div
-          style={{ x: parallaxX1, y: parallaxY2, animationDelay: "4s" }}
-          className="absolute bottom-[-20%] left-[20%] w-[40%] h-[40%] rounded-full bg-purple-500/40 mix-blend-screen opacity-70 animate-aurora-blob will-change-transform"
+          style={{ x: parallaxX1, y: parallaxY2, animationDelay: "4.5s" }}
+          className="absolute bottom-[-25%] left-[15%] w-[60%] h-[60%] rounded-full bg-gradient-to-tr from-indigo-500/20 via-purple-600/25 to-pink-500/15 mix-blend-screen opacity-75 animate-aurora-blob will-change-transform"
         />
-        {/* Blob 4 */}
+        {/* Blob 4 - Ambient Gold/Cyan Accent */}
         <motion.div
-          style={{ x: parallaxX2, y: parallaxY1, animationDelay: "6s" }}
-          className="absolute bottom-[10%] right-[10%] w-[30%] h-[30%] rounded-full bg-[var(--accent)] mix-blend-screen opacity-40 animate-aurora-blob-alt will-change-transform"
+          style={{ x: parallaxX2, y: parallaxY1, animationDelay: "6.5s" }}
+          className="absolute bottom-[5%] right-[5%] w-[50%] h-[50%] rounded-full bg-gradient-to-r from-cyan-500/20 via-blue-400/15 to-teal-500/20 mix-blend-screen opacity-55 animate-aurora-blob-alt will-change-transform"
         />
       </div>
-      <div className="absolute inset-0 glass-noise opacity-30" />
+      <div className="absolute inset-0 glass-noise opacity-20" />
     </div>
   );
 }
