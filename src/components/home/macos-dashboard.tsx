@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Folder, 
@@ -20,6 +21,7 @@ import {
   Code2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useProjects } from "@/stores/projects-store";
 
 type SidebarTab = "overview" | "projects" | "docs" | "analytics" | "ai" | "settings";
 
@@ -51,52 +53,28 @@ export function MacosDashboard() {
     return () => window.removeEventListener("switch-dashboard-tab", handleSwitchTab);
   }, []);
 
-  const projects: DashboardProject[] = [
-    {
-      name: "Criska AI",
-      tagline: "State-of-the-art AI orchestration platform.",
-      status: "live",
-      percent: 100,
-      category: "ai",
-      image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80",
-      tech: ["Next.js", "TypeScript", "Tailwind CSS"],
-      github: "https://github.com",
-      liveUrl: "https://vercel.app"
-    },
-    {
-      name: "InterviewAI",
-      tagline: "SaaS automation workflow engine.",
-      status: "live",
-      percent: 95,
-      category: "saas",
-      image: "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=400&q=80",
-      tech: ["React", "Prisma", "PostgreSQL"],
-      github: "https://github.com",
-      liveUrl: "https://vercel.app"
-    },
-    {
-      name: "RAN Fitness",
-      tagline: "Real-time edge telemetry application.",
-      status: "live",
-      percent: 92,
-      category: "mobile",
-      image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=400&q=80",
-      tech: ["TypeScript", "Next.js", "Prisma"],
-      github: "https://github.com",
-      liveUrl: "https://vercel.app"
-    },
-    {
-      name: "Trading AI",
-      tagline: "Algorithmic execution control script.",
-      status: "beta",
-      percent: 89,
-      category: "ml",
-      image: "https://images.unsplash.com/photo-1642790106117-e829e14a795f?auto=format&fit=crop&w=400&q=80",
-      tech: ["React", "PostgreSQL", "Vercel"],
-      github: "https://github.com",
-      liveUrl: "https://vercel.app"
-    }
-  ];
+  const storeProjects = useProjects();
+
+  const getProjectImage = (slug: string) => {
+    if (slug === 'kiwik') return "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80";
+    if (slug === 'criska-cloud' || slug === 'criskacloud') return "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=400&q=80";
+    if (slug === 'criska-ai' || slug === 'criskaai') return "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=400&q=80";
+    return "https://images.unsplash.com/photo-1642790106117-e829e14a795f?auto=format&fit=crop&w=400&q=80";
+  };
+
+  const projects = storeProjects.map(p => ({
+    id: p.id,
+    slug: p.slug,
+    name: p.name,
+    tagline: p.tagline || p.description,
+    status: (p.status === "completed" ? "live" : "beta") as "live" | "beta" | "in-progress",
+    percent: p.completionPercent || 100,
+    category: p.category,
+    image: getProjectImage(p.slug),
+    tech: p.techStack ? p.techStack.map(t => t.name).slice(0, 3) : ["React", "TypeScript", "Next.js"],
+    github: p.githubUrl,
+    liveUrl: p.liveUrl
+  }));
 
   const filteredProjects = projects.filter(p => 
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -232,18 +210,19 @@ export function MacosDashboard() {
                 >
                   <div className="flex items-center justify-between">
                     <h2 className="text-sm font-mono uppercase tracking-widest text-text-secondary font-bold">Featured Projects</h2>
-                    <span className="text-xs text-accent-blue hover:underline cursor-pointer flex items-center gap-1 font-semibold">
+                    <Link href="/projects" className="text-xs text-accent-blue hover:underline cursor-pointer flex items-center gap-1 font-semibold">
                       View All <ChevronRight className="w-3 h-3" />
-                    </span>
+                    </Link>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                     {filteredProjects.map((p) => {
                       const fav = favorites.includes(p.name);
                       return (
-                        <div 
-                          key={p.name} 
-                          className="vision-glass border border-white/50 bg-white/45 dark:bg-bg-secondary/40 rounded-2xl overflow-hidden hover:border-accent-blue/35 transition-all group flex flex-col"
+                        <Link 
+                          key={p.id} 
+                          href={`/projects/${p.slug}`}
+                          className="vision-glass border border-white/50 bg-white/45 dark:bg-bg-secondary/40 rounded-2xl overflow-hidden hover:border-accent-blue/35 transition-all group flex flex-col cursor-pointer"
                         >
                           {/* Image area */}
                           <div className="relative h-28 overflow-hidden border-b border-divider">
@@ -258,7 +237,11 @@ export function MacosDashboard() {
 
                             {/* Favorite Button */}
                             <button 
-                              onClick={() => toggleFavorite(p.name)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                toggleFavorite(p.name);
+                              }}
                               className="absolute top-2 right-2 p-1.5 rounded-full bg-glass-bg border border-glass-border hover:bg-glass-bg-hover text-text-secondary transition-colors"
                             >
                               <Heart className={cn("w-3 h-3", fav ? "fill-rose-500 text-rose-500" : "text-text-secondary")} />
@@ -277,7 +260,7 @@ export function MacosDashboard() {
                               <span className="text-accent-blue">{p.percent}%</span>
                             </div>
                           </div>
-                        </div>
+                        </Link>
                       );
                     })}
                   </div>
