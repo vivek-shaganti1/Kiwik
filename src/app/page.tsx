@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowRight, 
   Layers, 
@@ -31,6 +31,7 @@ import { GlassCard } from "@/components/glass/glass-card";
 
 export default function HomePage() {
   const [bootStep, setBootStep] = useState(0);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const projects = useProjects();
   
   // Dynamic Projects loaded from the CMS database store to reflect edits immediately
@@ -66,23 +67,8 @@ export default function HomePage() {
     <div className="min-h-screen text-text-primary overflow-x-hidden relative">
       <AuroraBackground intensity="medium" />
 
-      {/* Top Banner highlight space decoration */}
-      <div className="pt-24 flex justify-center px-4 w-full">
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="vision-glass border border-white/40 dark:border-white/10 px-5 py-2 rounded-full text-[11px] font-bold text-text-primary shadow-sm tracking-tight flex items-center gap-2 group cursor-pointer"
-          onClick={() => window.dispatchEvent(new CustomEvent("toggle-command-palette"))}
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-accent-blue animate-pulse" />
-          <span>✨ Introducing Kiwik.1: The digital command center for all Criska projects. Press ⌘K anywhere to query docs.</span>
-          <ArrowUpRight className="w-3 h-3 text-text-secondary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-        </motion.div>
-      </div>
-
       {/* Hero Section: Full Viewport 12-Column Layout */}
-      <section className="relative min-h-[85svh] flex items-center pt-10 pb-12 px-4 sm:px-6 md:px-8 max-w-[1400px] mx-auto overflow-visible">
+      <section className="relative min-h-[85svh] flex items-center pt-28 pb-12 px-4 sm:px-6 md:px-8 max-w-[1400px] mx-auto overflow-visible">
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* LEFT PANEL: Headline & Call-to-Actions */}
@@ -122,7 +108,7 @@ export default function HomePage() {
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
               <button 
-                onClick={() => window.dispatchEvent(new CustomEvent("toggle-command-palette"))}
+                onClick={() => setIsVideoModalOpen(true)}
                 className="flex items-center gap-2 px-6 py-3 text-xs font-semibold rounded-full bg-glass-bg hover:bg-glass-bg-hover border border-glass-border shadow-sm transition-all duration-300"
               >
                 <Play className="w-3.5 h-3.5 text-accent-blue fill-accent-blue/20" />
@@ -344,6 +330,71 @@ export default function HomePage() {
 
       {/* Floating AI voice search assistant */}
       <AIChatbot />
+
+      {/* Interactive macOS styled Video Demo Modal */}
+      <AnimatePresence>
+        {isVideoModalOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
+            onClick={() => setIsVideoModalOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              className="vision-glass w-full max-w-3xl rounded-2xl overflow-hidden border border-white/20 dark:border-white/10 shadow-2xl flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header bar chrome */}
+              <div className="px-4 py-3 bg-bg-secondary/40 border-b border-divider flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <span onClick={() => setIsVideoModalOpen(false)} className="w-3 h-3 rounded-full bg-rose-500 cursor-pointer hover:opacity-85" />
+                  <span className="w-3 h-3 rounded-full bg-amber-500" />
+                  <span className="w-3 h-3 rounded-full bg-emerald-500" />
+                </div>
+                <span className="text-[10px] font-mono text-text-secondary uppercase tracking-widest font-bold">
+                  Kiwik.1 Video Overview
+                </span>
+                <span className="w-10" />
+              </div>
+
+              {/* simulated video contents */}
+              <div className="relative aspect-video bg-neutral-950 flex flex-col items-center justify-center p-8 select-none">
+                <div className="absolute inset-0 bg-radial-[circle_at_center,rgba(59,130,246,0.15)_0%,transparent_70%]" />
+                
+                {/* Simulated visual timeline waves */}
+                <div className="flex items-end gap-1.5 h-32 mb-6">
+                  {[40, 60, 45, 90, 75, 50, 110, 85, 60, 130, 95, 70, 120, 150, 80, 100, 50, 40].map((h, i) => (
+                    <motion.div
+                      key={i}
+                      animate={{ height: [h * 0.4, h, h * 0.4] }}
+                      transition={{
+                        repeat: Infinity,
+                        duration: 1.5 + (i % 3) * 0.3,
+                        ease: "easeInOut"
+                      }}
+                      className="w-2 bg-accent-blue/80 rounded-full"
+                      style={{ height: h }}
+                    />
+                  ))}
+                </div>
+
+                <div className="relative z-10 text-center space-y-2">
+                  <h3 className="text-sm font-bold text-white font-mono">
+                    System Telemetry Diagnostic Playback
+                  </h3>
+                  <p className="text-xs text-neutral-400 font-mono">
+                    All pipelines synchronized. Real-time edge latency stable at 14ms.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
