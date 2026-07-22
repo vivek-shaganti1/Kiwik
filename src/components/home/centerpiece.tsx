@@ -143,9 +143,9 @@ export function Centerpiece() {
     <div className="relative w-full max-w-[720px] h-[520px] mx-auto flex items-center justify-center select-none overflow-visible">
       {/* Background Orbits & Particle Lines */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="50%" cy="50%" rx="290" ry="145" fill="none" stroke="currentColor" strokeWidth="1" className="text-slate-800/12 dark:text-white/25" />
-        <ellipse cx="50%" cy="50%" rx="250" ry="195" fill="none" stroke="currentColor" strokeWidth="1" className="text-slate-800/12 dark:text-white/25" strokeDasharray="4 4" />
-        <ellipse cx="50%" cy="50%" rx="190" ry="255" fill="none" stroke="currentColor" strokeWidth="1" className="text-slate-800/12 dark:text-white/25" />
+        <ellipse cx="50%" cy="50%" rx="290" ry="145" fill="none" stroke="currentColor" strokeWidth="1" className="text-black/20 dark:text-white/45" />
+        <ellipse cx="50%" cy="50%" rx="250" ry="195" fill="none" stroke="currentColor" strokeWidth="1" className="text-black/20 dark:text-white/45" strokeDasharray="4 4" />
+        <ellipse cx="50%" cy="50%" rx="190" ry="255" fill="none" stroke="currentColor" strokeWidth="1" className="text-black/20 dark:text-white/45" />
         
         {/* Glowing Orbs Particle Paths */}
         <circle r="3.5" fill="rgba(59, 130, 246, 0.55)" className="shadow-lg">

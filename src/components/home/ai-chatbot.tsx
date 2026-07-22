@@ -306,34 +306,36 @@ export function AIChatbot() {
   return (
     <>
       {/* Floating Chat Trigger Button */}
-      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
-        <AnimatePresence>
-          {!isOpen && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              className="px-4 py-2.5 rounded-full bg-glass-bg border border-glass-border shadow-xl backdrop-blur-xl text-xs font-semibold text-text-primary flex items-center gap-2 cursor-pointer hover:bg-glass-bg-hover transition-colors"
+      <div className="fixed bottom-6 right-6 z-50">
+        <AnimatePresence mode="wait">
+          {!isOpen ? (
+            <motion.button
+              key="chat-trigger-pill"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 15 }}
+              transition={{ duration: 0.2 }}
               onClick={() => setIsOpen(true)}
+              className="px-5 py-3 rounded-full bg-glass-bg border border-glass-border shadow-2xl backdrop-blur-2xl text-xs font-bold text-text-primary flex items-center gap-2.5 cursor-pointer hover:bg-glass-bg-hover transition-all active:scale-95 [box-shadow:0_12px_40px_rgba(0,0,0,0.15)]"
             >
-              <Sparkles className="w-3.5 h-3.5 text-accent-blue animate-pulse" />
+              <Sparkles className="w-4 h-4 text-indigo-500 dark:text-accent-blue animate-pulse" />
               <span>Ask Kiwik AI</span>
-            </motion.div>
+            </motion.button>
+          ) : (
+            <motion.button
+              key="chat-close-circle"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setIsOpen(false)}
+              className="p-3.5 rounded-full bg-rose-500 hover:bg-rose-600 text-white shadow-2xl transition-all active:scale-95 flex items-center justify-center border border-rose-500/20 cursor-pointer"
+              aria-label="Close AI Assistant"
+            >
+              <X className="w-5 h-5" />
+            </motion.button>
           )}
         </AnimatePresence>
-
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className={cn(
-            "p-4 rounded-full shadow-2xl transition-all active:scale-95 flex items-center justify-center border",
-            isOpen
-              ? "bg-rose-500 hover:bg-rose-600 text-white border-rose-500/20"
-              : "bg-accent-blue hover:bg-blue-600 text-white border-blue-500/20"
-          )}
-          aria-label="Toggle AI Assistant"
-        >
-          {isOpen ? <X className="w-6 h-6" /> : <MessageSquare className="w-6 h-6" />}
-        </button>
       </div>
 
       {/* Chat Window Panel */}
