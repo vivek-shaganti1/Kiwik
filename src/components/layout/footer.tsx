@@ -74,19 +74,19 @@ export function Footer() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      className="w-full mt-20 pt-16 pb-8 px-4 sm:px-6 md:px-8 border-t border-divider bg-[#06070a]/90 dark:bg-[#06070a]/95 text-slate-300 relative z-20 backdrop-blur-md"
+      className="w-full mt-20 pt-16 pb-8 px-4 sm:px-6 md:px-8 border-t border-slate-300/40 dark:border-white/10 bg-[#f2f5f9]/90 dark:bg-[#06070a]/95 text-slate-600 dark:text-slate-300 relative z-20 backdrop-blur-md transition-colors"
     >
       <div className="max-w-[1400px] mx-auto">
         
         {/* Newsletter Banner */}
-        <div className="p-6 md:p-8 rounded-2xl bg-white/5 border border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 mb-16 shadow-inner relative overflow-hidden backdrop-blur-2xl">
+        <div className="p-6 md:p-8 rounded-2xl bg-neutral-200/50 dark:bg-white/5 border border-slate-300/40 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 mb-16 shadow-inner relative overflow-hidden backdrop-blur-2xl">
           <div className="flex items-center gap-4 text-left mr-auto">
-            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-accent-blue shrink-0">
-              <Mail className="w-5 h-5 text-indigo-400" />
+            <div className="p-3.5 rounded-2xl bg-white/5 border border-slate-300/40 dark:border-white/10 text-accent-blue shrink-0">
+              <Mail className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
             </div>
             <div>
-              <h4 className="text-base font-bold text-white tracking-tight">Stay in the Loop</h4>
-              <p className="text-slate-400 text-xs mt-1 max-w-md">
+              <h4 className="text-base font-bold text-slate-800 dark:text-white tracking-tight">Stay in the Loop</h4>
+              <p className="text-slate-500 dark:text-slate-400 text-xs mt-1 max-w-md font-semibold">
                 Get product updates, launch notes, and insights directly in your inbox.
               </p>
             </div>
@@ -94,126 +94,139 @@ export function Footer() {
 
           <form onSubmit={handleSubscribe} className="flex items-center gap-3 w-full md:w-auto relative min-w-full sm:min-w-[360px] md:min-w-[400px]">
             <div className="relative flex-1">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
               <input
                 type="email"
                 required
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-full bg-white/5 border border-white/10 focus:outline-none focus:border-indigo-500 text-xs font-semibold text-white placeholder:text-slate-500"
+                className="w-full pl-10 pr-4 py-2.5 rounded-full bg-white/80 dark:bg-white/5 border border-slate-300/60 dark:border-white/10 focus:outline-none focus:border-indigo-500 text-xs font-semibold text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-sm"
               />
             </div>
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold transition-all shadow-md shadow-indigo-500/10 shrink-0"
+              className="px-6 py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold transition-all shadow-md shadow-indigo-500/10 shrink-0 cursor-pointer"
             >
               {subscribed ? "Subscribed!" : "Subscribe"}
             </button>
           </form>
         </div>
 
-        {/* Main Sitemap Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-10 xl:gap-8 pb-14 border-b border-white/10">
+        {/* Main Sitemap Grid (xl:grid-cols-7 resolves column wrapping) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-10 xl:gap-6 pb-14 border-b border-slate-300/40 dark:border-white/10">
           
           {/* Brand block (Col 1 & Col 2 span) */}
-          <div className="md:col-span-2 space-y-5 text-left pr-4">
+          <div className="md:col-span-3 xl:col-span-2 space-y-5 text-left pr-4">
             <div className="flex items-center gap-2">
-              <span className="text-lg font-serif font-bold text-white tracking-tight">Kiwik.1</span>
+              <span className="text-lg font-serif font-bold text-slate-800 dark:text-white tracking-tight">Kiwik.1</span>
             </div>
-            <p className="text-slate-400 text-xs leading-relaxed max-w-sm">
+            <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed max-w-sm font-semibold">
               The operating system for digital products. Build, ship, document, and scale your ideas with engineering excellence.
             </p>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono font-bold tracking-tight">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-mono font-bold tracking-tight">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>All Systems Operational</span>
             </div>
 
             {/* Social Icons row */}
             <div className="flex items-center gap-3 pt-2">
-              <Link href="https://github.com/criska" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+              <Link href="https://github.com/criska" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
                 <GithubIcon className="w-4 h-4" />
               </Link>
-              <Link href="https://x.com/criska" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+              <Link href="https://x.com/criska" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
                 <XIcon className="w-4 h-4" />
               </Link>
-              <Link href="https://discord.gg/criska" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+              <Link href="https://discord.gg/criska" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
                 <DiscordIcon className="w-4 h-4" />
               </Link>
-              <Link href="https://linkedin.com" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+              <Link href="https://linkedin.com" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
                 <LinkedInIcon className="w-4 h-4" />
               </Link>
-              <Link href="https://youtube.com" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+              <Link href="https://youtube.com" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
                 <YoutubeIcon className="w-4 h-4" />
               </Link>
             </div>
           </div>
 
           {/* Product links list */}
-          <div className="text-left space-y-3.5">
-            <h5 className="text-[11px] font-mono tracking-widest text-white uppercase font-bold">Product</h5>
-            <ul className="space-y-2 text-xs font-semibold text-slate-400">
-              <li><Link href="/projects" className="hover:text-white transition-colors">Projects</Link></li>
-              <li><Link href="#macos-dashboard-widget" className="hover:text-white transition-colors">Documentation</Link></li>
-              <li><Link href="#capabilities-section" className="hover:text-white transition-colors">Capabilities</Link></li>
-              <li><span className="opacity-45 cursor-not-allowed">Integrations</span></li>
-              <li><span className="opacity-45 cursor-not-allowed">Changelog</span></li>
-              <li><span className="opacity-45 cursor-not-allowed">Roadmap</span></li>
+          <div className="text-left space-y-3.5 col-span-1">
+            <h5 className="text-[11px] font-mono tracking-widest text-slate-900 dark:text-white uppercase font-bold">Product</h5>
+            <ul className="space-y-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+              <li><Link href="/projects" className="hover:text-slate-900 dark:hover:text-white transition-colors">Projects</Link></li>
+              <li><Link href="#macos-dashboard-widget" className="hover:text-slate-900 dark:hover:text-white transition-colors">Documentation</Link></li>
+              <li><Link href="#capabilities-section" className="hover:text-slate-900 dark:hover:text-white transition-colors">Capabilities</Link></li>
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Integrations</span></li>
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Changelog</span></li>
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Roadmap</span></li>
             </ul>
           </div>
 
           {/* Resources links list */}
-          <div className="text-left space-y-3.5">
-            <h5 className="text-[11px] font-mono tracking-widest text-white uppercase font-bold">Resources</h5>
-            <ul className="space-y-2 text-xs font-semibold text-slate-400">
-              <li><span className="opacity-45 cursor-not-allowed">Guides</span></li>
-              <li><span className="opacity-45 cursor-not-allowed">API Reference</span></li>
-              <li><span className="opacity-45 cursor-not-allowed">Blog</span></li>
-              <li><span className="opacity-45 cursor-not-allowed">Showcase</span></li>
-              <li><span className="opacity-45 cursor-not-allowed">Templates</span></li>
-              <li><span className="opacity-45 cursor-not-allowed">Help Center</span></li>
+          <div className="text-left space-y-3.5 col-span-1">
+            <h5 className="text-[11px] font-mono tracking-widest text-slate-900 dark:text-white uppercase font-bold">Resources</h5>
+            <ul className="space-y-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Guides</span></li>
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">API Reference</span></li>
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Blog</span></li>
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Showcase</span></li>
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Templates</span></li>
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Help Center</span></li>
             </ul>
           </div>
 
           {/* Company links list */}
-          <div className="text-left space-y-3.5">
-            <h5 className="text-[11px] font-mono tracking-widest text-white uppercase font-bold">Company</h5>
-            <ul className="space-y-2 text-xs font-semibold text-slate-400">
-              <li><span className="opacity-45 cursor-not-allowed">About Criska</span></li>
-              <li><Link href="#timeline-section" className="hover:text-white transition-colors">How We Work</Link></li>
-              <li><span className="opacity-45 cursor-not-allowed">Careers</span></li>
-              <li><span className="opacity-45 cursor-not-allowed">Partners</span></li>
-              <li><span className="opacity-45 cursor-not-allowed">Contact Us</span></li>
-              <li><span className="opacity-45 cursor-not-allowed">Press Kit</span></li>
+          <div className="text-left space-y-3.5 col-span-1">
+            <h5 className="text-[11px] font-mono tracking-widest text-slate-900 dark:text-white uppercase font-bold">Company</h5>
+            <ul className="space-y-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">About Criska</span></li>
+              <li><Link href="#timeline-section" className="hover:text-slate-900 dark:hover:text-white transition-colors">How We Work</Link></li>
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Careers</span></li>
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Partners</span></li>
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Contact Us</span></li>
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Press Kit</span></li>
+            </ul>
+          </div>
+
+          {/* Legal links list */}
+          <div className="text-left space-y-3.5 col-span-1">
+            <h5 className="text-[11px] font-mono tracking-widest text-slate-900 dark:text-white uppercase font-bold">Legal</h5>
+            <ul className="space-y-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Privacy Policy</span></li>
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Terms of Service</span></li>
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Cookie Policy</span></li>
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Security</span></li>
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Licenses</span></li>
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Compliance</span></li>
             </ul>
           </div>
 
           {/* Get in Touch Card */}
-          <div className="p-5 rounded-2xl bg-white/5 border border-white/10 flex flex-col gap-4 text-left min-w-[245px] backdrop-blur-xl">
-            <h5 className="text-[11px] font-mono tracking-widest text-white uppercase font-bold">Get in Touch</h5>
+          <div className="p-5 rounded-2xl bg-neutral-200/40 dark:bg-white/5 border border-slate-300/50 dark:border-white/10 flex flex-col gap-4 text-left min-w-[245px] backdrop-blur-xl md:col-span-3 xl:col-span-1">
+            <h5 className="text-[11px] font-mono tracking-widest text-slate-900 dark:text-white uppercase font-bold">Get in Touch</h5>
             
             <div className="space-y-3.5">
               <div className="flex gap-2.5 items-start">
-                <Mail className="w-4 h-4 text-indigo-400 mt-0.5 shrink-0" />
+                <Mail className="w-4 h-4 text-indigo-500 dark:text-indigo-400 mt-0.5 shrink-0" />
                 <div>
-                  <a href="mailto:hello@criska.dev" className="text-xs font-bold text-slate-200 hover:text-indigo-400 transition-colors">hello@criska.dev</a>
-                  <p className="text-[10px] text-slate-500 mt-0.5 font-semibold">We usually reply within 24 hours</p>
+                  <a href="mailto:hello@criska.dev" className="text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors">hello@criska.dev</a>
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-semibold">We usually reply within 24 hours</p>
                 </div>
               </div>
 
-              <div className="flex gap-2.5 items-start border-t border-white/10 pt-3">
-                <MapPin className="w-4 h-4 text-indigo-400 mt-0.5 shrink-0" />
+              <div className="flex gap-2.5 items-start border-t border-slate-300/40 dark:border-white/10 pt-3">
+                <MapPin className="w-4 h-4 text-indigo-500 dark:text-indigo-400 mt-0.5 shrink-0" />
                 <div>
-                  <span className="text-xs font-bold text-slate-200">Criska HQ</span>
-                  <p className="text-[10px] text-slate-500 mt-0.5 font-semibold">Internet, Everywhere</p>
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-200">Criska HQ</span>
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-semibold">Internet, Everywhere</p>
                 </div>
               </div>
 
-              <div className="flex gap-2.5 items-start border-t border-white/10 pt-3">
-                <MessageSquare className="w-4 h-4 text-indigo-400 mt-0.5 shrink-0" />
+              <div className="flex gap-2.5 items-start border-t border-slate-300/40 dark:border-white/10 pt-3">
+                <MessageSquare className="w-4 h-4 text-indigo-500 dark:text-indigo-400 mt-0.5 shrink-0" />
                 <div>
-                  <span className="text-xs font-bold text-slate-200">Live Support</span>
-                  <p className="text-[10px] text-slate-500 mt-0.5 font-semibold">Available Mon - Fri, 9AM - 6PM UTC</p>
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-200">Live Support</span>
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-semibold">Available Mon - Fri, 9AM - 6PM UTC</p>
                 </div>
               </div>
             </div>
@@ -226,8 +239,8 @@ export function Footer() {
           
           {/* Copyright block */}
           <div className="text-left space-y-1 select-none">
-            <div className="text-xs font-bold text-white">© {new Date().getFullYear()} Criska. All rights reserved.</div>
-            <p className="text-[10px] text-slate-500 font-semibold leading-relaxed">
+            <div className="text-xs font-bold text-slate-800 dark:text-white">© {new Date().getFullYear()} Criska. All rights reserved.</div>
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold leading-relaxed">
               Kiwik.1 is a registered trademark of Criska. <br />
               Built with ❤️ by the Criska Engineering Team.
             </p>
@@ -238,12 +251,12 @@ export function Footer() {
             
             {/* Status metric */}
             <div className="text-left space-y-1">
-              <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400">
                 <Activity className="w-3.5 h-3.5 text-emerald-500" />
                 <span>System Status</span>
               </div>
-              <p className="text-[10px] text-slate-500 font-semibold">All services running smoothly</p>
-              <Link href="#macos-dashboard-widget" className="text-[10px] text-indigo-400 font-bold hover:underline inline-flex items-center gap-0.5">
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold">All services running smoothly</p>
+              <Link href="#macos-dashboard-widget" className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline inline-flex items-center gap-0.5">
                 <span>View status page</span>
                 <ArrowRight className="w-2.5 h-2.5" />
               </Link>
@@ -251,12 +264,12 @@ export function Footer() {
 
             {/* Performance metric */}
             <div className="text-left space-y-1">
-              <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400">
                 <Cpu className="w-3.5 h-3.5 text-amber-500" />
                 <span>Performance</span>
               </div>
-              <p className="text-[10px] text-slate-500 font-semibold">99.9% uptime this month</p>
-              <Link href="#macos-dashboard-widget" className="text-[10px] text-indigo-400 font-bold hover:underline inline-flex items-center gap-0.5">
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold">99.9% uptime this month</p>
+              <Link href="#macos-dashboard-widget" className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline inline-flex items-center gap-0.5">
                 <span>View metrics</span>
                 <ArrowRight className="w-2.5 h-2.5" />
               </Link>
@@ -264,12 +277,12 @@ export function Footer() {
 
             {/* Security metric */}
             <div className="text-left space-y-1">
-              <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400">
                 <ShieldCheck className="w-3.5 h-3.5 text-indigo-500" />
                 <span>Security</span>
               </div>
-              <p className="text-[10px] text-slate-500 font-semibold">SOC 2 Type II Compliant</p>
-              <Link href="#macos-dashboard-widget" className="text-[10px] text-indigo-400 font-bold hover:underline inline-flex items-center gap-0.5">
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold">SOC 2 Type II Compliant</p>
+              <Link href="#macos-dashboard-widget" className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline inline-flex items-center gap-0.5">
                 <span>View security</span>
                 <ArrowRight className="w-2.5 h-2.5" />
               </Link>
@@ -277,11 +290,11 @@ export function Footer() {
 
             {/* Made for developers */}
             <div className="text-left space-y-1">
-              <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
-                <Terminal className="w-3.5 h-3.5 text-indigo-400" />
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                <Terminal className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
                 <span>Made for developers</span>
               </div>
-              <p className="text-[10px] text-slate-500 font-semibold leading-relaxed">
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold leading-relaxed">
                 Designed with precision. <br />
                 Engineered for scale.
               </p>
