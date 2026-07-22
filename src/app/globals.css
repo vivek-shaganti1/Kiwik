@@ -78,27 +78,27 @@
    ═══════════════════════════════════════════════════════════════ */
 
 [data-theme="dark"] {
-  --bg-primary: #111822; /* Premium deep midnight slate */
-  --bg-secondary: #16202c; /* Lighter container slate */
-  --bg-tertiary: #1b2837; /* Elevated elements */
-  --bg-elevated: #213042;
+  --bg-primary: #06070a; /* Premium deep obsidian black */
+  --bg-secondary: #0b0c13; /* Deep obsidian indigo-violet */
+  --bg-tertiary: #11131e;
+  --bg-elevated: #171927;
 
-  --text-primary: #f8fafc; /* Crisp silver white */
-  --text-secondary: #94a3b8; /* Muted steel gray */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
   --text-tertiary: #64748b;
   --text-muted: #475569;
 
-  --glass-bg: rgba(22, 32, 44, 0.65); /* Rich matte glassmorphism */
-  --glass-bg-hover: rgba(22, 32, 44, 0.8);
-  --glass-bg-active: rgba(22, 32, 44, 0.9);
-  --glass-border: rgba(255, 255, 255, 0.09); /* Soft specular border */
-  --glass-border-hover: rgba(255, 255, 255, 0.16);
-  --glass-highlight: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 12px 40px rgba(10, 15, 25, 0.4);
-  --glass-shadow-lg: 0 24px 80px rgba(10, 15, 25, 0.65);
+  --glass-bg: rgba(11, 12, 19, 0.75); /* Rich frosted obsidian glass */
+  --glass-bg-hover: rgba(11, 12, 19, 0.85);
+  --glass-bg-active: rgba(11, 12, 19, 0.95);
+  --glass-border: rgba(255, 255, 255, 0.07);
+  --glass-border-hover: rgba(99, 102, 241, 0.35); /* Glowing indigo-violet border on hover */
+  --glass-highlight: rgba(255, 255, 255, 0.05);
+  --glass-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+  --glass-shadow-lg: 0 24px 80px rgba(0, 0, 0, 0.75);
 
-  --surface-overlay: rgba(17, 24, 34, 0.7);
-  --divider: rgba(255, 255, 255, 0.09);
+  --surface-overlay: rgba(6, 7, 10, 0.8);
+  --divider: rgba(255, 255, 255, 0.07);
 
   color-scheme: dark;
 }

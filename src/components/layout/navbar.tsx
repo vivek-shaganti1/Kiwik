@@ -24,6 +24,8 @@ export function Navbar() {
   const navItems = [
     { label: 'Home', href: '/' },
     { label: 'Projects', href: '/projects' },
+    { label: 'Capabilities', href: '/#capabilities' },
+    { label: 'How We Work', href: '/#how-we-work' },
     { label: 'Admin', href: '/admin', isBadge: true }
   ];
 
@@ -36,8 +38,8 @@ export function Navbar() {
         className={cn(
           'w-full transition-all duration-500 border border-glass-border backdrop-blur-xl flex items-center justify-between px-6 relative',
           scrolled 
-            ? 'max-w-[900px] h-[58px] rounded-full bg-glass-bg/90 shadow-lg border-white/10' 
-            : 'max-w-[1200px] h-[64px] rounded-2xl bg-glass-bg/65 shadow-md border-white/5'
+            ? 'max-w-[950px] h-[58px] rounded-full bg-glass-bg/90 shadow-lg border-white/10' 
+            : 'max-w-[1250px] h-[64px] rounded-2xl bg-glass-bg/65 shadow-md border-white/5'
         )}
       >
         {/* Left Side: Brand Logo and Title */}
@@ -66,7 +68,7 @@ export function Navbar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "relative text-xs font-semibold px-4 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5",
+                  "relative text-[11px] font-semibold px-3 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5",
                   isActive 
                     ? "text-text-primary" 
                     : "text-text-secondary hover:text-text-primary"
@@ -89,7 +91,7 @@ export function Navbar() {
         </nav>
 
         {/* Right Side: Search and ThemeSwitcher Actions */}
-        <div className="hidden md:flex items-center gap-4 relative z-10">
+        <div className="hidden md:flex items-center gap-3 relative z-10">
           <button 
             onClick={() => window.dispatchEvent(new CustomEvent("toggle-command-palette"))}
             className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-200/20 dark:bg-white/5 border border-glass-border hover:bg-neutral-200/40 dark:hover:bg-white/10 transition-all duration-300 text-xs text-text-secondary hover:text-text-primary group"
@@ -102,6 +104,13 @@ export function Navbar() {
           </button>
           
           <ThemeSwitcher />
+
+          <button
+            onClick={() => alert("Demonstration requested successfully. We will follow up shortly!")}
+            className="hidden lg:flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-accent-blue hover:bg-blue-600 text-white text-xs font-bold transition-all shadow-sm"
+          >
+            <span>Request a Demo</span>
+          </button>
         </div>
 
         {/* Mobile menu triggers */}

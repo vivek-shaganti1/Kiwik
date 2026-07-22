@@ -11,17 +11,31 @@ import {
   Activity,
   Cpu,
   Zap,
-  Globe
+  Globe,
+  Sparkles,
+  Shield,
+  Workflow,
+  Cloud,
+  CheckCircle,
+  Code,
+  ArrowUpRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AuroraBackground } from "@/components/effects/aurora-background";
 import { Centerpiece } from "@/components/home/centerpiece";
 import { MacosDashboard } from "@/components/home/macos-dashboard";
 import { AiRaycastPanel } from "@/components/home/ai-raycast-panel";
-import { useCounter } from "@/hooks/use-counter";
+import { AIChatbot } from "@/components/home/ai-chatbot";
+import { useProjects } from "@/stores/projects-store";
+import { GlassCard } from "@/components/glass/glass-card";
 
 export default function HomePage() {
   const [bootStep, setBootStep] = useState(0);
+  const projects = useProjects();
+  
+  // Dynamic Projects loaded from the CMS database store to reflect edits immediately
+  const featuredCMS = projects.slice(0, 3);
+
   const bootMessages = [
     "Connecting to Criska edge...",
     "Loading Kiwik.1 core projects...",
@@ -43,7 +57,7 @@ export default function HomePage() {
         clearInterval(interval);
         return prev;
       });
-    }, 1500);
+    }, 1200);
 
     return () => clearInterval(interval);
   }, []);
@@ -52,11 +66,26 @@ export default function HomePage() {
     <div className="min-h-screen text-text-primary overflow-x-hidden relative">
       <AuroraBackground intensity="medium" />
 
+      {/* Top Banner highlight space decoration */}
+      <div className="pt-24 flex justify-center px-4 w-full">
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="vision-glass border border-white/40 dark:border-white/10 px-5 py-2 rounded-full text-[11px] font-bold text-text-primary shadow-sm tracking-tight flex items-center gap-2 group cursor-pointer"
+          onClick={() => window.dispatchEvent(new CustomEvent("toggle-command-palette"))}
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-accent-blue animate-pulse" />
+          <span>✨ Introducing Kiwik.1: The digital command center for all Criska projects. Press ⌘K anywhere to query docs.</span>
+          <ArrowUpRight className="w-3 h-3 text-text-secondary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+        </motion.div>
+      </div>
+
       {/* Hero Section: Full Viewport 12-Column Layout */}
-      <section className="relative min-h-[95svh] flex items-center pt-28 pb-12 px-4 sm:px-6 md:px-8 max-w-[1400px] mx-auto overflow-visible">
+      <section className="relative min-h-[85svh] flex items-center pt-10 pb-12 px-4 sm:px-6 md:px-8 max-w-[1400px] mx-auto overflow-visible">
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          {/* LEFT PANEL: Cinematic Headline & Call-to-Actions */}
+          {/* LEFT PANEL: Headline & Call-to-Actions */}
           <motion.div 
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -170,6 +199,151 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ==========================================
+          BOTTOM PAGES / EXTRA VISUAL GRID SECTIONS
+          ========================================== */}
+      
+      {/* SECTION A: DYNAMIC FEATURED PRODUCTS (Editable via Admin CMS) */}
+      <section className="py-16 md:py-24 px-4 sm:px-6 md:px-8 max-w-[1400px] mx-auto relative z-20">
+        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+          <h2 className="text-3xl font-serif font-bold text-text-primary tracking-tight">
+            Explore Criska Products
+          </h2>
+          <p className="text-sm text-text-secondary leading-relaxed font-medium">
+            Understand what each product does, who it helps, its current status, and request real-time access. Fully synchronised with the Admin CMS panel.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {featuredCMS.map((p, i) => (
+            <GlassCard 
+              key={p.id} 
+              className="flex flex-col justify-between p-6 sm:p-7 border border-glass-border hover:border-accent-blue/30 transition-all select-none hover:-translate-y-1 duration-300 h-full"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-bg-secondary flex items-center justify-center border border-glass-border font-serif font-bold text-accent-blue text-xs select-none">
+                      {p.name[0]}
+                    </div>
+                    <span className="text-sm font-bold text-text-primary tracking-tight">{p.name}</span>
+                  </div>
+                  
+                  <span className={cn(
+                    "text-[8px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border",
+                    p.status === "completed" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                  )}>
+                    {p.status}
+                  </span>
+                </div>
+
+                <p className="text-xs text-text-secondary leading-relaxed font-medium mb-6">
+                  {p.tagline || p.description}
+                </p>
+
+                <div className="space-y-2 mb-6">
+                  <div className="text-[9px] font-mono font-bold text-text-muted uppercase tracking-wider">Target Domain</div>
+                  <div className="text-xs text-text-primary font-semibold capitalize flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent-blue" />
+                    {p.category} Development
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 pt-4 border-t border-divider">
+                <Link href={`/projects/${p.slug}`} className="flex-1 text-center py-2 rounded-lg bg-glass-bg hover:bg-glass-bg-hover border border-glass-border text-[10px] font-bold text-text-primary transition-all">
+                  View Product
+                </Link>
+                <button 
+                  onClick={() => alert(`Demonstration requested for: ${p.name}`)}
+                  className="flex-1 text-center py-2 rounded-lg bg-accent-blue hover:bg-blue-600 text-[10px] font-bold text-white transition-all shadow-sm"
+                >
+                  Request Demo
+                </button>
+              </div>
+            </GlassCard>
+          ))}
+        </div>
+      </section>
+
+      {/* SECTION B: HOW WE WORK (5-Step Engineering Pipeline) */}
+      <section className="py-16 md:py-24 px-4 sm:px-6 md:px-8 border-t border-divider/60 max-w-[1400px] mx-auto relative z-20">
+        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+          <span className="text-[10px] font-mono text-accent-blue uppercase tracking-widest font-bold">Execution Workflow</span>
+          <h2 className="text-3xl font-serif font-bold text-text-primary tracking-tight">How We Work</h2>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4 relative">
+          {[
+            { step: "01", title: "Discover", desc: "We understand your goals, target architecture, and edge constraints." },
+            { step: "02", title: "Design", desc: "We design high-fidelity components, micro-interactions, and interface flows." },
+            { step: "03", title: "Build", desc: "We build with extreme quality, component reusability, and Next.js static engine speeds." },
+            { step: "04", title: "Secure", desc: "We secure telemetry endpoints, Firestore rule configurations, and credentials." },
+            { step: "05", title: "Operate", desc: "We monitor production latency, optimize edge hits, and provide continuous support." }
+          ].map((item, idx) => (
+            <GlassCard key={idx} className="p-5 border border-glass-border relative hover:border-accent-blue/20 transition-all select-none">
+              <div className="text-xs font-mono font-bold text-accent-blue mb-3">{item.step}</div>
+              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-text-primary">{item.title}</h3>
+              <p className="text-[11px] text-text-secondary leading-relaxed font-medium mt-2">{item.desc}</p>
+            </GlassCard>
+          ))}
+        </div>
+      </section>
+
+      {/* SECTION C: CAPABILITIES & TRUST ASSURANCE */}
+      <section id="capabilities" className="py-16 md:py-24 px-4 sm:px-6 md:px-8 border-t border-divider/60 max-w-[1400px] mx-auto relative z-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* Capabilities Grid */}
+          <div className="lg:col-span-7 space-y-6">
+            <h2 className="text-2xl font-serif font-bold text-text-primary tracking-tight mb-6">Our Capabilities</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[
+                { title: "AI & Knowledge Systems", icon: <Sparkles className="w-4 h-4 text-purple-400" />, desc: "Semantic context vector indexing and voice voice transcription mappings." },
+                { title: "Identity & Security Services", icon: <Shield className="w-4 h-4 text-rose-400" />, desc: "Secure OAuth authorization hooks and granular serverless database access rules." },
+                { title: "Automation & Workflows", icon: <Workflow className="w-4 h-4 text-amber-400" />, desc: "Event-driven edge action pipelines and cron automation routines." },
+                { title: "Cloud & DevOps Infrastructure", icon: <Cloud className="w-4 h-4 text-accent-blue" />, desc: "High-performance CDN setups, edge caching rules, and serverless builds." }
+              ].map((cap, i) => (
+                <div key={i} className="p-4.5 rounded-2xl bg-bg-secondary/40 border border-glass-border flex gap-4 select-none">
+                  <div className="p-2 rounded-lg bg-bg-primary border border-glass-border text-text-primary flex-shrink-0 h-fit">
+                    {cap.icon}
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold text-text-primary tracking-tight leading-tight">{cap.title}</h3>
+                    <p className="text-[10px] text-text-secondary font-medium leading-relaxed mt-1">{cap.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Trust & Delivery Panel */}
+          <div className="lg:col-span-5 space-y-6">
+            <h2 className="text-2xl font-serif font-bold text-text-primary tracking-tight mb-6">Trust & Delivery</h2>
+            <GlassCard className="p-6 border border-glass-border space-y-4 select-none">
+              {[
+                { title: "Real products, real deployments", desc: "No vaporware. Complete and functional static components linked live." },
+                { title: "Security first architecture", desc: "Built-in sanitization, credentials protection, and secure data routing." },
+                { title: "Scalable systems designed for growth", desc: "Edge functions and database structures designed to handle production spikes." },
+                { title: "Ongoing support and optimization", desc: "Continuous profiling of latency, edge cache ratios, and framework migrations." }
+              ].map((item, i) => (
+                <div key={i} className="flex gap-3 text-left">
+                  <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="text-xs font-bold text-text-primary leading-tight">{item.title}</h4>
+                    <p className="text-[10px] text-text-secondary leading-relaxed mt-1 font-medium">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </GlassCard>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Floating AI voice search assistant */}
+      <AIChatbot />
     </div>
   );
 }
