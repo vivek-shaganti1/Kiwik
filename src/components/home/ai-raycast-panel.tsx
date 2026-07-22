@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Sparkles, 
@@ -10,11 +10,13 @@ import {
   FileCode, 
   MessageSquare,
   ChevronRight,
-  Terminal,
   Cpu,
-  CornerDownLeft
+  ArrowRight,
+  CornerDownLeft,
+  RefreshCw
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useProjects } from "@/stores/projects-store";
 
 interface AIAction {
   id: string;
@@ -23,10 +25,19 @@ interface AIAction {
   icon: React.ReactNode;
 }
 
+interface Message {
+  sender: "user" | "bot";
+  text: string;
+}
+
 export function AiRaycastPanel() {
-  const [activeQuery, setActiveQuery] = useState<string | null>(null);
-  const [simulatedResponse, setSimulatedResponse] = useState<string>("");
+  const [activeAction, setActiveAction] = useState<string | null>(null);
+  const [activeActionLabel, setActiveActionLabel] = useState<string>("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputVal, setInputVal] = useState("");
   const [loading, setLoading] = useState(false);
+  const projects = useProjects();
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   const actions: AIAction[] = [
     { id: "summarize", label: "Summarize Project", sublabel: "Compress README parameters", icon: <FileText className="w-3.5 h-3.5 text-accent-blue" /> },
@@ -36,34 +47,102 @@ export function AiRaycastPanel() {
     { id: "ask", label: "Ask Anything", sublabel: "Ask about Criska systems", icon: <MessageSquare className="w-3.5 h-3.5 text-cyan-400" /> }
   ];
 
-  const handleActionClick = (id: string, label: string) => {
-    setActiveQuery(label);
-    setLoading(true);
-    setSimulatedResponse("");
+  // Auto-scroll chat history
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
 
-    // Simulate AI thinking and streaming response
-    setTimeout(() => {
-      setLoading(false);
-      switch (id) {
-        case "summarize":
-          setSimulatedResponse("🤖 Kiwik.1 summaries: 6 platform projects index active. Top stats average 14ms global edge latency across 47 production deployments.");
-          break;
-        case "find_doc":
-          setSimulatedResponse("🤖 Query found: 362 documents parsed. Core frameworks listed are Next.js 16, React 19, Tailwind CSS v4, and Zustand state storage.");
-          break;
-        case "health":
-          setSimulatedResponse("🤖 Deployments check: All Vercel serverless edge nodes report 100% operational. Active edge node aliases map directly to the main production pipeline.");
-          break;
-        case "readme":
-          setSimulatedResponse("🤖 Draft generated: # Kiwik.1 OS \\n The operating control deck for all Criska ecosystem deployments. Powered by frosted glassmorphism sheets.");
-          break;
-        case "ask":
-          setSimulatedResponse("🤖 Criska AI assistant initialized. Ask about project status, team profiles, edge metrics, or system config templates!");
-          break;
-        default:
-          setSimulatedResponse("🤖 Query processed successfully.");
+  const handleActionClick = (id: string, label: string) => {
+    setActiveAction(id);
+    setActiveActionLabel(label);
+    setInputVal("");
+    
+    // Set initial custom welcome message based on selected workflow
+    let welcome = "";
+    switch (id) {
+      case "summarize":
+        welcome = "🤖 Selected: Summarize Project. Ask me about any of Criska's 6 projects (Kiwik.1, CriskaAI, CriskaCloud, CriskaPay, CriskaOS, CriskaBot) to compile a summary.";
+        break;
+      case "find_doc":
+        welcome = "🤖 Selected: Find Documentation. Ask about technical features (e.g. Next.js, Prisma, Tailwind version, or rules) to query manual logs.";
+        break;
+      case "health":
+        welcome = "🤖 Selected: Check Deployments. Current edge health: 100% operational. Ask me about serverless aliases, routing latency, or edge nodes.";
+        break;
+      case "readme":
+        welcome = "🤖 Selected: Generate README. Describe your project concept and I'll structure a custom README markdown template.";
+        break;
+      case "ask":
+      default:
+        welcome = "🤖 Selected: Ask Anything. Ask me about Criska developers, project statuses, tech stacks, or latency values!";
+        break;
+    }
+
+    setMessages([{ sender: "bot", text: welcome }]);
+  };
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputVal.trim() || loading) return;
+
+    const userText = inputVal.trim();
+    setInputVal("");
+    setMessages(prev => [...prev, { sender: "user", text: userText }]);
+    setLoading(true);
+
+    try {
+      // Fetch backend model endpoint response
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [...messages, { sender: "user", text: userText }],
+          projectsContext: projects
+        })
+      });
+
+      const data = await res.json();
+      
+      if (data.reply && !data.fallback) {
+        setMessages(prev => [...prev, { sender: "bot", text: data.reply }]);
+        setLoading(false);
+        return;
       }
-    }, 1200);
+      
+      // Intelligent fallback matching rules if no Groq API Key is set in backend
+      setTimeout(() => {
+        let reply = "";
+        const lower = userText.toLowerCase();
+
+        if (activeAction === "summarize" || lower.includes("project") || lower.includes("summar")) {
+          if (lower.includes("criskaai") || lower.includes("criska ai")) {
+            reply = "🤖 **CriskaAI Summary**:\n- **Status**: Completed (100%)\n- **Version**: v2.3.1\n- **Stack**: Next.js, Python, Tailwind\n- **Use**: State-of-the-art AI assistant orchestrator resolving file context queries.";
+          } else if (lower.includes("criskacloud") || lower.includes("criska cloud")) {
+            reply = "🤖 **CriskaCloud Summary**:\n- **Status**: Completed (100%)\n- **Version**: v3.0.0\n- **Stack**: Next.js, Prisma, Vercel Edge\n- **Use**: Managed serverless workflow execution engine and telemetry collector.";
+          } else if (lower.includes("kiwik")) {
+            reply = "🤖 **Kiwik.1 Summary**:\n- **Status**: Active Beta\n- **Version**: v1.0.0\n- **Stack**: Next.js 16, Framer Motion, Tailwind v4\n- **Use**: Frosted Glassmorphism digital control deck for all Criska projects.";
+          } else {
+            reply = "🤖 I can compile project summaries for Kiwik.1, CriskaAI, CriskaCloud, CriskaPay, CriskaOS, and CriskaBot. Which one would you like to explore?";
+          }
+        } else if (activeAction === "health" || lower.includes("deploy") || lower.includes("health") || lower.includes("latency")) {
+          reply = "🤖 **System Telemetry Logs**:\n- **Uptime**: 99.99%\n- **Average Latency**: 14ms (Frankfurt/Singapore Edge)\n- **Active CDN nodes**: 47 active serverless aliases. All routes report 100% cache execution.";
+        } else if (lower.includes("people") || lower.includes("team") || lower.includes("worked")) {
+          reply = "🤖 **Criska Dev Team**:\n- **Lead Architect**: Vivek Shaganti (Lead Product & Motion Designer)\n- **Scope**: Next.js client engineering, custom glass styling, and Firestore security configurations.";
+        } else if (lower.includes("tech") || lower.includes("stack") || lower.includes("database")) {
+          reply = "🤖 **Kiwik.1 Tech Stack**:\n- **Frontend**: Next.js 16, React 19, Tailwind CSS v4\n- **Motion**: Framer Motion spring physics\n- **Database**: Cloud Firestore, Prisma ORM, PostgreSQL\n- **Deploy**: Vercel Serverless Edge";
+        } else {
+          reply = `🤖 Chatbot context active under [${activeActionLabel}]. Ask about project metrics, team credentials, or technical documentation parameters!`;
+        }
+
+        setMessages(prev => [...prev, { sender: "bot", text: reply }]);
+        setLoading(false);
+      }, 1000);
+
+    } catch (err) {
+      console.error("Chat panel error:", err);
+      setMessages(prev => [...prev, { sender: "bot", text: "🤖 Telemetry endpoint disconnected. Please verify connection configurations." }]);
+      setLoading(false);
+    }
   };
 
   return (
@@ -84,14 +163,14 @@ export function AiRaycastPanel() {
           </div>
 
           <h3 className="text-sm font-bold text-text-primary">
-            How can I help you today?
+            {!activeAction ? "How can I help you today?" : activeActionLabel}
           </h3>
         </div>
 
         {/* Panel Main Display */}
-        <div className="flex-1 flex flex-col justify-between mt-2 gap-4">
+        <div className="flex-1 flex flex-col justify-between mt-2 gap-4 overflow-hidden">
           <AnimatePresence mode="wait">
-            {!activeQuery ? (
+            {!activeAction ? (
               // Actions list
               <motion.div 
                 key="actions-list"
@@ -124,44 +203,66 @@ export function AiRaycastPanel() {
                 ))}
               </motion.div>
             ) : (
-              // Active simulated interaction panel output
+              // ACTIVE CHAT SCREEN WINDOW
               <motion.div
-                key="response-screen"
+                key="chat-screen"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                className="flex-1 flex flex-col justify-between p-3.5 rounded-2xl bg-bg-secondary/20 border border-glass-border font-mono text-[10px] leading-relaxed relative"
+                className="flex-1 flex flex-col justify-between overflow-hidden"
               >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-text-muted pb-2 border-b border-divider/60">
-                    <span className="font-bold uppercase tracking-wider">Active Search</span>
-                    <button 
-                      onClick={() => setActiveQuery(null)}
-                      className="hover:text-text-primary font-bold uppercase transition-colors"
+                {/* Scrollable messages container */}
+                <div className="flex-1 overflow-y-auto pr-1 space-y-3 max-h-[380px] scrollbar-thin select-text">
+                  {messages.map((m, idx) => (
+                    <div 
+                      key={idx} 
+                      className={cn(
+                        "flex flex-col max-w-[85%] text-[10px] leading-relaxed p-2.5 rounded-2xl border font-mono whitespace-pre-wrap",
+                        m.sender === "user" 
+                          ? "bg-accent-blue/10 border-accent-blue/20 text-text-primary ml-auto text-right" 
+                          : "bg-bg-secondary/40 border-glass-border text-text-secondary mr-auto text-left"
+                      )}
                     >
-                      Clear
-                    </button>
-                  </div>
-                  <div className="text-text-primary font-semibold">
-                    &gt; {activeQuery}
-                  </div>
-
-                  {loading ? (
-                    <div className="flex items-center gap-2 text-accent-blue py-4">
-                      <Cpu className="w-3.5 h-3.5 animate-spin" />
+                      {m.text}
+                    </div>
+                  ))}
+                  
+                  {loading && (
+                    <div className="flex items-center gap-2 text-accent-blue py-1.5 font-mono text-[9px]">
+                      <Cpu className="w-3 h-3 animate-spin" />
                       <span>Thinking...</span>
                     </div>
-                  ) : (
-                    <div className="text-text-secondary whitespace-pre-wrap select-text selection:bg-accent-blue/20">
-                      {simulatedResponse}
-                    </div>
                   )}
+                  <div ref={chatEndRef} />
                 </div>
 
-                <div className="text-[9px] text-text-muted mt-4 text-right flex items-center justify-end gap-1 select-none">
-                  <span>Press Esc to exit</span>
-                  <CornerDownLeft className="w-2.5 h-2.5" />
-                </div>
+                {/* Input Text Form */}
+                <form onSubmit={handleSendMessage} className="relative mt-4 flex-shrink-0">
+                  <input
+                    type="text"
+                    placeholder="Ask Kiwik AI..."
+                    value={inputVal}
+                    onChange={(e) => setInputVal(e.target.value)}
+                    disabled={loading}
+                    className="w-full pl-3 pr-9 py-2 rounded-xl bg-neutral-200/40 dark:bg-white/5 border border-glass-border focus:outline-none focus:border-accent-blue text-[10px] font-mono text-text-primary"
+                  />
+                  <button 
+                    type="submit"
+                    disabled={loading || !inputVal.trim()}
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-accent-blue text-white hover:bg-blue-600 disabled:opacity-50 transition-colors"
+                  >
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                </form>
+
+                {/* Reset button to list */}
+                <button
+                  onClick={() => setActiveAction(null)}
+                  className="mt-2.5 w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-divider hover:bg-bg-secondary text-[9px] font-mono text-text-secondary font-semibold"
+                >
+                  <RefreshCw className="w-2.5 h-2.5" />
+                  <span>Choose Another Action</span>
+                </button>
               </motion.div>
             )}
           </AnimatePresence>
