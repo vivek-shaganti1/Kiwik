@@ -43,13 +43,13 @@ import {
   Compass,
   Database,
   Terminal,
-  Activity
+  Activity,
+  Workflow
 } from "lucide-react";
 
 import { useProjectsStore, useProjects } from "@/stores/projects-store";
 import { useSiteCMSStore } from "@/stores/site-cms-store";
 import { GlassCard } from "@/components/glass/glass-card";
-import { GlassButton } from "@/components/glass/glass-button";
 import type { Project } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -57,6 +57,7 @@ type AdminTab =
   | "dashboard"
   | "visual-editor"
   | "hero"
+  | "sections"
   | "projects"
   | "media"
   | "navigation"
@@ -65,14 +66,13 @@ type AdminTab =
   | "audit-snapshots";
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
+  const [activeTab, setActiveTab] = useState<AdminTab>("hero");
   const projects = useProjects();
   const {
     addProject,
     updateProject,
     deleteProject,
     duplicateProject,
-    resetToDefaults
   } = useProjectsStore();
 
   const cms = useSiteCMSStore((state) => state.cms);
@@ -82,6 +82,20 @@ export default function AdminPage() {
     updateHeroRotatingWords,
     updateHeroMetric,
     updateNavigation,
+    addNavItem,
+    updateNavItem,
+    deleteNavItem,
+    updateFeaturedSection,
+    updateCapabilities,
+    addCapabilityItem,
+    updateCapabilityItem,
+    deleteCapabilityItem,
+    updateTrust,
+    addTrustItem,
+    updateTrustItem,
+    deleteTrustItem,
+    updateHowWeWork,
+    updateWorkflowStep,
     updateFooter,
     updateTheme,
     updateSEO,
@@ -92,21 +106,28 @@ export default function AdminPage() {
     deleteSnapshot,
     exportJSONBackup,
     importJSONBackup,
-    resetCMSToDefaults
   } = useSiteCMSStore();
 
-  // Search & Filter States
-  const [searchQuery, setSearchQuery] = useState("");
+  // Search & Form States
   const [newRotatingWord, setNewRotatingWord] = useState("");
-  const [snapshotName, setSnapshotName] = useState("");
+  const [newNavLabel, setNewNavLabel] = useState("");
+  const [newNavHref, setNewNavHref] = useState("");
+
+  const [newCapTitle, setNewCapTitle] = useState("");
+  const [newCapDesc, setNewCapDesc] = useState("");
+  const [newCapIcon, setNewCapIcon] = useState("Sparkles");
+
+  const [newTrustTitle, setNewTrustTitle] = useState("");
+  const [newTrustDesc, setNewTrustDesc] = useState("");
+
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const [previewMode, setPreviewMode] = useState<"dark" | "light">("dark");
   const [jsonBackupInput, setJsonBackupInput] = useState("");
   const [saveNotification, setSaveNotification] = useState<string | null>(null);
 
-  // New Project Form Modal
+  // Edit Project Modal
   const [isEditingProject, setIsEditingProject] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<Partial<Project> | null>(null);
+  const [editingProjectData, setEditingProjectData] = useState<Partial<Project>>({});
 
   const showSaveSuccess = (msg: string) => {
     setSaveNotification(msg);
@@ -118,13 +139,52 @@ export default function AdminPage() {
     const updated = [...cms.hero.rotatingWords, newRotatingWord.trim()];
     updateHeroRotatingWords(updated);
     setNewRotatingWord("");
-    showSaveSuccess("Added rotating headline phrase!");
+    showSaveSuccess("Added rotating phrase!");
   };
 
   const handleRemoveRotatingWord = (index: number) => {
     const updated = cms.hero.rotatingWords.filter((_, i) => i !== index);
     updateHeroRotatingWords(updated);
-    showSaveSuccess("Removed rotating headline phrase!");
+    showSaveSuccess("Removed phrase!");
+  };
+
+  const handleAddNavItem = () => {
+    if (!newNavLabel.trim() || !newNavHref.trim()) return;
+    addNavItem({
+      id: `nav-${Date.now()}`,
+      label: newNavLabel.trim(),
+      href: newNavHref.trim(),
+      order: cms.navigation.items.length + 1,
+      visible: true
+    });
+    setNewNavLabel("");
+    setNewNavHref("");
+    showSaveSuccess("Added navigation item!");
+  };
+
+  const handleAddCapability = () => {
+    if (!newCapTitle.trim()) return;
+    addCapabilityItem({
+      id: `cap-${Date.now()}`,
+      title: newCapTitle.trim(),
+      desc: newCapDesc.trim() || "Capability description.",
+      iconName: newCapIcon
+    });
+    setNewCapTitle("");
+    setNewCapDesc("");
+    showSaveSuccess("Added capability card!");
+  };
+
+  const handleAddTrust = () => {
+    if (!newTrustTitle.trim()) return;
+    addTrustItem({
+      id: `tr-${Date.now()}`,
+      title: newTrustTitle.trim(),
+      desc: newTrustDesc.trim() || "Trust item description."
+    });
+    setNewTrustTitle("");
+    setNewTrustDesc("");
+    showSaveSuccess("Added trust assurance item!");
   };
 
   const handleExportBackup = () => {
@@ -135,18 +195,60 @@ export default function AdminPage() {
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
-    showSaveSuccess("CMS Backup exported successfully!");
+    showSaveSuccess("CMS Backup exported!");
   };
 
   const handleImportBackup = () => {
     if (!jsonBackupInput.trim()) return;
     const success = importJSONBackup(jsonBackupInput);
     if (success) {
-      showSaveSuccess("CMS Backup imported and restored!");
+      showSaveSuccess("CMS Backup restored!");
       setJsonBackupInput("");
     } else {
       alert("Invalid JSON Backup format.");
     }
+  };
+
+  const handleSaveProjectForm = () => {
+    if (!editingProjectData.name || !editingProjectData.slug) return;
+    if (editingProjectData.id) {
+      updateProject(editingProjectData.id, editingProjectData);
+      showSaveSuccess("Project updated!");
+    } else {
+      addProject({
+        id: `proj-${Date.now()}`,
+        slug: editingProjectData.slug,
+        name: editingProjectData.name,
+        tagline: editingProjectData.tagline || "",
+        description: editingProjectData.description || "",
+        longDescription: editingProjectData.longDescription || "",
+        status: editingProjectData.status || "in-progress",
+        category: editingProjectData.category || "web",
+        tags: editingProjectData.tags || ["new"],
+        version: editingProjectData.version || "1.0.0",
+        completionPercent: editingProjectData.completionPercent || 50,
+        liveUrl: editingProjectData.liveUrl || "",
+        githubUrl: editingProjectData.githubUrl || "",
+        coverImage: editingProjectData.coverImage || "/images/kiwik-cover.jpg",
+        images: [],
+        techStack: [],
+        features: [],
+        changelog: [],
+        contributors: [],
+        timeline: [],
+        readme: "",
+        architecture: "",
+        lastUpdated: new Date().toISOString().split("T")[0],
+        createdAt: new Date().toISOString().split("T")[0],
+        owner: "Criska",
+        stars: 0,
+        forks: 0,
+        views: 0,
+        deploymentStatus: "live"
+      });
+      showSaveSuccess("Project created!");
+    }
+    setIsEditingProject(false);
   };
 
   return (
@@ -168,7 +270,7 @@ export default function AdminPage() {
       </AnimatePresence>
 
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 border-b border-divider pb-6">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 border-b border-divider pb-6 text-left">
         <div>
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -177,7 +279,7 @@ export default function AdminPage() {
             </h1>
           </div>
           <p className="text-xs text-text-secondary mt-1 font-medium">
-            Database-Driven Content Engine. Edit text, headlines, rotating phrases, navigation, theme, and projects live.
+            Full Interactive Edit Access. Modify text, rotating phrases, navigation links, capabilities, theme, and projects live.
           </p>
         </div>
 
@@ -185,16 +287,16 @@ export default function AdminPage() {
           <button
             onClick={() => {
               createSnapshot(`Snapshot-${new Date().toLocaleTimeString()}`, "Manual snapshot backup");
-              showSaveSuccess("Created version snapshot!");
+              showSaveSuccess("Saved version snapshot!");
             }}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-glass-bg border border-glass-border hover:bg-glass-bg-hover text-xs font-semibold shadow-sm transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-glass-bg border border-glass-border hover:bg-glass-bg-hover text-xs font-semibold shadow-sm transition-all cursor-pointer"
           >
             <History className="w-3.5 h-3.5 text-accent-blue" />
             Save Snapshot
           </button>
           <button
             onClick={handleExportBackup}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-glass-bg border border-glass-border hover:bg-glass-bg-hover text-xs font-semibold shadow-sm transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-glass-bg border border-glass-border hover:bg-glass-bg-hover text-xs font-semibold shadow-sm transition-all cursor-pointer"
           >
             <Download className="w-3.5 h-3.5 text-indigo-400" />
             Export JSON
@@ -216,7 +318,8 @@ export default function AdminPage() {
           { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-3.5 h-3.5" /> },
           { id: "visual-editor", label: "Visual Editor", icon: <Eye className="w-3.5 h-3.5" /> },
           { id: "hero", label: "Hero CMS", icon: <Sparkles className="w-3.5 h-3.5" /> },
-          { id: "projects", label: "Projects CMS", icon: <Layers className="w-3.5 h-3.5" /> },
+          { id: "sections", label: "Page Sections", icon: <Layers className="w-3.5 h-3.5" /> },
+          { id: "projects", label: "Projects CMS", icon: <Database className="w-3.5 h-3.5" /> },
           { id: "media", label: "Media Library", icon: <ImageIcon className="w-3.5 h-3.5" /> },
           { id: "navigation", label: "Nav & Footer", icon: <Compass className="w-3.5 h-3.5" /> },
           { id: "theme", label: "Theme & Styling", icon: <Palette className="w-3.5 h-3.5" /> },
@@ -243,13 +346,13 @@ export default function AdminPage() {
           TAB 1: DASHBOARD OVERVIEW
          ───────────────────────────────────────────────────────────── */}
       {activeTab === "dashboard" && (
-        <div className="space-y-8">
+        <div className="space-y-8 text-left">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
               { label: "Active Projects", val: projects.length, icon: <Layers className="w-5 h-5 text-accent-blue" /> },
               { label: "Rotating Phrases", val: cms.hero.rotatingWords.length, icon: <Sparkles className="w-5 h-5 text-indigo-400" /> },
-              { label: "Media Assets", val: cms.media.length, icon: <ImageIcon className="w-5 h-5 text-cyan-400" /> },
-              { label: "Audit Log Trail", val: cms.auditLogs.length, icon: <History className="w-5 h-5 text-amber-400" /> }
+              { label: "Nav Items", val: cms.navigation.items.length, icon: <Compass className="w-5 h-5 text-cyan-400" /> },
+              { label: "Audit Logs", val: cms.auditLogs.length, icon: <History className="w-5 h-5 text-amber-400" /> }
             ].map((st, i) => (
               <GlassCard key={i} className="p-5 flex items-center justify-between">
                 <div>
@@ -261,7 +364,6 @@ export default function AdminPage() {
             ))}
           </div>
 
-          {/* Quick Edit Summary */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <GlassCard className="p-6 text-left space-y-4">
               <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
@@ -271,11 +373,11 @@ export default function AdminPage() {
                 "{cms.hero.headlinePrefix} <span className="italic text-accent-blue">{cms.hero.headlineHighlightWord}</span> [Rotating Phrases]"
               </div>
               <p className="text-xs text-text-secondary">
-                Description: {cms.hero.description}
+                {cms.hero.description}
               </p>
               <button
                 onClick={() => setActiveTab("hero")}
-                className="px-4 py-2 rounded-full bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors"
+                className="px-4 py-2 rounded-full bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors cursor-pointer"
               >
                 Edit Hero Content
               </button>
@@ -283,7 +385,7 @@ export default function AdminPage() {
 
             <GlassCard className="p-6 text-left space-y-4">
               <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                <History className="w-4 h-4 text-indigo-400" /> Recent Audit Activity
+                <History className="w-4 h-4 text-indigo-400" /> Recent Audit Trail
               </h3>
               <div className="space-y-2 max-h-[160px] overflow-y-auto pr-2">
                 {cms.auditLogs.slice(0, 4).map((log) => (
@@ -304,38 +406,38 @@ export default function AdminPage() {
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB 2: VISUAL WEBSITE EDITOR & DEVICE PREVIEW
+          TAB 2: VISUAL EDITOR & LIVE DEVICE PREVIEW
          ───────────────────────────────────────────────────────────── */}
       {activeTab === "visual-editor" && (
         <div className="space-y-6 text-left">
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-glass-bg border border-glass-border">
+          <div className="flex items-center justify-between p-4 rounded-2xl bg-glass-bg border border-glass-border flex-wrap gap-4">
             <div className="flex items-center gap-3">
               <span className="text-xs font-bold text-text-primary">Device Viewport:</span>
               <button
                 onClick={() => setPreviewDevice("desktop")}
-                className={cn("p-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors", previewDevice === "desktop" ? "bg-accent-blue text-white" : "bg-bg-secondary text-text-secondary")}
+                className={cn("p-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer", previewDevice === "desktop" ? "bg-accent-blue text-white" : "bg-bg-secondary text-text-secondary")}
               >
                 <Monitor className="w-4 h-4" /> Desktop
               </button>
               <button
                 onClick={() => setPreviewDevice("tablet")}
-                className={cn("p-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors", previewDevice === "tablet" ? "bg-accent-blue text-white" : "bg-bg-secondary text-text-secondary")}
+                className={cn("p-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer", previewDevice === "tablet" ? "bg-accent-blue text-white" : "bg-bg-secondary text-text-secondary")}
               >
                 <Tablet className="w-4 h-4" /> Tablet
               </button>
               <button
                 onClick={() => setPreviewDevice("mobile")}
-                className={cn("p-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors", previewDevice === "mobile" ? "bg-accent-blue text-white" : "bg-bg-secondary text-text-secondary")}
+                className={cn("p-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer", previewDevice === "mobile" ? "bg-accent-blue text-white" : "bg-bg-secondary text-text-secondary")}
               >
                 <Smartphone className="w-4 h-4" /> Mobile
               </button>
             </div>
 
             <div className="flex items-center gap-3">
-              <span className="text-xs font-bold text-text-primary">Theme:</span>
+              <span className="text-xs font-bold text-text-primary">Theme Mode:</span>
               <button
                 onClick={() => setPreviewMode(previewMode === "dark" ? "light" : "dark")}
-                className="p-2 rounded-lg bg-bg-secondary text-text-primary text-xs font-bold flex items-center gap-1.5 border border-glass-border"
+                className="p-2 rounded-lg bg-bg-secondary text-text-primary text-xs font-bold flex items-center gap-1.5 border border-glass-border cursor-pointer"
               >
                 {previewMode === "dark" ? <Moon className="w-4 h-4 text-indigo-400" /> : <Sun className="w-4 h-4 text-amber-500" />}
                 {previewMode === "dark" ? "Dark Mode" : "Light Mode"}
@@ -343,7 +445,6 @@ export default function AdminPage() {
             </div>
           </div>
 
-          {/* Device Frame */}
           <div className="flex justify-center w-full py-4 bg-black/40 rounded-3xl border border-glass-border overflow-hidden">
             <div
               className={cn(
@@ -365,14 +466,14 @@ export default function AdminPage() {
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB 3: HERO CMS EDITOR
+          TAB 3: HERO CMS EDITOR (FULLY INTERACTIVE EDIT)
          ───────────────────────────────────────────────────────────── */}
       {activeTab === "hero" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-left">
           <div className="lg:col-span-7 space-y-6">
             <GlassCard className="p-6 space-y-5">
               <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-accent-blue" /> Hero Headlines & Copy
+                <Sparkles className="w-4 h-4 text-accent-blue" /> Hero Headlines & Subheadings
               </h3>
 
               <div className="space-y-4">
@@ -381,8 +482,11 @@ export default function AdminPage() {
                   <input
                     type="text"
                     value={cms.hero.versionBadge}
-                    onChange={(e) => updateHero({ versionBadge: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary"
+                    onChange={(e) => {
+                      updateHero({ versionBadge: e.target.value });
+                      showSaveSuccess("Updated version badge!");
+                    }}
+                    className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary focus:border-accent-blue focus:outline-none"
                   />
                 </div>
 
@@ -392,8 +496,11 @@ export default function AdminPage() {
                     <input
                       type="text"
                       value={cms.hero.headlinePrefix}
-                      onChange={(e) => updateHero({ headlinePrefix: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary"
+                      onChange={(e) => {
+                        updateHero({ headlinePrefix: e.target.value });
+                        showSaveSuccess("Updated headline prefix!");
+                      }}
+                      className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary focus:border-accent-blue focus:outline-none"
                     />
                   </div>
                   <div>
@@ -401,8 +508,11 @@ export default function AdminPage() {
                     <input
                       type="text"
                       value={cms.hero.headlineHighlightWord}
-                      onChange={(e) => updateHero({ headlineHighlightWord: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary"
+                      onChange={(e) => {
+                        updateHero({ headlineHighlightWord: e.target.value });
+                        showSaveSuccess("Updated highlight word!");
+                      }}
+                      className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary focus:border-accent-blue focus:outline-none"
                     />
                   </div>
                 </div>
@@ -412,8 +522,11 @@ export default function AdminPage() {
                   <textarea
                     rows={3}
                     value={cms.hero.description}
-                    onChange={(e) => updateHero({ description: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium text-text-primary"
+                    onChange={(e) => {
+                      updateHero({ description: e.target.value });
+                      showSaveSuccess("Updated hero description!");
+                    }}
+                    className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium text-text-primary focus:border-accent-blue focus:outline-none"
                   />
                 </div>
               </div>
@@ -435,19 +548,29 @@ export default function AdminPage() {
                 />
                 <button
                   onClick={handleAddRotatingWord}
-                  className="px-5 py-2 rounded-xl bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors flex items-center gap-1.5"
+                  className="px-5 py-2 rounded-xl bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <Plus className="w-4 h-4" /> Add
                 </button>
               </div>
 
-              <div className="space-y-2 max-h-[220px] overflow-y-auto pr-2">
+              <div className="space-y-2 max-h-[240px] overflow-y-auto pr-2">
                 {cms.hero.rotatingWords.map((word, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-bg-secondary/60 border border-glass-border">
-                    <span className="text-xs font-bold font-serif italic text-accent-blue">{word}</span>
+                  <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-bg-secondary/60 border border-glass-border gap-3">
+                    <input
+                      type="text"
+                      value={word}
+                      onChange={(e) => {
+                        const updated = [...cms.hero.rotatingWords];
+                        updated[idx] = e.target.value;
+                        updateHeroRotatingWords(updated);
+                        showSaveSuccess("Updated phrase!");
+                      }}
+                      className="flex-1 bg-transparent text-xs font-bold font-serif italic text-accent-blue focus:outline-none"
+                    />
                     <button
                       onClick={() => handleRemoveRotatingWord(idx)}
-                      className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-500/10 transition-colors"
+                      className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -457,7 +580,7 @@ export default function AdminPage() {
             </GlassCard>
           </div>
 
-          {/* Telemetry Metrics & CTAs */}
+          {/* Telemetry Metrics & CTA Buttons */}
           <div className="lg:col-span-5 space-y-6">
             <GlassCard className="p-6 space-y-4">
               <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
@@ -474,31 +597,285 @@ export default function AdminPage() {
                     <input
                       type="number"
                       value={m.val}
-                      onChange={(e) => updateHeroMetric(m.id, { val: parseFloat(e.target.value) || 0 })}
+                      onChange={(e) => {
+                        updateHeroMetric(m.id, { val: parseFloat(e.target.value) || 0 });
+                        showSaveSuccess(`Updated ${m.label} value!`);
+                      }}
                       className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono"
                     />
                     <input
                       type="text"
                       value={m.suffix}
-                      onChange={(e) => updateHeroMetric(m.id, { suffix: e.target.value })}
+                      onChange={(e) => {
+                        updateHeroMetric(m.id, { suffix: e.target.value });
+                        showSaveSuccess(`Updated ${m.label} suffix!`);
+                      }}
                       className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono"
                     />
                     <input
                       type="text"
                       value={m.label}
-                      onChange={(e) => updateHeroMetric(m.id, { label: e.target.value })}
+                      onChange={(e) => {
+                        updateHeroMetric(m.id, { label: e.target.value });
+                        showSaveSuccess(`Updated metric label!`);
+                      }}
                       className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono"
                     />
                   </div>
                 </div>
               ))}
             </GlassCard>
+
+            <GlassCard className="p-6 space-y-4">
+              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-accent-blue" /> CTA Buttons Configuration
+              </h3>
+
+              <div className="space-y-3">
+                <div className="p-3 rounded-xl bg-bg-secondary border border-glass-border space-y-2">
+                  <span className="text-xs font-bold text-text-primary block">Primary CTA Button</span>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      value={cms.hero.primaryButton.text}
+                      onChange={(e) => {
+                        updateHero({ primaryButton: { ...cms.hero.primaryButton, text: e.target.value } });
+                        showSaveSuccess("Updated Primary CTA Text!");
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-semibold"
+                    />
+                    <input
+                      type="text"
+                      value={cms.hero.primaryButton.link}
+                      onChange={(e) => {
+                        updateHero({ primaryButton: { ...cms.hero.primaryButton, link: e.target.value } });
+                        showSaveSuccess("Updated Primary CTA Link!");
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-bg-secondary border border-glass-border space-y-2">
+                  <span className="text-xs font-bold text-text-primary block">Secondary CTA Button</span>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      value={cms.hero.secondaryButton.text}
+                      onChange={(e) => {
+                        updateHero({ secondaryButton: { ...cms.hero.secondaryButton, text: e.target.value } });
+                        showSaveSuccess("Updated Secondary CTA Text!");
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-semibold"
+                    />
+                    <input
+                      type="text"
+                      value={cms.hero.secondaryButton.link}
+                      onChange={(e) => {
+                        updateHero({ secondaryButton: { ...cms.hero.secondaryButton, link: e.target.value } });
+                        showSaveSuccess("Updated Secondary CTA Link!");
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+            </GlassCard>
           </div>
         </div>
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB 4: PROJECTS CMS
+          TAB 4: PAGE SECTIONS CMS (FEATURED, CAPABILITIES, TRUST, HOW WE WORK)
+         ───────────────────────────────────────────────────────────── */}
+      {activeTab === "sections" && (
+        <div className="space-y-8 text-left">
+          
+          {/* Featured Products Section Editor */}
+          <GlassCard className="p-6 space-y-4">
+            <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+              <Layers className="w-4 h-4 text-accent-blue" /> Featured Products Section Headings
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-text-secondary block mb-1">Section Title</label>
+                <input
+                  type="text"
+                  value={cms.featuredSection.title}
+                  onChange={(e) => {
+                    updateFeaturedSection({ title: e.target.value });
+                    showSaveSuccess("Updated Featured Products Title!");
+                  }}
+                  className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-text-secondary block mb-1">Section Subtitle / Description</label>
+                <input
+                  type="text"
+                  value={cms.featuredSection.subtitle}
+                  onChange={(e) => {
+                    updateFeaturedSection({ subtitle: e.target.value });
+                    showSaveSuccess("Updated Featured Products Subtitle!");
+                  }}
+                  className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+                />
+              </div>
+            </div>
+          </GlassCard>
+
+          {/* Capabilities Grid Editor */}
+          <GlassCard className="p-6 space-y-5">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-purple-400" /> Our Capabilities ({cms.capabilities.items.length})
+              </h3>
+              <input
+                type="text"
+                value={cms.capabilities.sectionTitle}
+                onChange={(e) => {
+                  updateCapabilities({ sectionTitle: e.target.value });
+                  showSaveSuccess("Updated Capabilities Title!");
+                }}
+                className="px-3 py-1 rounded-lg bg-bg-secondary border border-glass-border text-xs font-bold"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+              <input
+                type="text"
+                placeholder="Capability Title"
+                value={newCapTitle}
+                onChange={(e) => setNewCapTitle(e.target.value)}
+                className="px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+              />
+              <input
+                type="text"
+                placeholder="Description"
+                value={newCapDesc}
+                onChange={(e) => setNewCapDesc(e.target.value)}
+                className="px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+              />
+              <button
+                onClick={handleAddCapability}
+                className="px-4 py-2 rounded-xl bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors cursor-pointer"
+              >
+                + Add Capability
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {cms.capabilities.items.map((cap) => (
+                <div key={cap.id} className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-2">
+                  <div className="flex items-center justify-between">
+                    <input
+                      type="text"
+                      value={cap.title}
+                      onChange={(e) => {
+                        updateCapabilityItem(cap.id, { title: e.target.value });
+                        showSaveSuccess("Updated capability title!");
+                      }}
+                      className="bg-transparent font-bold text-xs text-text-primary focus:outline-none"
+                    />
+                    <button
+                      onClick={() => deleteCapabilityItem(cap.id)}
+                      className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition-colors cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <textarea
+                    rows={2}
+                    value={cap.desc}
+                    onChange={(e) => {
+                      updateCapabilityItem(cap.id, { desc: e.target.value });
+                      showSaveSuccess("Updated capability description!");
+                    }}
+                    className="w-full bg-bg-primary px-3 py-1.5 rounded-lg border border-glass-border text-[11px] text-text-secondary focus:outline-none"
+                  />
+                </div>
+              ))}
+            </div>
+          </GlassCard>
+
+          {/* Trust & Delivery Editor */}
+          <GlassCard className="p-6 space-y-5">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Trust & Delivery ({cms.trust.items.length})
+              </h3>
+              <input
+                type="text"
+                value={cms.trust.sectionTitle}
+                onChange={(e) => {
+                  updateTrust({ sectionTitle: e.target.value });
+                  showSaveSuccess("Updated Trust Title!");
+                }}
+                className="px-3 py-1 rounded-lg bg-bg-secondary border border-glass-border text-xs font-bold"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+              <input
+                type="text"
+                placeholder="Trust Item Title"
+                value={newTrustTitle}
+                onChange={(e) => setNewTrustTitle(e.target.value)}
+                className="px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+              />
+              <input
+                type="text"
+                placeholder="Description"
+                value={newTrustDesc}
+                onChange={(e) => setNewTrustDesc(e.target.value)}
+                className="px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+              />
+              <button
+                onClick={handleAddTrust}
+                className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold shadow-md hover:bg-emerald-500 transition-colors cursor-pointer"
+              >
+                + Add Trust Item
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {cms.trust.items.map((tr) => (
+                <div key={tr.id} className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-2">
+                  <div className="flex items-center justify-between">
+                    <input
+                      type="text"
+                      value={tr.title}
+                      onChange={(e) => {
+                        updateTrustItem(tr.id, { title: e.target.value });
+                        showSaveSuccess("Updated trust title!");
+                      }}
+                      className="bg-transparent font-bold text-xs text-text-primary focus:outline-none"
+                    />
+                    <button
+                      onClick={() => deleteTrustItem(tr.id)}
+                      className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition-colors cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <textarea
+                    rows={2}
+                    value={tr.desc}
+                    onChange={(e) => {
+                      updateTrustItem(tr.id, { desc: e.target.value });
+                      showSaveSuccess("Updated trust description!");
+                    }}
+                    className="w-full bg-bg-primary px-3 py-1.5 rounded-lg border border-glass-border text-[11px] text-text-secondary focus:outline-none"
+                  />
+                </div>
+              ))}
+            </div>
+          </GlassCard>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TAB 5: PROJECTS CMS
          ───────────────────────────────────────────────────────────── */}
       {activeTab === "projects" && (
         <div className="space-y-6 text-left">
@@ -506,10 +883,10 @@ export default function AdminPage() {
             <h3 className="text-lg font-bold text-text-primary">Projects CMS Repository ({projects.length})</h3>
             <button
               onClick={() => {
-                setSelectedProject({ name: "New Kiwik Project", slug: `project-${Date.now()}`, tagline: "", description: "", tags: ["new"] });
+                setEditingProjectData({ name: "New Kiwik Project", slug: `project-${Date.now()}`, tagline: "", description: "", tags: ["new"], status: "in-progress" });
                 setIsEditingProject(true);
               }}
-              className="px-5 py-2.5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold text-xs shadow-md transition-all hover:scale-102 flex items-center gap-2"
+              className="px-5 py-2.5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold text-xs shadow-md transition-all hover:scale-102 flex items-center gap-2 cursor-pointer"
             >
               <Plus className="w-4 h-4" /> Add New Project
             </button>
@@ -533,15 +910,25 @@ export default function AdminPage() {
                   <span className="text-[10px] font-mono text-emerald-500 font-bold">● {proj.deploymentStatus}</span>
                   <div className="flex items-center gap-2">
                     <button
+                      onClick={() => {
+                        setEditingProjectData(proj);
+                        setIsEditingProject(true);
+                      }}
+                      className="p-2 rounded-lg bg-bg-secondary hover:bg-glass-bg-hover text-accent-blue transition-colors cursor-pointer"
+                      title="Edit Project"
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                    </button>
+                    <button
                       onClick={() => duplicateProject(proj.id)}
-                      className="p-2 rounded-lg bg-bg-secondary hover:bg-glass-bg-hover text-text-secondary transition-colors"
+                      className="p-2 rounded-lg bg-bg-secondary hover:bg-glass-bg-hover text-text-secondary transition-colors cursor-pointer"
                       title="Duplicate"
                     >
                       <Copy className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => deleteProject(proj.id)}
-                      className="p-2 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-colors"
+                      className="p-2 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-colors cursor-pointer"
                       title="Delete"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -551,11 +938,88 @@ export default function AdminPage() {
               </GlassCard>
             ))}
           </div>
+
+          {/* Project Form Modal */}
+          {isEditingProject && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="w-full max-w-2xl rounded-2xl bg-glass-bg border border-glass-border p-6 shadow-2xl space-y-4 text-left"
+              >
+                <div className="flex items-center justify-between border-b border-divider pb-3">
+                  <h3 className="text-base font-bold text-text-primary">
+                    {editingProjectData.id ? "Edit Project" : "Create New Project"}
+                  </h3>
+                  <button onClick={() => setIsEditingProject(false)} className="p-1 rounded text-text-secondary hover:text-text-primary">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-text-secondary block mb-1">Project Name</label>
+                    <input
+                      type="text"
+                      value={editingProjectData.name || ""}
+                      onChange={(e) => setEditingProjectData({ ...editingProjectData, name: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-text-secondary block mb-1">Slug</label>
+                    <input
+                      type="text"
+                      value={editingProjectData.slug || ""}
+                      onChange={(e) => setEditingProjectData({ ...editingProjectData, slug: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-text-secondary block mb-1">Tagline / Short Description</label>
+                  <input
+                    type="text"
+                    value={editingProjectData.tagline || ""}
+                    onChange={(e) => setEditingProjectData({ ...editingProjectData, tagline: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-text-secondary block mb-1">Description</label>
+                  <textarea
+                    rows={3}
+                    value={editingProjectData.description || ""}
+                    onChange={(e) => setEditingProjectData({ ...editingProjectData, description: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4 border-t border-divider">
+                  <button
+                    onClick={() => setIsEditingProject(false)}
+                    className="px-4 py-2 rounded-full bg-glass-bg border border-glass-border text-xs font-semibold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveProjectForm}
+                    className="px-5 py-2 rounded-full bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors"
+                  >
+                    Save Project
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
         </div>
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB 5: MEDIA LIBRARY
+          TAB 6: MEDIA LIBRARY
          ───────────────────────────────────────────────────────────── */}
       {activeTab === "media" && (
         <div className="space-y-6 text-left">
@@ -583,7 +1047,7 @@ export default function AdminPage() {
                   showSaveSuccess("Added asset to Media Library!");
                 }
               }}
-              className="px-5 py-2.5 rounded-full bg-accent-blue text-white font-bold text-xs shadow-md transition-all hover:bg-blue-600 flex items-center gap-2"
+              className="px-5 py-2.5 rounded-full bg-accent-blue text-white font-bold text-xs shadow-md transition-all hover:bg-blue-600 flex items-center gap-2 cursor-pointer"
             >
               <Upload className="w-4 h-4" /> Upload Asset
             </button>
@@ -599,7 +1063,7 @@ export default function AdminPage() {
                   <span className="text-xs font-bold text-text-primary truncate">{item.name}</span>
                   <button
                     onClick={() => deleteMediaItem(item.id)}
-                    className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition-colors"
+                    className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition-colors cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -611,28 +1075,77 @@ export default function AdminPage() {
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB 6: NAVIGATION & FOOTER
+          TAB 7: NAVIGATION & FOOTER (FULL EDITABLE INPUTS)
          ───────────────────────────────────────────────────────────── */}
       {activeTab === "navigation" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-left">
+          
+          {/* Navbar Items Editor */}
           <GlassCard className="p-6 space-y-5">
-            <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-              <Compass className="w-4 h-4 text-accent-blue" /> Navbar Navigation Items ({cms.navigation.items.length})
-            </h3>
-            <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                <Compass className="w-4 h-4 text-accent-blue" /> Navbar Navigation Items ({cms.navigation.items.length})
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                type="text"
+                placeholder="Link Label (e.g. Pricing)"
+                value={newNavLabel}
+                onChange={(e) => setNewNavLabel(e.target.value)}
+                className="px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+              />
+              <input
+                type="text"
+                placeholder="Href (e.g. /pricing)"
+                value={newNavHref}
+                onChange={(e) => setNewNavHref(e.target.value)}
+                className="px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
+              />
+            </div>
+            <button
+              onClick={handleAddNavItem}
+              className="w-full py-2 rounded-xl bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+            >
+              <Plus className="w-4 h-4" /> Add Navigation Link
+            </button>
+
+            <div className="space-y-3 max-h-[320px] overflow-y-auto pr-2">
               {cms.navigation.items.map((item) => (
                 <div key={item.id} className="p-3 rounded-xl bg-bg-secondary/60 border border-glass-border flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-mono font-bold text-text-muted">#{item.order}</span>
-                    <span className="text-xs font-bold text-text-primary">{item.label}</span>
-                    <span className="text-[10px] font-mono text-accent-blue">{item.href}</span>
+                  <div className="grid grid-cols-2 gap-2 flex-1">
+                    <input
+                      type="text"
+                      value={item.label}
+                      onChange={(e) => {
+                        updateNavItem(item.id, { label: e.target.value });
+                        showSaveSuccess("Updated nav label!");
+                      }}
+                      className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-semibold"
+                    />
+                    <input
+                      type="text"
+                      value={item.href}
+                      onChange={(e) => {
+                        updateNavItem(item.id, { href: e.target.value });
+                        showSaveSuccess("Updated nav link!");
+                      }}
+                      className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono"
+                    />
                   </div>
-                  <span className="text-[10px] font-mono text-emerald-500 font-bold">Visible</span>
+                  <button
+                    onClick={() => deleteNavItem(item.id)}
+                    className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               ))}
             </div>
           </GlassCard>
 
+          {/* Footer Editor */}
           <GlassCard className="p-6 space-y-5">
             <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
               <FileText className="w-4 h-4 text-indigo-400" /> Footer Newsletter & Copyright
@@ -643,16 +1156,36 @@ export default function AdminPage() {
                 <input
                   type="text"
                   value={cms.footer.newsletterHeadline}
-                  onChange={(e) => updateFooter({ newsletterHeadline: e.target.value })}
+                  onChange={(e) => {
+                    updateFooter({ newsletterHeadline: e.target.value });
+                    showSaveSuccess("Updated Newsletter Headline!");
+                  }}
                   className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
                 />
               </div>
+
+              <div>
+                <label className="text-xs font-bold text-text-secondary block mb-1">Newsletter Subtitle Description</label>
+                <textarea
+                  rows={2}
+                  value={cms.footer.newsletterDescription}
+                  onChange={(e) => {
+                    updateFooter({ newsletterDescription: e.target.value });
+                    showSaveSuccess("Updated Newsletter Description!");
+                  }}
+                  className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium"
+                />
+              </div>
+
               <div>
                 <label className="text-xs font-bold text-text-secondary block mb-1">Copyright Text</label>
                 <input
                   type="text"
                   value={cms.footer.copyrightText}
-                  onChange={(e) => updateFooter({ copyrightText: e.target.value })}
+                  onChange={(e) => {
+                    updateFooter({ copyrightText: e.target.value });
+                    showSaveSuccess("Updated Copyright Text!");
+                  }}
                   className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
                 />
               </div>
@@ -662,7 +1195,7 @@ export default function AdminPage() {
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB 7: THEME & STYLING
+          TAB 8: THEME & STYLING (INTERACTIVE COLOR PICKERS)
          ───────────────────────────────────────────────────────────── */}
       {activeTab === "theme" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-left">
@@ -676,26 +1209,69 @@ export default function AdminPage() {
                 { label: "Accent Cyan", key: "accentCyan", val: cms.theme.colors.accentCyan },
                 { label: "Accent Indigo", key: "accentIndigo", val: cms.theme.colors.accentIndigo }
               ].map((c) => (
-                <div key={c.key} className="p-3 rounded-xl bg-bg-secondary border border-glass-border space-y-1.5">
+                <div key={c.key} className="p-3 rounded-xl bg-bg-secondary border border-glass-border space-y-2">
                   <label className="text-xs font-bold text-text-secondary block">{c.label}</label>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <input
                       type="color"
                       value={c.val}
-                      onChange={(e) => updateTheme({ colors: { ...cms.theme.colors, [c.key]: e.target.value } })}
-                      className="w-8 h-8 rounded cursor-pointer border-none"
+                      onChange={(e) => {
+                        updateTheme({ colors: { ...cms.theme.colors, [c.key]: e.target.value } });
+                        showSaveSuccess(`Updated ${c.label} color!`);
+                      }}
+                      className="w-10 h-10 rounded-lg cursor-pointer border-none bg-transparent"
                     />
-                    <span className="text-xs font-mono font-bold text-text-primary">{c.val}</span>
+                    <input
+                      type="text"
+                      value={c.val}
+                      onChange={(e) => {
+                        updateTheme({ colors: { ...cms.theme.colors, [c.key]: e.target.value } });
+                        showSaveSuccess(`Updated ${c.label} hex!`);
+                      }}
+                      className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono w-24"
+                    />
                   </div>
                 </div>
               ))}
+            </div>
+          </GlassCard>
+
+          <GlassCard className="p-6 space-y-5">
+            <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-indigo-400" /> Glass & Border Controls
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-text-secondary block mb-1">Glass Backdrop Blur (px)</label>
+                <input
+                  type="number"
+                  value={cms.theme.glassBlurPx}
+                  onChange={(e) => {
+                    updateTheme({ glassBlurPx: parseInt(e.target.value) || 20 });
+                    showSaveSuccess("Updated Glass Blur!");
+                  }}
+                  className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-text-secondary block mb-1">Card Border Radius (px)</label>
+                <input
+                  type="number"
+                  value={cms.theme.borderRadiusPx}
+                  onChange={(e) => {
+                    updateTheme({ borderRadiusPx: parseInt(e.target.value) || 16 });
+                    showSaveSuccess("Updated Border Radius!");
+                  }}
+                  className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
+                />
+              </div>
             </div>
           </GlassCard>
         </div>
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB 8: SEO ENGINE
+          TAB 9: SEO ENGINE
          ───────────────────────────────────────────────────────────── */}
       {activeTab === "seo" && (
         <GlassCard className="p-6 text-left space-y-5 max-w-3xl">
@@ -708,7 +1284,10 @@ export default function AdminPage() {
               <input
                 type="text"
                 value={cms.seo.defaultTitle}
-                onChange={(e) => updateSEO({ defaultTitle: e.target.value })}
+                onChange={(e) => {
+                  updateSEO({ defaultTitle: e.target.value });
+                  showSaveSuccess("Updated Meta Title!");
+                }}
                 className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
               />
             </div>
@@ -717,7 +1296,10 @@ export default function AdminPage() {
               <textarea
                 rows={3}
                 value={cms.seo.defaultDescription}
-                onChange={(e) => updateSEO({ defaultDescription: e.target.value })}
+                onChange={(e) => {
+                  updateSEO({ defaultDescription: e.target.value });
+                  showSaveSuccess("Updated Meta Description!");
+                }}
                 className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium"
               />
             </div>
@@ -726,7 +1308,7 @@ export default function AdminPage() {
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB 9: AUDIT LOGS & VERSION SNAPSHOTS
+          TAB 10: AUDIT LOGS & VERSION SNAPSHOTS
          ───────────────────────────────────────────────────────────── */}
       {activeTab === "audit-snapshots" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-left">
@@ -747,7 +1329,7 @@ export default function AdminPage() {
                         rollbackSnapshot(snap.id);
                         showSaveSuccess(`Rolled back to [${snap.versionName}]`);
                       }}
-                      className="px-3 py-1.5 rounded-full bg-accent-blue text-white text-[10px] font-bold hover:bg-blue-600 transition-colors"
+                      className="px-3 py-1.5 rounded-full bg-accent-blue text-white text-[10px] font-bold hover:bg-blue-600 transition-colors cursor-pointer"
                     >
                       Rollback
                     </button>
@@ -771,7 +1353,7 @@ export default function AdminPage() {
               />
               <button
                 onClick={handleImportBackup}
-                className="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-500 transition-colors"
+                className="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-500 transition-colors cursor-pointer"
               >
                 Restore from JSON Backup
               </button>

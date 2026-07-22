@@ -97,6 +97,47 @@ export interface FooterCMS {
   policyBadges: string[];
 }
 
+export interface FeaturedSectionCMS {
+  title: string;
+  subtitle: string;
+}
+
+export interface CapabilityItem {
+  id: string;
+  title: string;
+  desc: string;
+  iconName: string;
+}
+
+export interface CapabilitiesCMS {
+  sectionTitle: string;
+  items: CapabilityItem[];
+}
+
+export interface TrustItem {
+  id: string;
+  title: string;
+  desc: string;
+}
+
+export interface TrustCMS {
+  sectionTitle: string;
+  items: TrustItem[];
+}
+
+export interface WorkflowStep {
+  id: string;
+  step: string;
+  title: string;
+  desc: string;
+}
+
+export interface HowWeWorkCMS {
+  badge: string;
+  sectionTitle: string;
+  steps: WorkflowStep[];
+}
+
 export interface SectionBlock {
   id: string;
   type: "hero" | "features" | "stats" | "text" | "gallery" | "cta" | "custom";
@@ -149,9 +190,9 @@ export interface ThemeColors {
 }
 
 export interface TypographyCMS {
-  headingFont: string; // e.g. "Playfair Display"
-  bodyFont: string;    // e.g. "Inter"
-  monoFont: string;    // e.g. "JetBrains Mono"
+  headingFont: string;
+  bodyFont: string;
+  monoFont: string;
   baseFontSizePx: number;
 }
 
@@ -192,7 +233,7 @@ export interface VersionSnapshot {
   versionName: string;
   author: string;
   note: string;
-  data: string; // JSON stringified snapshot
+  data: string;
 }
 
 export interface SiteCMSData {
@@ -200,6 +241,10 @@ export interface SiteCMSData {
   hero: HeroCMS;
   navigation: NavigationCMS;
   footer: FooterCMS;
+  featuredSection: FeaturedSectionCMS;
+  capabilities: CapabilitiesCMS;
+  trust: TrustCMS;
+  howWeWork: HowWeWorkCMS;
   pages: PageCMS[];
   media: MediaItem[];
   theme: ThemeCMS;

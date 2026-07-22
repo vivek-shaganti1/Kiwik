@@ -7,11 +7,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Command, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeSwitcher } from './theme-switcher';
+import { useSiteCMSStore } from '@/stores/site-cms-store';
 
 export function Navbar() {
   const [scrolled, setScrolled] = React.useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const pathname = usePathname();
+
+  const navCMS = useSiteCMSStore((state) => state.cms.navigation);
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -21,13 +24,7 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navItems = [
-    { label: 'Home', href: '/' },
-    { label: 'Projects', href: '/projects' },
-    { label: 'Capabilities', href: '/#capabilities' },
-    { label: 'How We Work', href: '/#how-we-work' },
-    { label: 'Admin', href: '/admin', isBadge: true }
-  ];
+  const navItems = (navCMS.items || []).filter(item => item.visible !== false);
 
   return (
     <div className="fixed top-0 inset-x-0 z-50 flex justify-center px-4 transition-all duration-500 pt-4">
@@ -49,14 +46,14 @@ export function Navbar() {
             transition={{ type: "spring", stiffness: 400, damping: 15 }}
             className="w-7 h-7 flex items-center justify-center overflow-hidden rounded-lg bg-bg-secondary/40 border border-glass-border group-hover:border-glass-border-hover transition-colors"
           >
-            <img src="/logo.png" alt="Kiwik Logo" className="w-5 h-5 object-contain" style={{ imageRendering: "auto" }} />
+            <img src={navCMS.logoUrl || "/logo.png"} alt="Kiwik Logo" className="w-5 h-5 object-contain" style={{ imageRendering: "auto" }} />
           </motion.div>
           <span className="text-base font-serif font-bold bg-clip-text text-transparent bg-gradient-to-r from-text-primary via-text-primary to-text-secondary group-hover:opacity-85 transition-opacity tracking-tight">
-            Kiwik.1
+            {navCMS.logoText || "Kiwik.1"}
           </span>
         </Link>
 
-        {/* Center: Desktop Menu Navigation with Layout Animation */}
+        {/* Center: Desktop Menu Navigation with Dynamic CMS Items */}
         <nav className="hidden lg:flex items-center gap-1 z-0 px-4 flex-1 justify-center max-w-xl mx-auto">
           {navItems.map((item) => {
             const isActive = item.href === '/' 
@@ -65,7 +62,7 @@ export function Navbar() {
 
             return (
               <Link
-                key={item.href}
+                key={item.id || item.href}
                 href={item.href}
                 className={cn(
                   "relative text-[11px] font-semibold px-2.5 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5 flex-shrink-0",
@@ -81,7 +78,7 @@ export function Navbar() {
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
-                {item.isBadge && (
+                {item.badge && (
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 )}
                 {item.label}
@@ -94,7 +91,7 @@ export function Navbar() {
         <div className="hidden lg:flex items-center gap-2.5 relative z-10 flex-shrink-0">
           <button 
             onClick={() => window.dispatchEvent(new CustomEvent("toggle-command-palette"))}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-200/20 dark:bg-white/5 border border-glass-border hover:bg-neutral-200/40 dark:hover:bg-white/10 transition-all duration-300 text-xs text-text-secondary hover:text-text-primary group"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-200/20 dark:bg-white/5 border border-glass-border hover:bg-neutral-200/40 dark:hover:bg-white/10 transition-all duration-300 text-xs text-text-secondary hover:text-text-primary group cursor-pointer"
           >
             <Search className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
             <span>Search...</span>
@@ -105,53 +102,49 @@ export function Navbar() {
           
           <ThemeSwitcher />
 
-          <button
-            onClick={() => alert("Demonstration requested successfully. We will follow up shortly!")}
-            className="hidden lg:flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-accent-blue hover:bg-blue-600 text-white text-xs font-bold transition-all shadow-sm"
-          >
-            <span>Request a Demo</span>
-          </button>
+          {navCMS.ctaButtonVisible !== false && (
+            <Link
+              href={navCMS.ctaButtonHref || "#ai"}
+              className="hidden lg:flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-accent-blue hover:bg-blue-600 text-white text-xs font-bold transition-all shadow-sm"
+            >
+              <span>{navCMS.ctaButtonText || "Ask Kiwik AI"}</span>
+            </Link>
+          )}
         </div>
 
         {/* Mobile menu triggers */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="lg:hidden p-2 rounded-full hover:bg-neutral-200/20 dark:hover:bg-white/5 transition-colors relative z-10 border border-transparent hover:border-glass-border"
+          className="lg:hidden p-2 rounded-full hover:bg-neutral-200/20 dark:hover:bg-white/5 transition-colors relative z-10 border border-transparent hover:border-glass-border cursor-pointer"
           aria-label="Toggle Navigation Drawer"
         >
-          {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
 
-        {/* Mobile Menu Slide-out Panel */}
+        {/* Mobile Menu Drawer */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -15, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -15, scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              className="absolute top-[110%] left-0 right-0 p-4 rounded-2xl bg-glass-bg border border-glass-border backdrop-blur-2xl lg:hidden flex flex-col gap-2 shadow-2xl z-50"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="absolute top-full inset-x-0 mt-3 p-4 rounded-2xl bg-glass-bg border border-glass-border backdrop-blur-2xl shadow-2xl flex flex-col gap-2 lg:hidden overflow-hidden"
             >
               {navItems.map((item) => (
-                <Link 
-                  key={item.href}
-                  href={item.href} 
+                <Link
+                  key={item.id || item.href}
+                  href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="px-4 py-2.5 rounded-xl hover:bg-neutral-200/40 dark:hover:bg-white/5 transition-colors text-xs font-semibold text-text-primary flex items-center justify-between"
+                  className="px-4 py-2.5 rounded-xl hover:bg-white/10 text-xs font-bold text-text-primary flex items-center justify-between"
                 >
                   <span>{item.label}</span>
-                  {item.isBadge && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  )}
+                  {item.badge && <span className="text-[10px] font-mono font-bold text-accent-blue bg-accent-blue/10 px-2 py-0.5 rounded-full">{item.badge}</span>}
                 </Link>
               ))}
-              <div className="px-4 py-2 border-t border-divider mt-2 flex items-center justify-between">
-                <span className="text-xs font-semibold text-text-secondary">Theme</span>
-                <ThemeSwitcher />
-              </div>
             </motion.div>
           )}
         </AnimatePresence>
+
       </motion.header>
     </div>
   );

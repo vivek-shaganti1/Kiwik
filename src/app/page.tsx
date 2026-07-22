@@ -28,6 +28,7 @@ import { MacosDashboard } from "@/components/home/macos-dashboard";
 import { AiRaycastPanel } from "@/components/home/ai-raycast-panel";
 import { AIChatbot } from "@/components/home/ai-chatbot";
 import { useProjects } from "@/stores/projects-store";
+import { useSiteCMSStore } from "@/stores/site-cms-store";
 import { GlassCard } from "@/components/glass/glass-card";
 
 export default function HomePage() {
@@ -35,33 +36,33 @@ export default function HomePage() {
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const projects = useProjects();
   
+  const cms = useSiteCMSStore((state) => state.cms);
+  const featuredSection = cms.featuredSection || {
+    title: "Explore Criska Products",
+    subtitle: "Understand what each product does, who it helps, its current status, and request real-time access. Fully synchronised with the Admin CMS panel."
+  };
+  const capabilities = cms.capabilities || { sectionTitle: "Our Capabilities", items: [] };
+  const trust = cms.trust || { sectionTitle: "Trust & Delivery", items: [] };
+  const howWeWork = cms.howWeWork || { badge: "Execution Workflow", sectionTitle: "How We Work", steps: [] };
+
   // Dynamic Projects loaded from the CMS database store to reflect edits immediately
   const featuredCMS = projects.slice(0, 3);
 
-  const bootMessages = [
-    "Connecting to Criska edge...",
-    "Loading Kiwik.1 core projects...",
-    "Synchronizing workspace telemetry...",
-    "Vercel serverless deployments ready...",
-    "Kiwik OS v1.0.0-beta ONLINE."
-  ];
+  const getIcon = (iconName: string) => {
+    switch (iconName) {
+      case "Sparkles": return <Sparkles className="w-4 h-4 text-purple-400" />;
+      case "Shield": return <Shield className="w-4 h-4 text-rose-400" />;
+      case "Workflow": return <Workflow className="w-4 h-4 text-amber-400" />;
+      case "Cloud": return <Cloud className="w-4 h-4 text-accent-blue" />;
+      default: return <Cpu className="w-4 h-4 text-accent-blue" />;
+    }
+  };
 
   useEffect(() => {
     // Record visitor session
     fetch("/api/visitors", { method: "POST" }).catch((err) =>
       console.error("Error logging visitor session", err)
     );
-
-    // Boot terminal sequence animation
-    const interval = setInterval(() => {
-      setBootStep((prev) => {
-        if (prev < bootMessages.length - 1) return prev + 1;
-        clearInterval(interval);
-        return prev;
-      });
-    }, 1200);
-
-    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -86,26 +87,22 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ==========================================
-          BOTTOM PAGES / EXTRA VISUAL GRID SECTIONS
-          ========================================== */}
-      
-      {/* SECTION A: DYNAMIC FEATURED PRODUCTS (Editable via Admin CMS) */}
-      <section id="featured-products-section" className="py-16 md:py-24 px-4 sm:px-6 md:px-8 max-w-[1400px] mx-auto relative z-20">
+      {/* SECTION A: FEATURED PRODUCTS GRID */}
+      <section id="featured-products-section" className="py-16 md:py-24 px-4 sm:px-6 md:px-8 border-t border-divider/60 max-w-[1400px] mx-auto relative z-20">
         <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
           <h2 className="text-3xl font-serif font-bold text-text-primary tracking-tight">
-            Explore Criska Products
+            {featuredSection.title}
           </h2>
           <p className="text-sm text-text-secondary leading-relaxed font-medium">
-            Understand what each product does, who it helps, its current status, and request real-time access. Fully synchronised with the Admin CMS panel.
+            {featuredSection.subtitle}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {featuredCMS.map((p, i) => (
+          {featuredCMS.map((p) => (
             <GlassCard 
               key={p.id} 
-              className="flex flex-col justify-between p-6 sm:p-7 border border-glass-border hover:border-accent-blue/30 transition-all select-none hover:-translate-y-1 duration-300 h-full"
+              className="flex flex-col justify-between p-6 sm:p-7 border border-glass-border hover:border-accent-blue/30 transition-all select-none hover:-translate-y-1 duration-300 h-full text-left"
             >
               <div>
                 <div className="flex items-center justify-between gap-3 mb-4">
@@ -143,7 +140,7 @@ export default function HomePage() {
                 </Link>
                 <button 
                   onClick={() => alert(`Demonstration requested for: ${p.name}`)}
-                  className="flex-1 text-center py-2 rounded-lg bg-accent-blue hover:bg-blue-600 text-[10px] font-bold text-white transition-all shadow-sm"
+                  className="flex-1 text-center py-2 rounded-lg bg-accent-blue hover:bg-blue-600 text-[10px] font-bold text-white transition-all shadow-sm cursor-pointer"
                 >
                   Request Demo
                 </button>
@@ -154,21 +151,19 @@ export default function HomePage() {
       </section>
 
       {/* SECTION B: HOW WE WORK (5-Step Engineering Pipeline) */}
-      <section className="py-16 md:py-24 px-4 sm:px-6 md:px-8 border-t border-divider/60 max-w-[1400px] mx-auto relative z-20">
+      <section id="how-we-work" className="py-16 md:py-24 px-4 sm:px-6 md:px-8 border-t border-divider/60 max-w-[1400px] mx-auto relative z-20">
         <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-          <span className="text-[10px] font-mono text-accent-blue uppercase tracking-widest font-bold">Execution Workflow</span>
-          <h2 className="text-3xl font-serif font-bold text-text-primary tracking-tight">How We Work</h2>
+          <span className="text-[10px] font-mono text-accent-blue uppercase tracking-widest font-bold">
+            {howWeWork.badge || "Execution Workflow"}
+          </span>
+          <h2 className="text-3xl font-serif font-bold text-text-primary tracking-tight">
+            {howWeWork.sectionTitle || "How We Work"}
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4 relative">
-          {[
-            { step: "01", title: "Discover", desc: "We understand your goals, target architecture, and edge constraints." },
-            { step: "02", title: "Design", desc: "We design high-fidelity components, micro-interactions, and interface flows." },
-            { step: "03", title: "Build", desc: "We build with extreme quality, component reusability, and Next.js static engine speeds." },
-            { step: "04", title: "Secure", desc: "We secure telemetry endpoints, Firestore rule configurations, and credentials." },
-            { step: "05", title: "Operate", desc: "We monitor production latency, optimize edge hits, and provide continuous support." }
-          ].map((item, idx) => (
-            <GlassCard key={idx} className="p-5 border border-glass-border relative hover:border-accent-blue/20 transition-all select-none">
+          {(howWeWork.steps || []).map((item, idx) => (
+            <GlassCard key={item.id || idx} className="p-5 border border-glass-border relative hover:border-accent-blue/20 transition-all select-none text-left">
               <div className="text-xs font-mono font-bold text-accent-blue mb-3">{item.step}</div>
               <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-text-primary">{item.title}</h3>
               <p className="text-[11px] text-text-secondary leading-relaxed font-medium mt-2">{item.desc}</p>
@@ -182,18 +177,15 @@ export default function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* Capabilities Grid */}
-          <div className="lg:col-span-7 space-y-6">
-            <h2 className="text-2xl font-serif font-bold text-text-primary tracking-tight mb-6">Our Capabilities</h2>
+          <div className="lg:col-span-7 space-y-6 text-left">
+            <h2 className="text-2xl font-serif font-bold text-text-primary tracking-tight mb-6">
+              {capabilities.sectionTitle || "Our Capabilities"}
+            </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[
-                { title: "AI & Knowledge Systems", icon: <Sparkles className="w-4 h-4 text-purple-400" />, desc: "Semantic context vector indexing and voice voice transcription mappings." },
-                { title: "Identity & Security Services", icon: <Shield className="w-4 h-4 text-rose-400" />, desc: "Secure OAuth authorization hooks and granular serverless database access rules." },
-                { title: "Automation & Workflows", icon: <Workflow className="w-4 h-4 text-amber-400" />, desc: "Event-driven edge action pipelines and cron automation routines." },
-                { title: "Cloud & DevOps Infrastructure", icon: <Cloud className="w-4 h-4 text-accent-blue" />, desc: "High-performance CDN setups, edge caching rules, and serverless builds." }
-              ].map((cap, i) => (
-                <div key={i} className="p-4.5 rounded-2xl bg-bg-secondary/40 border border-glass-border flex gap-4 select-none">
+              {(capabilities.items || []).map((cap, i) => (
+                <div key={cap.id || i} className="p-4.5 rounded-2xl bg-bg-secondary/40 border border-glass-border flex gap-4 select-none">
                   <div className="p-2 rounded-lg bg-bg-primary border border-glass-border text-text-primary flex-shrink-0 h-fit">
-                    {cap.icon}
+                    {getIcon(cap.iconName)}
                   </div>
                   <div>
                     <h3 className="text-xs font-bold text-text-primary tracking-tight leading-tight">{cap.title}</h3>
@@ -205,16 +197,13 @@ export default function HomePage() {
           </div>
 
           {/* Trust & Delivery Panel */}
-          <div className="lg:col-span-5 space-y-6">
-            <h2 className="text-2xl font-serif font-bold text-text-primary tracking-tight mb-6">Trust & Delivery</h2>
+          <div className="lg:col-span-5 space-y-6 text-left">
+            <h2 className="text-2xl font-serif font-bold text-text-primary tracking-tight mb-6">
+              {trust.sectionTitle || "Trust & Delivery"}
+            </h2>
             <GlassCard className="p-6 border border-glass-border space-y-4 select-none">
-              {[
-                { title: "Real products, real deployments", desc: "No vaporware. Complete and functional static components linked live." },
-                { title: "Security first architecture", desc: "Built-in sanitization, credentials protection, and secure data routing." },
-                { title: "Scalable systems designed for growth", desc: "Edge functions and database structures designed to handle production spikes." },
-                { title: "Ongoing support and optimization", desc: "Continuous profiling of latency, edge cache ratios, and framework migrations." }
-              ].map((item, i) => (
-                <div key={i} className="flex gap-3 text-left">
+              {(trust.items || []).map((item, i) => (
+                <div key={item.id || i} className="flex gap-3 text-left">
                   <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
                   <div>
                     <h4 className="text-xs font-bold text-text-primary leading-tight">{item.title}</h4>
