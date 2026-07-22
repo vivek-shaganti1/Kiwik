@@ -140,32 +140,6 @@ export default function HomePage() {
           <div className="col-span-1 lg:col-span-6 flex flex-col items-center justify-center relative min-h-[520px] overflow-visible">
             {/* Holographic Centerpiece */}
             <Centerpiece />
-
-            {/* Dark glass boot terminal overlay */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.8 }}
-              className="absolute bottom-[-10px] right-2 sm:right-6 w-[230px] rounded-xl bg-black/85 border border-white/10 p-3.5 shadow-2xl font-mono text-[9px] text-emerald-400/90 leading-relaxed text-left z-30 select-none shadow-emerald-950/20"
-            >
-              <div className="flex items-center gap-1.5 border-b border-white/10 pb-1.5 mb-2 text-white/50 select-none">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-500/80" />
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500/80" />
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80" />
-                <span className="ml-1 text-[8px]">kiwik-os-boot.sh</span>
-              </div>
-
-              <div className="space-y-1 min-h-[70px]">
-                {bootMessages.slice(0, bootStep + 1).map((msg, i) => (
-                  <div key={i} className={cn(
-                    i === bootStep && bootStep < bootMessages.length - 1 ? "animate-pulse" : "",
-                    i === bootMessages.length - 1 ? "text-accent-cyan font-bold" : ""
-                  )}>
-                    {i === bootMessages.length - 1 ? "✔" : "●"} {msg}
-                  </div>
-                ))}
-              </div>
-            </motion.div>
           </div>
 
         </div>

@@ -101,10 +101,10 @@ export function CommandPalette() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className="w-full max-w-2xl bg-glass-bg border border-glass-border rounded-xl shadow-2xl overflow-hidden pointer-events-auto backdrop-blur-xl"
+              className="w-full max-w-xl bg-bg-secondary/95 dark:bg-bg-secondary/90 border border-glass-border rounded-2xl shadow-2xl overflow-hidden pointer-events-auto backdrop-blur-2xl"
             >
-              <div className="flex items-center px-4 border-b border-divider">
-                <Search className="w-5 h-5 text-text-secondary" />
+              <div className="flex items-center px-4 bg-neutral-200/20 dark:bg-black/15 border-b border-divider">
+                <Search className="w-4 h-4 text-text-secondary shrink-0" />
                 <input
                   ref={inputRef}
                   type="text"
@@ -112,13 +112,19 @@ export function CommandPalette() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="w-full px-4 py-4 bg-transparent border-none outline-none text-text-primary placeholder:text-text-secondary/50 text-lg"
+                  className="w-full px-3 py-3.5 bg-transparent border-0 border-transparent outline-none focus:outline-none focus:ring-0 focus:border-transparent text-text-primary placeholder:text-text-secondary/40 text-base"
+                  style={{
+                    border: 'none',
+                    outline: 'none',
+                    background: 'transparent',
+                    boxShadow: 'none',
+                  }}
                 />
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-1 rounded-md hover:bg-glass-bg-hover transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-neutral-200/50 dark:hover:bg-white/5 transition-colors text-text-secondary hover:text-text-primary shrink-0"
                 >
-                  <X className="w-5 h-5 text-text-secondary" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
 
