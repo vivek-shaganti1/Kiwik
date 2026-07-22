@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useProjects } from "@/stores/projects-store";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import Fuse from "fuse.js";
 
 interface Message {
   id: string;
@@ -149,49 +150,91 @@ export function AIChatbot() {
     speakText(text);
   };
 
-  const generateResponse = (query: string): { text: string; matchedProjects: any[] } => {
-    const lowerQuery = query.toLowerCase();
+  const generateResponse = (rawQuery: string): { text: string; matchedProjects: any[] } => {
+    // 1. Pre-process query to resolve common voice-transcription phonetics
+    let query = rawQuery.toLowerCase();
+    query = query.replace(/\btext tag\b/g, "tech stack");
+    query = query.replace(/\btext tags\b/g, "tech stack");
+    query = query.replace(/\btech tag\b/g, "tech stack");
+    query = query.replace(/\btech tags\b/g, "tech stack");
+    query = query.replace(/\bchris gayle\b/g, "criskaai");
+    query = query.replace(/\bchris copy\b/g, "criskapay");
+    query = query.replace(/\bchris\b/g, "criska");
+    query = query.replace(/\bchrisy\b/g, "criska");
+    query = query.replace(/\bchrisha\b/g, "criska");
+    query = query.replace(/\buses\b/g, "purpose");
+
     let matchedProjects: any[] = [];
     let text = "";
 
-    // 1. Check for specific project query
-    const matchingProj = projects.find((p) => lowerQuery.includes(p.name.toLowerCase()) || p.slug.split("-").some(part => lowerQuery.includes(part)));
+    // Setup Fuse.js for project searching
+    const fuse = new Fuse(projects, {
+      keys: ["name", "category", "tagline", "description", "techStack.name"],
+      threshold: 0.45,
+    });
 
-    if (matchingProj) {
-      matchedProjects = [matchingProj];
-      text = `Here are the details on **${matchingProj.name}** (${matchingProj.category} project, v${matchingProj.version || "1.0.0"}): \n\n* **Status**: ${matchingProj.status.replace("-", " ")} (${matchingProj.completionPercent}% complete)\n* **Tagline**: ${matchingProj.tagline}\n* **Stack**: ${matchingProj.techStack.map(t => t.name).join(", ")}\n\nYou can click below to explore its live edge monitor or full documentation.`;
+    const results = fuse.search(query);
+
+    // 2. Handle queries about contributors / team members
+    if (query.includes("people") || query.includes("worked") || query.includes("contributors") || query.includes("team") || query.includes("who built")) {
+      const allContributorsMap = new Map<string, { name: string; role: string; projects: string[] }>();
+      projects.forEach((p) => {
+        if (p.contributors) {
+          p.contributors.forEach((c) => {
+            const existing = allContributorsMap.get(c.name) || { name: c.name, role: c.role, projects: [] };
+            existing.projects.push(p.name);
+            allContributorsMap.set(c.name, existing);
+          });
+        }
+      });
+
+      const uniqueContributors = Array.from(allContributorsMap.values());
+      if (uniqueContributors.length > 0) {
+        text = `Here is our team and contributors who engineered the projects:\n\n` + 
+          uniqueContributors.map(c => `* **${c.name}** (${c.role}) — Worked on: *${c.projects.join(", ")}*`).join("\n");
+      } else {
+        text = "Our systems indicate the projects are engineered and maintained by **Criska Core Team**.";
+      }
       return { text, matchedProjects };
     }
 
-    // 2. Check for technology queries
-    const techMatches = projects.filter((p) =>
-      p.techStack.some((t) => lowerQuery.includes(t.name.toLowerCase()))
-    );
+    // 3. Handle queries about README documentation
+    if (query.includes("readme") || query.includes("documentation") || query.includes("doc")) {
+      const matched = results.length > 0 ? results[0].item : null;
+      if (matched) {
+        text = `Here is a summary of the **README.md** documentation for **${matched.name}**:\n\n* **Description**: ${matched.description}\n* **Key Stack**: ${matched.techStack.slice(0, 5).map(t => t.name).join(", ")}\n* **Details**: Check out the full markdown tab on its detail page below!`;
+        return { text, matchedProjects: [matched] };
+      } else {
+        text = "Which project's README would you like to explore? (e.g. CriskaAI, CriskaCloud, CriskaPay)";
+        return { text, matchedProjects };
+      }
+    }
 
-    if (techMatches.length > 0 && (lowerQuery.includes("tech") || lowerQuery.includes("stack") || lowerQuery.includes("react") || lowerQuery.includes("next") || lowerQuery.includes("tailwind") || lowerQuery.includes("prisma") || lowerQuery.includes("postgres") || lowerQuery.includes("ai") || lowerQuery.includes("python"))) {
-      matchedProjects = techMatches;
-      text = `I found ${techMatches.length} project(s) matching your requested stack: \n\n${techMatches
-        .map((p) => `* **${p.name}** — ${p.tagline} (${p.category})`)
-        .join("\n")}\n\nCheck out the quick action links below to view them!`;
+    // 4. Handle technology queries
+    const isTechQuery = query.includes("tech") || query.includes("stack") || query.includes("work") || query.includes("language") || query.includes("framework");
+    if (isTechQuery) {
+      if (results.length > 0) {
+        matchedProjects = results.map(r => r.item).slice(0, 4);
+        text = `Here is the tech stack used in our key projects:\n\n` +
+          matchedProjects.map(p => `* **${p.name}**: uses *${p.techStack.map((t: any) => t.name).slice(0, 6).join(", ")}*`).join("\n") +
+          `\n\nExplore any of these projects below for detailed telemetry!`;
+        return { text, matchedProjects };
+      }
+    }
+
+    // 5. Check if we have a direct match for a specific project
+    if (results.length > 0) {
+      const match = results[0].item;
+      matchedProjects = [match];
+      text = `Here are details on **${match.name}** (${match.category} project, v${match.version || "1.0.0"}): \n\n* **Status**: ${match.status.replace("-", " ")} (${match.completionPercent}% complete)\n* **Tagline**: ${match.tagline}\n* **Stack**: ${match.techStack.map(t => t.name).join(", ")}\n\nYou can click below to explore its live edge monitor or full documentation.`;
       return { text, matchedProjects };
     }
 
-    // 3. Status queries
-    if (lowerQuery.includes("progress") || lowerQuery.includes("complete") || lowerQuery.includes("status")) {
-      const inProgress = projects.filter((p) => p.status === "in-progress");
-      const completed = projects.filter((p) => p.status === "completed");
-      text = `Our edge operating system currently tracks **${projects.length} total projects**:\n\n* **Completed**: ${completed.length} project(s)\n* **In Progress**: ${inProgress.length} project(s)\n\nAsk me about any specific project (e.g. "CriskaCloud") to get deep statistics!`;
-      return { text, matchedProjects };
-    }
-
-    // 4. Default fallbacks
-    if (lowerQuery.includes("hello") || lowerQuery.includes("hi ") || lowerQuery.includes("hey")) {
+    // Fallbacks
+    if (query.includes("hello") || query.includes("hi ") || query.includes("hey")) {
       text = "Hi there! Welcome to Kiwik.1. Ask me about our projects (like CriskaAI, CriskaCloud), tech stack, or edge latency stats!";
-    } else if (lowerQuery.includes("who are you") || lowerQuery.includes("what is this")) {
-      text = "This is Kiwik.1, the central Operating System of Criska projects. I am an on-board semantic AI designed to index and answer queries about Criska's applications.";
     } else {
-      // General match
-      text = `I'm here to help you navigate our ecosystems! I'm indexing **${projects.length} Criska projects**: ${projects.map(p => p.name).join(", ")}. Ask me about any of these!`;
+      text = `I'm here to help you navigate our ecosystems! I'm indexing **${projects.length} Criska projects**: ${projects.map(p => p.name).join(", ")}. Ask me about their tech stacks, README files, or team members!`;
     }
 
     return { text, matchedProjects };
