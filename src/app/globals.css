@@ -145,11 +145,7 @@
    BASE STYLES
    ═══════════════════════════════════════════════════════════════ */
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* Unlayered reset removed - Tailwind preflight handles box-sizing, margin, and padding resets within CSS Cascade Layers */
 
 html {
   scroll-behavior: smooth;

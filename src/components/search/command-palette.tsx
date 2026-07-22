@@ -6,10 +6,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, Command, ArrowUp, ArrowDown, CornerDownLeft, X, LayoutTemplate } from "lucide-react";
 import Fuse from "fuse.js";
 import { cn } from "@/lib/utils";
-import { projects } from "@/data/projects";
+import { useProjects } from "@/stores/projects-store";
 import { Project } from "@/types";
 
 export function CommandPalette() {
+  const projects = useProjects();
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);

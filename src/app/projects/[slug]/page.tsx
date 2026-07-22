@@ -9,13 +9,14 @@ import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import { ExternalLink, Star, GitFork, Eye, CheckCircle, X, ArrowLeft, Code } from "lucide-react";
 
-import { projects } from "@/data/projects";
+import { useProjects } from "@/stores/projects-store";
 import { GlassCard } from "@/components/glass/glass-card";
 import { GlassButton } from "@/components/glass/glass-button";
 import { useHistoryStore } from "@/stores/history-store";
 import { cn } from "@/lib/utils";
 
 export default function ProjectDetailPage() {
+  const projects = useProjects();
   const params = useParams();
   const slug = params?.slug as string;
   const project = projects.find(p => p.slug === slug);
@@ -54,7 +55,7 @@ export default function ProjectDetailPage() {
   return (
     <div className="min-h-screen pb-20">
       {/* Hero */}
-      <div className={cn("relative pt-32 pb-20 px-4 md:px-8 bg-gradient-to-b", gradient)}>
+      <div className={cn("relative pt-32 pb-20 px-4 sm:px-6 md:px-8 bg-gradient-to-b", gradient)}>
         <div className="absolute inset-0 bg-[var(--bg-primary)] opacity-80 -z-10" />
         
         <div className="max-w-5xl mx-auto">
@@ -104,8 +105,8 @@ export default function ProjectDetailPage() {
       </div>
 
       {/* Sticky Nav */}
-      <div className="sticky top-[72px] z-40 backdrop-blur-md border-y border-divider" style={{ backgroundColor: "var(--bg-primary)" }}>
-        <div className="max-w-5xl mx-auto px-4 md:px-8">
+      <div className="sticky top-[72px] z-40 backdrop-blur-md border-y border-divider bg-bg-primary/80">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8">
           <div className="flex overflow-x-auto scrollbar-hide py-3 gap-1">
             {tabs.map(tab => (
               <button
@@ -126,7 +127,7 @@ export default function ProjectDetailPage() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 md:px-8 mt-12 space-y-24">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 mt-12 space-y-24">
         {/* Overview */}
         <section id="overview" className="scroll-mt-32">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>

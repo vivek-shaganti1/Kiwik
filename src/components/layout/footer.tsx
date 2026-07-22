@@ -34,12 +34,7 @@ export function Footer() {
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
-      className="w-full mt-auto py-8 px-4"
-      style={{
-        borderTop: "1px solid var(--divider)",
-        background: "var(--glass-bg)",
-        backdropFilter: "blur(20px)",
-      }}
+      className="w-full mt-auto py-8 px-4 sm:px-6 md:px-8 border-t border-divider bg-glass-bg backdrop-blur-xl"
     >
       <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2 text-sm" style={{ color: "var(--text-secondary)" }}>

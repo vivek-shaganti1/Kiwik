@@ -5,9 +5,8 @@ import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { ArrowRight, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { projects } from "@/data/projects";
+import { useProjects } from "@/stores/projects-store";
 import { useCounter } from "@/hooks/use-counter";
-import { Footer } from "@/components/layout/footer";
 import { AuroraBackground } from "@/components/effects/aurora-background";
 import { ProjectCard } from "@/components/projects/project-card";
 
@@ -40,7 +39,8 @@ function StatItem({ label, value }: { label: string; value: string | number }) {
 }
 
 export default function HomePage() {
-  const featuredProjects = projects.filter(p => p.status === "completed").slice(0, 3);
+  const projects = useProjects();
+  const featuredProjects = projects.slice(0, 4);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -60,12 +60,12 @@ export default function HomePage() {
       <AuroraBackground intensity="medium" />
       
       {/* Hero Section */}
-      <section className="relative min-h-[100svh] flex flex-col items-center justify-center overflow-hidden px-4">
+      <section className="relative min-h-[100svh] flex flex-col items-center justify-center overflow-hidden px-4 sm:px-6 md:px-8">
         <motion.div 
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="relative z-10 flex flex-col items-center text-center max-w-5xl mx-auto mt-20"
+          className="relative z-10 flex flex-col items-center text-center max-w-5xl mx-auto mt-12 md:mt-20"
         >
           <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-glass-bg border border-glass-border backdrop-blur-md mb-8">
             <span className="w-2 h-2 rounded-full bg-[var(--accent)] animate-pulse" />
@@ -108,7 +108,7 @@ export default function HomePage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-24 px-4 relative z-10">
+      <section className="py-16 md:py-24 px-4 sm:px-6 md:px-8 relative z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
             {stats.map((stat, i) => (
@@ -119,7 +119,7 @@ export default function HomePage() {
       </section>
 
       {/* Featured Projects */}
-      <section className="py-24 px-4 relative z-10 overflow-hidden">
+      <section className="py-16 md:py-24 px-4 sm:px-6 md:px-8 relative z-10 overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-end justify-between mb-12">
             <h2 className="text-4xl md:text-5xl font-black gradient-text">Featured Projects</h2>
@@ -133,7 +133,7 @@ export default function HomePage() {
 
           <div className="flex overflow-x-auto pb-12 -mx-4 px-4 snap-x snap-mandatory hide-scrollbar gap-6">
             {featuredProjects.map((project) => (
-              <div key={project.id} className="flex-none w-[85vw] md:w-[400px] snap-center">
+              <div key={project.id} className="flex-none w-[85vw] md:w-[400px] h-[500px] snap-center">
                 <ProjectCard project={project} />
               </div>
             ))}
@@ -150,7 +150,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <Footer />
     </div>
   );
 }

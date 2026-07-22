@@ -39,8 +39,8 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
   return (
     <Link href={`/projects/${project.slug}`} className="block h-full outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-2xl">
-      <GlassCard hover tilt glow className="h-full flex flex-col p-0 overflow-hidden group">
-        <div className={cn("relative h-[200px] w-full bg-gradient-to-br", gradient)}>
+      <GlassCard hover tilt glow className="h-full flex flex-col p-0 overflow-hidden group border border-glass-border">
+        <div className={cn("relative h-[200px] w-full bg-gradient-to-br border-b border-glass-border", gradient)}>
           <div className="absolute top-4 left-4 flex items-center gap-2">
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/10">
               <div className={cn("w-2 h-2 rounded-full", {
@@ -58,7 +58,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
           </div>
         </div>
         
-        <div className="p-6 flex flex-col flex-grow">
+        <div className="p-4 sm:p-6 flex flex-col flex-grow">
           <h3 className="text-lg font-bold text-text-primary mb-2 line-clamp-1 group-hover:text-[var(--accent)] transition-colors">
             {project.name}
           </h3>
@@ -67,7 +67,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
             {project.tagline}
           </p>
           
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="flex flex-wrap gap-2 mb-4">
             {project.techStack.slice(0, 4).map((tech) => (
               <span key={tech.name} className="px-2 py-1 text-[10px] font-medium rounded bg-white/5 border border-white/10 text-text-secondary">
                 {tech.name}

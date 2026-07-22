@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Grid3X3, List, Clock, Filter, Search } from "lucide-react";
-import { projects } from "@/data/projects";
+import { useProjects } from "@/stores/projects-store";
 import { ProjectCard } from "@/components/projects/project-card";
 import { ProjectStatus, ProjectCategory, SortMode } from "@/types";
 import { cn } from "@/lib/utils";
@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 type LayoutMode = "grid" | "rows" | "timeline";
 
 export default function ProjectsPage() {
+  const projects = useProjects();
   const [layout, setLayout] = useState<LayoutMode>("grid");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | "all">("all");
@@ -47,7 +48,7 @@ export default function ProjectsPage() {
   }, [search, statusFilter, categoryFilter, sortMode]);
 
   return (
-    <div className="min-h-screen pt-24 pb-16 px-4 md:px-8 max-w-7xl mx-auto">
+    <div className="min-h-screen pt-24 pb-16 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
       <div className="mb-12">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">All Projects</h1>
         <p className="text-text-secondary text-lg">Showing {filteredAndSorted.length} project{filteredAndSorted.length !== 1 ? 's' : ''}</p>
@@ -77,7 +78,6 @@ export default function ProjectsPage() {
             value={sortMode} 
             onChange={(e) => setSortMode(e.target.value as SortMode)}
             className="bg-glass-bg border border-glass-border rounded-xl px-4 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent appearance-none cursor-pointer shrink-0"
-            style={{ backgroundColor: "var(--glass-bg)" }}
           >
             <option value="newest" className="bg-bg-elevated text-text-primary">Newest</option>
             <option value="oldest" className="bg-bg-elevated text-text-primary">Oldest</option>
@@ -165,6 +165,7 @@ export default function ProjectsPage() {
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.3 }}
                 className={cn(
+                  "h-full",
                   layout === "rows" ? "w-full" : "",
                   layout === "timeline" ? cn(
                     "relative md:w-[calc(50%-2rem)]", 
@@ -181,7 +182,7 @@ export default function ProjectsPage() {
                 {layout === "timeline" && (
                   <div className="absolute top-10 left-5 w-4 h-4 rounded-full bg-[var(--bg-primary)] border-2 border-[var(--accent)] z-10 -translate-x-1/2 md:hidden" />
                 )}
-                <div className={layout === "timeline" ? "pl-12 md:pl-0" : ""}>
+                <div className={cn("h-full", layout === "timeline" ? "pl-12 md:pl-0" : "")}>
                   <ProjectCard project={project} />
                 </div>
               </motion.div>

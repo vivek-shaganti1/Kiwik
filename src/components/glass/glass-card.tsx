@@ -75,7 +75,7 @@ export function GlassCard({
         transformStyle: "preserve-3d",
       }}
       className={cn(
-        "relative rounded-2xl p-6 transition-colors duration-300",
+        "relative rounded-2xl p-4 sm:p-6 transition-colors duration-300",
         "glass glass-noise",
         hover && "glass-hover",
         glow && "glass-glow",
@@ -91,7 +91,18 @@ export function GlassCard({
           background: `radial-gradient(circle 300px at var(--mouse-x, 0) var(--mouse-y, 0), hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.15), transparent 80%)`,
         }}
       />
-      <div className="relative z-10" style={{ transform: tilt && isHovered ? "translateZ(30px)" : "none" }}>
+      <div 
+        className={cn(
+          "relative z-10 h-full w-full",
+          className?.includes("flex") && "flex",
+          className?.includes("flex-col") && "flex-col",
+          className?.includes("flex-row") && "flex-row",
+          className?.includes("items-") && className.split(" ").filter(c => c.startsWith("items-")).join(" "),
+          className?.includes("justify-") && className.split(" ").filter(c => c.startsWith("justify-")).join(" "),
+          className?.includes("gap-") && className.split(" ").filter(c => c.startsWith("gap-")).join(" ")
+        )}
+        style={{ transform: tilt && isHovered ? "translateZ(30px)" : "none" }}
+      >
         {children}
       </div>
     </motion.div>
