@@ -127,6 +127,8 @@ function MagneticGlassButton({ children, onClick, href, variant = "primary", cla
   return <div onClick={onClick}>{content}</div>;
 }
 
+import { useSiteCMSStore } from "@/stores/site-cms-store";
+
 // ─────────────────────────────────────────────────────────────
 // 3. MAIN ANIMATED HERO COMPONENT
 // ─────────────────────────────────────────────────────────────
@@ -136,25 +138,19 @@ export interface AnimatedHeroProps {
 }
 
 export function AnimatedHero({ onWatchOverview, className }: AnimatedHeroProps) {
-  // Rotating headline words
-  const rotatingWords = [
-    "Digital Products.",
-    "AI Platforms.",
-    "Enterprise Apps.",
-    "Automation.",
-    "Research.",
-    "Innovation.",
-    "Developer Tools.",
-    "Cloud Infrastructure.",
-  ];
+  const heroCMS = useSiteCMSStore((state) => state.cms.hero);
+  const rotatingWords = heroCMS.rotatingWords && heroCMS.rotatingWords.length > 0
+    ? heroCMS.rotatingWords
+    : ["Digital Products.", "AI Platforms.", "Enterprise Apps.", "Automation.", "Research.", "Innovation."];
+
   const [wordIndex, setWordIndex] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setWordIndex((prev) => (prev + 1) % rotatingWords.length);
-    }, 2500);
+    }, (heroCMS.animationSpeedSeconds || 2.5) * 1000);
     return () => clearInterval(timer);
-  }, [rotatingWords.length]);
+  }, [rotatingWords.length, heroCMS.animationSpeedSeconds]);
 
   return (
     <section
@@ -178,15 +174,15 @@ export function AnimatedHero({ onWatchOverview, className }: AnimatedHeroProps) 
           <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-glass-bg border border-glass-border shadow-sm w-fit group cursor-pointer hover:border-glass-border-hover transition-colors">
             <span className="w-1.5 h-1.5 rounded-full bg-accent-blue animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
             <span className="text-[10px] font-mono font-bold text-text-secondary uppercase tracking-wider group-hover:text-text-primary transition-colors">
-              Kiwik.1 v1.0.0-beta
+              {heroCMS.versionBadge || "Kiwik.1 v1.0.0-beta"}
             </span>
           </div>
 
           {/* Title Header with Perfectly Aligned Inline Baseline Rotating Word */}
           <h1 className="text-4xl sm:text-5xl md:text-[62px] font-serif font-semibold leading-[1.08] tracking-tight text-text-primary">
-            The Operating System <br />
+            {heroCMS.headlinePrefix || "The Operating System"} <br />
             <span className="inline-flex items-baseline flex-wrap gap-x-3">
-              <span>for</span>
+              <span>{heroCMS.headlineHighlightWord || "for"}</span>
               <span className="inline-block relative overflow-hidden h-[1.22em] min-w-[280px] sm:min-w-[340px] align-baseline">
                 <AnimatePresence mode="wait">
                   <motion.span
@@ -202,7 +198,7 @@ export function AnimatedHero({ onWatchOverview, className }: AnimatedHeroProps) 
                     }}
                     className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-accent-blue via-indigo-500 to-accent-cyan font-serif font-bold italic drop-shadow-sm whitespace-nowrap leading-[1.22]"
                   >
-                    {rotatingWords[wordIndex]}
+                    {rotatingWords[wordIndex % rotatingWords.length]}
                   </motion.span>
                 </AnimatePresence>
               </span>
@@ -211,35 +207,33 @@ export function AnimatedHero({ onWatchOverview, className }: AnimatedHeroProps) 
 
           {/* Description Paragraph */}
           <p className="text-sm md:text-base text-text-secondary leading-relaxed font-medium max-w-[480px]">
-            Build. Ship. Document. Scale. Everything.
-            Unified workspace for projects, documentation, deployments, analytics, and AI assistant layers.
+            {heroCMS.description || "Build. Ship. Document. Scale. Everything. Unified workspace for projects, documentation, deployments, analytics, and AI assistant layers."}
           </p>
 
           {/* CTA Buttons with Magnetic Micro-interactions */}
           <div className="flex flex-wrap items-center gap-3 pt-2">
-            <MagneticGlassButton href="/projects" variant="primary">
-              <span>Explore Projects</span>
-              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-            </MagneticGlassButton>
+            {heroCMS.primaryButton?.visible !== false && (
+              <MagneticGlassButton href={heroCMS.primaryButton?.link || "/projects"} variant="primary">
+                <span>{heroCMS.primaryButton?.text || "Explore Projects"}</span>
+                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+              </MagneticGlassButton>
+            )}
 
-            <MagneticGlassButton
-              onClick={() => onWatchOverview && onWatchOverview()}
-              variant="secondary"
-            >
-              <Play className="w-3.5 h-3.5 text-accent-blue fill-accent-blue/20 group-hover:scale-110 transition-transform" />
-              <span>Watch Overview</span>
-            </MagneticGlassButton>
+            {heroCMS.secondaryButton?.visible !== false && (
+              <MagneticGlassButton
+                onClick={() => onWatchOverview && onWatchOverview()}
+                variant="secondary"
+              >
+                <Play className="w-3.5 h-3.5 text-accent-blue fill-accent-blue/20 group-hover:scale-110 transition-transform" />
+                <span>{heroCMS.secondaryButton?.text || "Watch Overview"}</span>
+              </MagneticGlassButton>
+            )}
           </div>
 
           {/* Core Telemetry Metrics Grid with CountUp Animation */}
           <div className="grid grid-cols-4 gap-3 pt-8 border-t border-divider/60 max-w-[500px]">
-            {[
-              { val: 24, suffix: "+", label: "Projects", decimals: 0 },
-              { val: 1.2, suffix: "M+", label: "Visitors", decimals: 1 },
-              { val: 99.9, suffix: "%", label: "Uptime", decimals: 1 },
-              { val: 42, suffix: "ms", label: "Latency", decimals: 0 },
-            ].map((st, i) => (
-              <div key={i} className="text-left select-none group">
+            {(heroCMS.metrics || []).map((st, i) => (
+              <div key={st.id || i} className="text-left select-none group">
                 <div className="text-sm sm:text-base font-bold text-text-primary tracking-tight font-mono group-hover:text-accent-blue transition-colors">
                   <CountUpNumber end={st.val} suffix={st.suffix} decimals={st.decimals} />
                 </div>

@@ -56,7 +56,12 @@ function DiscordIcon({ className }: { className?: string }) {
   );
 }
 
+import { useSiteCMSStore } from "@/stores/site-cms-store";
+
 export function Footer() {
+  const footerCMS = useSiteCMSStore((state) => state.cms.footer);
+  const settingsCMS = useSiteCMSStore((state) => state.cms.settings);
+
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
 
@@ -85,9 +90,11 @@ export function Footer() {
               <Mail className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
             </div>
             <div>
-              <h4 className="text-base font-bold text-slate-800 dark:text-white tracking-tight">Stay in the Loop</h4>
+              <h4 className="text-base font-bold text-slate-800 dark:text-white tracking-tight">
+                {footerCMS.newsletterHeadline || "Stay in the Loop"}
+              </h4>
               <p className="text-slate-500 dark:text-slate-400 text-xs mt-1 max-w-md font-semibold">
-                Get product updates, launch notes, and insights directly in your inbox.
+                {footerCMS.newsletterDescription || "Get product updates, launch notes, and insights directly in your inbox."}
               </p>
             </div>
           </div>

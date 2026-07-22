@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -29,1051 +29,757 @@ import {
   Image as ImageIcon,
   Check,
   Eye,
-  Star
+  Star,
+  LayoutDashboard,
+  Smartphone,
+  Tablet,
+  Monitor,
+  Moon,
+  Sun,
+  Shield,
+  History,
+  Settings,
+  Palette,
+  Compass,
+  Database,
+  Terminal,
+  Activity
 } from "lucide-react";
 
 import { useProjectsStore, useProjects } from "@/stores/projects-store";
+import { useSiteCMSStore } from "@/stores/site-cms-store";
 import { GlassCard } from "@/components/glass/glass-card";
 import { GlassButton } from "@/components/glass/glass-button";
-import type {
-  Project,
-  ProjectStatus,
-  ProjectCategory,
-  TechCategory,
-  TechItem,
-  Feature,
-  ChangelogEntry,
-  TimelineEntry,
-  Contributor,
-  ProjectImage
-} from "@/types";
+import type { Project } from "@/types";
 import { cn } from "@/lib/utils";
 
-// Initial blank project template
-const emptyProject: Project = {
-  id: "",
-  slug: "",
-  name: "",
-  tagline: "",
-  description: "",
-  longDescription: "",
-  status: "in-progress",
-  category: "web",
-  tags: ["new"],
-  version: "1.0.0",
-  completionPercent: 50,
-  liveUrl: "",
-  githubUrl: "",
-  coverImage: "/images/kiwik-cover.jpg",
-  images: [],
-  techStack: [],
-  features: [],
-  changelog: [],
-  contributors: [],
-  timeline: [],
-  readme: "",
-  architecture: "",
-  lastUpdated: new Date().toISOString().split("T")[0],
-  createdAt: new Date().toISOString().split("T")[0],
-  owner: "Criska",
-  stars: 0,
-  forks: 0,
-  views: 0,
-  deploymentStatus: "live"
-};
+type AdminTab =
+  | "dashboard"
+  | "visual-editor"
+  | "hero"
+  | "projects"
+  | "media"
+  | "navigation"
+  | "theme"
+  | "seo"
+  | "audit-snapshots";
 
 export default function AdminPage() {
+  const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
   const projects = useProjects();
   const {
     addProject,
     updateProject,
     deleteProject,
-    movePriority,
     duplicateProject,
-    resetToDefaults,
-    setProjects
+    resetToDefaults
   } = useProjectsStore();
 
+  const cms = useSiteCMSStore((state) => state.cms);
+  const {
+    updateSettings,
+    updateHero,
+    updateHeroRotatingWords,
+    updateHeroMetric,
+    updateNavigation,
+    updateFooter,
+    updateTheme,
+    updateSEO,
+    addMediaItem,
+    deleteMediaItem,
+    createSnapshot,
+    rollbackSnapshot,
+    deleteSnapshot,
+    exportJSONBackup,
+    importJSONBackup,
+    resetCMSToDefaults
+  } = useSiteCMSStore();
+
+  // Search & Filter States
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [newRotatingWord, setNewRotatingWord] = useState("");
+  const [snapshotName, setSnapshotName] = useState("");
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
+  const [previewMode, setPreviewMode] = useState<"dark" | "light">("dark");
+  const [jsonBackupInput, setJsonBackupInput] = useState("");
+  const [saveNotification, setSaveNotification] = useState<string | null>(null);
 
-  // Modal states
-  const [isEditing, setIsEditing] = useState(false);
-  const [currentProject, setCurrentProject] = useState<Project>(emptyProject);
-  const [activeTab, setActiveTab] = useState<string>("basic");
-  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  const [showJsonModal, setShowJsonModal] = useState(false);
-  const [jsonInput, setJsonInput] = useState("");
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [visitorStats, setVisitorStats] = useState({ total: 35247, active: 4 });
+  // New Project Form Modal
+  const [isEditingProject, setIsEditingProject] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Partial<Project> | null>(null);
 
-  useEffect(() => {
-    fetch("/api/visitors")
-      .then((res) => res.json())
-      .then((data) => setVisitorStats(data))
-      .catch((err) => console.error("Error loading visitors telemetry", err));
-
-    // Poll every 10 seconds for real-time live active updates
-    const interval = setInterval(() => {
-      fetch("/api/visitors")
-        .then((res) => res.json())
-        .then((data) => setVisitorStats(data))
-        .catch((err) => console.error("Error polling visitors telemetry", err));
-    }, 10000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
+  const showSaveSuccess = (msg: string) => {
+    setSaveNotification(msg);
+    setTimeout(() => setSaveNotification(null), 3000);
   };
 
-  // Stats calculation
-  const totalProjects = projects.length;
-  const inProgressCount = projects.filter(p => p.status === "in-progress").length;
-  const completedCount = projects.filter(p => p.status === "completed").length;
-  const avgCompletion = totalProjects > 0
-    ? Math.round(projects.reduce((acc, p) => acc + (p.completionPercent || 0), 0) / totalProjects)
-    : 0;
-
-  // Filtered projects
-  const filteredProjects = projects.filter(p => {
-    const matchesSearch =
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.tagline.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.category.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "all" || p.status === statusFilter;
-    const matchesCategory = categoryFilter === "all" || p.category === categoryFilter;
-    return matchesSearch && matchesStatus && matchesCategory;
-  });
-
-  // Open modal for new project
-  const handleCreateNew = () => {
-    const newId = `proj-${Date.now()}`;
-    setCurrentProject({
-      ...emptyProject,
-      id: newId,
-      slug: `project-${Date.now().toString().slice(-4)}`
-    });
-    setActiveTab("basic");
-    setIsEditing(true);
+  const handleAddRotatingWord = () => {
+    if (!newRotatingWord.trim()) return;
+    const updated = [...cms.hero.rotatingWords, newRotatingWord.trim()];
+    updateHeroRotatingWords(updated);
+    setNewRotatingWord("");
+    showSaveSuccess("Added rotating headline phrase!");
   };
 
-  // Open modal for editing existing project
-  const handleEditProject = (proj: Project) => {
-    setCurrentProject(JSON.parse(JSON.stringify(proj)));
-    setActiveTab("basic");
-    setIsEditing(true);
+  const handleRemoveRotatingWord = (index: number) => {
+    const updated = cms.hero.rotatingWords.filter((_, i) => i !== index);
+    updateHeroRotatingWords(updated);
+    showSaveSuccess("Removed rotating headline phrase!");
   };
 
-  // Save Project (Create or Update)
-  const handleSaveProject = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!currentProject.name || !currentProject.slug) {
-      showToast("Please provide both a Name and a Slug!");
-      return;
-    }
-
-    const exists = projects.some(p => p.id === currentProject.id);
-    if (exists) {
-      updateProject(currentProject.id, currentProject);
-      showToast(`Updated project "${currentProject.name}"`);
-    } else {
-      addProject(currentProject);
-      showToast(`Added new project "${currentProject.name}"`);
-    }
-
-    setIsEditing(false);
-  };
-
-  // Duplicate handler
-  const handleDuplicate = (id: string, name: string) => {
-    duplicateProject(id);
-    showToast(`Duplicated "${name}"`);
-  };
-
-  // Delete handler
-  const handleDelete = (id: string) => {
-    deleteProject(id);
-    setDeleteConfirmId(null);
-    showToast("Project deleted.");
-  };
-
-  // Priority move handler
-  const handleMovePriority = (id: string, dir: "up" | "down") => {
-    movePriority(id, dir);
-    showToast(`Priority adjusted.`);
-  };
-
-  // Export JSON
-  const handleExportJson = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(projects, null, 2));
+  const handleExportBackup = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(exportJSONBackup());
     const downloadAnchor = document.createElement("a");
     downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `kiwik_projects_${new Date().toISOString().split("T")[0]}.json`);
+    downloadAnchor.setAttribute("download", `kiwik_cms_backup_${Date.now()}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
-    showToast("Exported projects JSON file!");
+    showSaveSuccess("CMS Backup exported successfully!");
   };
 
-  // Import JSON
-  const handleImportJson = () => {
-    try {
-      const parsed = JSON.parse(jsonInput);
-      if (Array.isArray(parsed)) {
-        setProjects(parsed);
-        setShowJsonModal(false);
-        setJsonInput("");
-        showToast("Successfully imported projects JSON!");
-      } else {
-        alert("JSON must be an array of Project objects.");
-      }
-    } catch {
-      alert("Invalid JSON format.");
+  const handleImportBackup = () => {
+    if (!jsonBackupInput.trim()) return;
+    const success = importJSONBackup(jsonBackupInput);
+    if (success) {
+      showSaveSuccess("CMS Backup imported and restored!");
+      setJsonBackupInput("");
+    } else {
+      alert("Invalid JSON Backup format.");
     }
   };
 
   return (
-    <div className="min-h-screen text-text-primary pt-24 pb-20 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
-      {/* Toast Notification */}
+    <div className="min-h-screen bg-bg-primary text-text-primary pt-24 pb-16 px-4 sm:px-6 md:px-8 max-w-[1500px] mx-auto select-none">
+      
+      {/* Toast Save Notification */}
       <AnimatePresence>
-        {toastMessage && (
+        {saveNotification && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed top-20 right-6 z-50 px-4 py-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 backdrop-blur-xl shadow-2xl flex items-center gap-2"
+            initial={{ opacity: 0, y: -20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.9 }}
+            className="fixed top-6 right-6 z-50 px-5 py-3 rounded-full bg-emerald-600 text-white font-semibold text-xs shadow-2xl flex items-center gap-2 border border-emerald-400/40"
           >
-            <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-            <span className="font-medium text-sm">{toastMessage}</span>
+            <CheckCircle2 className="w-4 h-4" />
+            {saveNotification}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Header Banner */}
-      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-glass-border">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 border-b border-divider pb-6">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-xl bg-accent-blue/10 border border-accent-blue/30 text-accent-blue">
-              <Layers className="w-6 h-6" />
-            </div>
-            <h1 className="text-3xl md:text-4xl font-serif font-semibold bg-clip-text text-transparent bg-gradient-to-r from-text-primary via-text-primary/95 to-text-secondary">
-              Admin Project CMS
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-text-primary tracking-tight">
+              Kiwik.1 Enterprise Website CMS
             </h1>
           </div>
-          <p className="text-text-secondary text-sm md:text-base">
-            Add, edit, duplicate, and reorder projects by priority. Changes persist instantly across the entire platform.
+          <p className="text-xs text-text-secondary mt-1 font-medium">
+            Database-Driven Content Engine. Edit text, headlines, rotating phrases, navigation, theme, and projects live.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <GlassButton onClick={handleCreateNew} variant="primary" className="flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            <span>Add Project</span>
-          </GlassButton>
-          <GlassButton onClick={() => setShowJsonModal(true)} variant="secondary" className="flex items-center gap-2">
-            <Upload className="w-4 h-4" />
-            <span>Import</span>
-          </GlassButton>
-          <GlassButton onClick={handleExportJson} variant="secondary" className="flex items-center gap-2">
-            <Download className="w-4 h-4" />
-            <span>Export</span>
-          </GlassButton>
+        <div className="flex items-center gap-3 flex-wrap">
           <button
             onClick={() => {
-              if (confirm("Reset all projects to default sample data?")) {
-                resetToDefaults();
-                showToast("Reset projects to default data.");
-              }
+              createSnapshot(`Snapshot-${new Date().toLocaleTimeString()}`, "Manual snapshot backup");
+              showSaveSuccess("Created version snapshot!");
             }}
-            className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 transition-colors"
-            title="Reset to Defaults"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-glass-bg border border-glass-border hover:bg-glass-bg-hover text-xs font-semibold shadow-sm transition-all"
           >
-            <RotateCcw className="w-4 h-4" />
+            <History className="w-3.5 h-3.5 text-accent-blue" />
+            Save Snapshot
           </button>
+          <button
+            onClick={handleExportBackup}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-glass-bg border border-glass-border hover:bg-glass-bg-hover text-xs font-semibold shadow-sm transition-all"
+          >
+            <Download className="w-3.5 h-3.5 text-indigo-400" />
+            Export JSON
+          </button>
+          <Link
+            href="/"
+            target="_blank"
+            className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold text-xs shadow-md transition-all hover:scale-102"
+          >
+            <Eye className="w-3.5 h-3.5" />
+            Live Website
+          </Link>
         </div>
       </div>
 
-      {/* Stats Summary Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
-        <GlassCard className="p-4 flex flex-col justify-between">
-          <span className="text-xs text-text-secondary font-medium uppercase tracking-wider">Total Projects</span>
-          <span className="text-2xl font-bold text-text-primary mt-2">{totalProjects}</span>
-        </GlassCard>
-        <GlassCard className="p-4 flex flex-col justify-between">
-          <span className="text-xs text-text-secondary font-medium uppercase tracking-wider">In Progress</span>
-          <span className="text-2xl font-bold text-amber-400 mt-2">{inProgressCount}</span>
-        </GlassCard>
-        <GlassCard className="p-4 flex flex-col justify-between">
-          <span className="text-xs text-text-secondary font-medium uppercase tracking-wider">Completed</span>
-          <span className="text-2xl font-bold text-emerald-400 mt-2">{completedCount}</span>
-        </GlassCard>
-        <GlassCard className="p-4 flex flex-col justify-between">
-          <span className="text-xs text-text-secondary font-medium uppercase tracking-wider">Avg Completion</span>
-          <span className="text-2xl font-bold text-accent-blue mt-2">{avgCompletion}%</span>
-        </GlassCard>
+      {/* Admin Navigation Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar border-b border-divider/60">
+        {[
+          { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-3.5 h-3.5" /> },
+          { id: "visual-editor", label: "Visual Editor", icon: <Eye className="w-3.5 h-3.5" /> },
+          { id: "hero", label: "Hero CMS", icon: <Sparkles className="w-3.5 h-3.5" /> },
+          { id: "projects", label: "Projects CMS", icon: <Layers className="w-3.5 h-3.5" /> },
+          { id: "media", label: "Media Library", icon: <ImageIcon className="w-3.5 h-3.5" /> },
+          { id: "navigation", label: "Nav & Footer", icon: <Compass className="w-3.5 h-3.5" /> },
+          { id: "theme", label: "Theme & Styling", icon: <Palette className="w-3.5 h-3.5" /> },
+          { id: "seo", label: "SEO Engine", icon: <Search className="w-3.5 h-3.5" /> },
+          { id: "audit-snapshots", label: "Audit & Versioning", icon: <History className="w-3.5 h-3.5" /> }
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as AdminTab)}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all whitespace-nowrap cursor-pointer",
+              activeTab === tab.id
+                ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-md font-bold"
+                : "bg-glass-bg border border-glass-border text-text-secondary hover:text-text-primary hover:bg-glass-bg-hover"
+            )}
+          >
+            {tab.icon}
+            <span>{tab.label}</span>
+          </button>
+        ))}
+      </div>
 
-        {/* Visitors Analytics Dashboard Cards */}
-        <GlassCard className="p-4 flex flex-col justify-between border-accent-blue/30 bg-accent-blue/5">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-text-secondary font-medium uppercase tracking-wider">Live Visitors</span>
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+      {/* ─────────────────────────────────────────────────────────────
+          TAB 1: DASHBOARD OVERVIEW
+         ───────────────────────────────────────────────────────────── */}
+      {activeTab === "dashboard" && (
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[
+              { label: "Active Projects", val: projects.length, icon: <Layers className="w-5 h-5 text-accent-blue" /> },
+              { label: "Rotating Phrases", val: cms.hero.rotatingWords.length, icon: <Sparkles className="w-5 h-5 text-indigo-400" /> },
+              { label: "Media Assets", val: cms.media.length, icon: <ImageIcon className="w-5 h-5 text-cyan-400" /> },
+              { label: "Audit Log Trail", val: cms.auditLogs.length, icon: <History className="w-5 h-5 text-amber-400" /> }
+            ].map((st, i) => (
+              <GlassCard key={i} className="p-5 flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] uppercase font-mono tracking-wider text-text-secondary font-bold">{st.label}</p>
+                  <h3 className="text-2xl font-bold text-text-primary font-mono mt-1">{st.val}</h3>
+                </div>
+                <div className="p-3 rounded-2xl bg-bg-secondary border border-glass-border">{st.icon}</div>
+              </GlassCard>
+            ))}
           </div>
-          <span className="text-2xl font-bold text-text-primary mt-2">{visitorStats.active} active</span>
-        </GlassCard>
-        <GlassCard className="p-4 flex flex-col justify-between border-violet-500/30 bg-violet-500/5">
-          <span className="text-xs text-text-secondary font-medium uppercase tracking-wider">Total Visits</span>
-          <span className="text-2xl font-bold text-text-primary mt-2">{visitorStats.total.toLocaleString()}</span>
-        </GlassCard>
-      </div>
 
-      {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
-        <div className="relative w-full sm:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
-          <input
-            type="text"
-            placeholder="Search by name, category..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 rounded-xl bg-glass-bg border border-glass-border focus:outline-none focus:border-accent-blue text-sm transition-colors"
-          />
-        </div>
+          {/* Quick Edit Summary */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <GlassCard className="p-6 text-left space-y-4">
+              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-accent-blue" /> Current Hero Headline
+              </h3>
+              <div className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border font-serif text-lg text-text-primary">
+                "{cms.hero.headlinePrefix} <span className="italic text-accent-blue">{cms.hero.headlineHighlightWord}</span> [Rotating Phrases]"
+              </div>
+              <p className="text-xs text-text-secondary">
+                Description: {cms.hero.description}
+              </p>
+              <button
+                onClick={() => setActiveTab("hero")}
+                className="px-4 py-2 rounded-full bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors"
+              >
+                Edit Hero Content
+              </button>
+            </GlassCard>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3.5 py-2 rounded-xl bg-glass-bg border border-glass-border text-xs font-bold text-text-primary focus:outline-none hover:bg-glass-bg-hover transition-colors cursor-pointer"
-          >
-            <option value="all" className="bg-neutral-900">All Statuses</option>
-            <option value="completed" className="bg-neutral-900">Completed</option>
-            <option value="in-progress" className="bg-neutral-900">In Progress</option>
-            <option value="archived" className="bg-neutral-900">Archived</option>
-          </select>
-
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-3.5 py-2 rounded-xl bg-glass-bg border border-glass-border text-xs font-bold text-text-primary focus:outline-none hover:bg-glass-bg-hover transition-colors cursor-pointer"
-          >
-            <option value="all" className="bg-neutral-900">All Categories</option>
-            <option value="web" className="bg-neutral-900">Web</option>
-            <option value="ai" className="bg-neutral-900">AI</option>
-            <option value="mobile" className="bg-neutral-900">Mobile</option>
-            <option value="devops" className="bg-neutral-900">DevOps</option>
-            <option value="saas" className="bg-neutral-900">SaaS</option>
-            <option value="research" className="bg-neutral-900">Research</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Projects Management List */}
-      <div className="space-y-4">
-        {filteredProjects.length === 0 ? (
-          <GlassCard className="p-12 text-center">
-            <p className="text-text-secondary">No projects match your filter or query.</p>
-          </GlassCard>
-        ) : (
-          filteredProjects.map((proj, idx) => {
-            const actualIndex = projects.findIndex(p => p.id === proj.id);
-            return (
-              <GlassCard key={proj.id} className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 group">
-                <div className="flex items-center gap-4">
-                  {/* Priority & Reorder Controls */}
-                  <div className="flex flex-col items-center justify-center p-1.5 rounded-lg bg-neutral-900/60 border border-white/5 gap-1">
-                    <button
-                      disabled={actualIndex === 0}
-                      onClick={() => handleMovePriority(proj.id, "up")}
-                      className="p-1 rounded hover:bg-white/10 text-neutral-400 hover:text-white disabled:opacity-30 transition-colors"
-                      title="Move Priority Up"
-                    >
-                      <ArrowUp className="w-3.5 h-3.5" />
-                    </button>
-                    <span className="text-xs font-bold text-accent-blue px-1">
-                      #{actualIndex + 1}
-                    </span>
-                    <button
-                      disabled={actualIndex === projects.length - 1}
-                      onClick={() => handleMovePriority(proj.id, "down")}
-                      className="p-1 rounded hover:bg-white/10 text-neutral-400 hover:text-white disabled:opacity-30 transition-colors"
-                      title="Move Priority Down"
-                    >
-                      <ArrowDown className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-
-                  {/* Project Info */}
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-neutral-800 border border-glass-border overflow-hidden flex items-center justify-center flex-shrink-0">
-                      {proj.logo ? (
-                        <img src={proj.logo} alt={proj.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="text-lg font-bold text-accent-blue">{proj.name[0]}</span>
-                      )}
-                    </div>
+            <GlassCard className="p-6 text-left space-y-4">
+              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                <History className="w-4 h-4 text-indigo-400" /> Recent Audit Activity
+              </h3>
+              <div className="space-y-2 max-h-[160px] overflow-y-auto pr-2">
+                {cms.auditLogs.slice(0, 4).map((log) => (
+                  <div key={log.id} className="text-xs p-2.5 rounded-lg bg-bg-secondary border border-glass-border flex items-center justify-between">
                     <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-bold text-text-primary text-base">{proj.name}</h3>
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-glass-bg border border-glass-border text-text-secondary capitalize">
-                          {proj.category}
-                        </span>
-                        <span
-                          className={cn("text-xs px-2 py-0.5 rounded-full font-medium capitalize", {
-                            "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20": proj.status === "completed",
-                            "bg-amber-500/10 text-amber-400 border border-amber-500/20": proj.status === "in-progress",
-                            "bg-rose-500/10 text-rose-400 border border-rose-500/20": proj.status === "archived",
-                          })}
-                        >
-                          {proj.status.replace("-", " ")}
-                        </span>
-                      </div>
-                      <p className="text-xs text-text-secondary mt-0.5 line-clamp-1 max-w-xl">
-                        {proj.tagline || proj.description}
-                      </p>
+                      <span className="font-bold text-accent-blue">{log.section}: </span>
+                      <span className="text-text-secondary">{log.details}</span>
                     </div>
+                    <span className="text-[10px] font-mono text-text-muted shrink-0 ml-2">
+                      {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </GlassCard>
+          </div>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TAB 2: VISUAL WEBSITE EDITOR & DEVICE PREVIEW
+         ───────────────────────────────────────────────────────────── */}
+      {activeTab === "visual-editor" && (
+        <div className="space-y-6 text-left">
+          <div className="flex items-center justify-between p-4 rounded-2xl bg-glass-bg border border-glass-border">
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-bold text-text-primary">Device Viewport:</span>
+              <button
+                onClick={() => setPreviewDevice("desktop")}
+                className={cn("p-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors", previewDevice === "desktop" ? "bg-accent-blue text-white" : "bg-bg-secondary text-text-secondary")}
+              >
+                <Monitor className="w-4 h-4" /> Desktop
+              </button>
+              <button
+                onClick={() => setPreviewDevice("tablet")}
+                className={cn("p-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors", previewDevice === "tablet" ? "bg-accent-blue text-white" : "bg-bg-secondary text-text-secondary")}
+              >
+                <Tablet className="w-4 h-4" /> Tablet
+              </button>
+              <button
+                onClick={() => setPreviewDevice("mobile")}
+                className={cn("p-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors", previewDevice === "mobile" ? "bg-accent-blue text-white" : "bg-bg-secondary text-text-secondary")}
+              >
+                <Smartphone className="w-4 h-4" /> Mobile
+              </button>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-bold text-text-primary">Theme:</span>
+              <button
+                onClick={() => setPreviewMode(previewMode === "dark" ? "light" : "dark")}
+                className="p-2 rounded-lg bg-bg-secondary text-text-primary text-xs font-bold flex items-center gap-1.5 border border-glass-border"
+              >
+                {previewMode === "dark" ? <Moon className="w-4 h-4 text-indigo-400" /> : <Sun className="w-4 h-4 text-amber-500" />}
+                {previewMode === "dark" ? "Dark Mode" : "Light Mode"}
+              </button>
+            </div>
+          </div>
+
+          {/* Device Frame */}
+          <div className="flex justify-center w-full py-4 bg-black/40 rounded-3xl border border-glass-border overflow-hidden">
+            <div
+              className={cn(
+                "transition-all duration-500 rounded-2xl overflow-hidden border border-white/20 shadow-2xl bg-bg-primary",
+                previewDevice === "desktop" && "w-full max-w-[1300px] h-[720px]",
+                previewDevice === "tablet" && "w-[768px] h-[720px]",
+                previewDevice === "mobile" && "w-[375px] h-[680px]",
+                previewMode === "dark" ? "dark" : ""
+              )}
+            >
+              <iframe
+                src="/"
+                className="w-full h-full border-none"
+                title="Live Website Preview"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TAB 3: HERO CMS EDITOR
+         ───────────────────────────────────────────────────────────── */}
+      {activeTab === "hero" && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-left">
+          <div className="lg:col-span-7 space-y-6">
+            <GlassCard className="p-6 space-y-5">
+              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-accent-blue" /> Hero Headlines & Copy
+              </h3>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold text-text-secondary block mb-1.5">Version Pill Badge Text</label>
+                  <input
+                    type="text"
+                    value={cms.hero.versionBadge}
+                    onChange={(e) => updateHero({ versionBadge: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-text-secondary block mb-1.5">Headline Prefix</label>
+                    <input
+                      type="text"
+                      value={cms.hero.headlinePrefix}
+                      onChange={(e) => updateHero({ headlinePrefix: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-text-secondary block mb-1.5">Highlight Connecting Word</label>
+                    <input
+                      type="text"
+                      value={cms.hero.headlineHighlightWord}
+                      onChange={(e) => updateHero({ headlineHighlightWord: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary"
+                    />
                   </div>
                 </div>
 
-                {/* Progress & Quick Actions */}
-                <div className="flex items-center justify-between md:justify-end gap-6 pt-3 md:pt-0 border-t md:border-t-0 border-glass-border">
-                  <div className="flex items-center gap-3">
-                    <div className="w-24 bg-neutral-800 h-2 rounded-full overflow-hidden">
-                      <div
-                        className="bg-gradient-to-r from-blue-500 to-accent-blue h-full rounded-full transition-all"
-                        style={{ width: `${proj.completionPercent}%` }}
-                      />
-                    </div>
-                    <span className="text-xs font-semibold text-text-secondary w-8">{proj.completionPercent}%</span>
+                <div>
+                  <label className="text-xs font-bold text-text-secondary block mb-1.5">Hero Description Copy</label>
+                  <textarea
+                    rows={3}
+                    value={cms.hero.description}
+                    onChange={(e) => updateHero({ description: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium text-text-primary"
+                  />
+                </div>
+              </div>
+            </GlassCard>
+
+            {/* Rotating Phrases Manager */}
+            <GlassCard className="p-6 space-y-4">
+              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                <RotateCcw className="w-4 h-4 text-indigo-400" /> Animated Rotating Phrases ({cms.hero.rotatingWords.length})
+              </h3>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Add new phrase (e.g. AI Agents.)"
+                  value={newRotatingWord}
+                  onChange={(e) => setNewRotatingWord(e.target.value)}
+                  className="flex-1 px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary"
+                />
+                <button
+                  onClick={handleAddRotatingWord}
+                  className="px-5 py-2 rounded-xl bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors flex items-center gap-1.5"
+                >
+                  <Plus className="w-4 h-4" /> Add
+                </button>
+              </div>
+
+              <div className="space-y-2 max-h-[220px] overflow-y-auto pr-2">
+                {cms.hero.rotatingWords.map((word, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-bg-secondary/60 border border-glass-border">
+                    <span className="text-xs font-bold font-serif italic text-accent-blue">{word}</span>
+                    <button
+                      onClick={() => handleRemoveRotatingWord(idx)}
+                      className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-500/10 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
+                ))}
+              </div>
+            </GlassCard>
+          </div>
 
-                  <div className="flex items-center gap-1.5">
-                    <Link
-                      href={`/projects/${proj.slug}`}
-                      target="_blank"
-                      className="p-2 rounded-lg bg-glass-bg hover:bg-white/10 text-neutral-400 hover:text-white transition-colors border border-glass-border"
-                      title="View Public Page"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </Link>
+          {/* Telemetry Metrics & CTAs */}
+          <div className="lg:col-span-5 space-y-6">
+            <GlassCard className="p-6 space-y-4">
+              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                <Activity className="w-4 h-4 text-emerald-400" /> Telemetry Metrics Grid
+              </h3>
 
+              {cms.hero.metrics.map((m) => (
+                <div key={m.id} className="p-3.5 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono font-bold text-text-secondary">{m.label}</span>
+                    <span className="text-xs font-mono font-bold text-accent-blue">{m.val}{m.suffix}</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <input
+                      type="number"
+                      value={m.val}
+                      onChange={(e) => updateHeroMetric(m.id, { val: parseFloat(e.target.value) || 0 })}
+                      className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono"
+                    />
+                    <input
+                      type="text"
+                      value={m.suffix}
+                      onChange={(e) => updateHeroMetric(m.id, { suffix: e.target.value })}
+                      className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono"
+                    />
+                    <input
+                      type="text"
+                      value={m.label}
+                      onChange={(e) => updateHeroMetric(m.id, { label: e.target.value })}
+                      className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono"
+                    />
+                  </div>
+                </div>
+              ))}
+            </GlassCard>
+          </div>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TAB 4: PROJECTS CMS
+         ───────────────────────────────────────────────────────────── */}
+      {activeTab === "projects" && (
+        <div className="space-y-6 text-left">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-bold text-text-primary">Projects CMS Repository ({projects.length})</h3>
+            <button
+              onClick={() => {
+                setSelectedProject({ name: "New Kiwik Project", slug: `project-${Date.now()}`, tagline: "", description: "", tags: ["new"] });
+                setIsEditingProject(true);
+              }}
+              className="px-5 py-2.5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold text-xs shadow-md transition-all hover:scale-102 flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" /> Add New Project
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {projects.map((proj) => (
+              <GlassCard key={proj.id} className="p-5 space-y-4 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="text-[10px] font-mono font-bold text-accent-blue bg-accent-blue/10 px-2 py-0.5 rounded-full">
+                      {proj.category}
+                    </span>
+                    <span className="text-[10px] font-mono text-text-muted">{proj.version}</span>
+                  </div>
+                  <h4 className="text-base font-bold text-text-primary tracking-tight">{proj.name}</h4>
+                  <p className="text-xs text-text-secondary mt-1 line-clamp-2">{proj.description}</p>
+                </div>
+
+                <div className="flex items-center justify-between pt-4 border-t border-divider">
+                  <span className="text-[10px] font-mono text-emerald-500 font-bold">● {proj.deploymentStatus}</span>
+                  <div className="flex items-center gap-2">
                     <button
-                      onClick={() => handleDuplicate(proj.id, proj.name)}
-                      className="p-2 rounded-lg bg-glass-bg hover:bg-white/10 text-neutral-400 hover:text-white transition-colors border border-glass-border"
-                      title="Duplicate Project"
+                      onClick={() => duplicateProject(proj.id)}
+                      className="p-2 rounded-lg bg-bg-secondary hover:bg-glass-bg-hover text-text-secondary transition-colors"
+                      title="Duplicate"
                     >
-                      <Copy className="w-4 h-4" />
+                      <Copy className="w-3.5 h-3.5" />
                     </button>
-
                     <button
-                      onClick={() => handleEditProject(proj)}
-                      className="p-2 rounded-lg bg-accent-blue/10 hover:bg-accent-blue/20 text-accent-blue transition-colors border border-accent-blue/20"
-                      title="Edit Project"
+                      onClick={() => deleteProject(proj.id)}
+                      className="p-2 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-colors"
+                      title="Delete"
                     >
-                      <Edit className="w-4 h-4" />
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
-
-                    {deleteConfirmId === proj.id ? (
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => handleDelete(proj.id)}
-                          className="px-2 py-1 rounded bg-rose-600 text-white text-xs font-semibold"
-                        >
-                          Confirm
-                        </button>
-                        <button
-                          onClick={() => setDeleteConfirmId(null)}
-                          className="p-1 text-neutral-400 hover:text-white"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => setDeleteConfirmId(proj.id)}
-                        className="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors border border-rose-500/20"
-                        title="Delete Project"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
                   </div>
                 </div>
               </GlassCard>
-            );
-          })
-        )}
-      </div>
+            ))}
+          </div>
+        </div>
+      )}
 
-      {/* Edit / Create Comprehensive Modal */}
-      <AnimatePresence>
-        {isEditing && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-4xl bg-neutral-900 border border-glass-border rounded-2xl shadow-2xl overflow-hidden my-8 flex flex-col max-h-[90vh]"
+      {/* ─────────────────────────────────────────────────────────────
+          TAB 5: MEDIA LIBRARY
+         ───────────────────────────────────────────────────────────── */}
+      {activeTab === "media" && (
+        <div className="space-y-6 text-left">
+          <div className="p-6 rounded-2xl bg-glass-bg border border-glass-border flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <h3 className="text-base font-bold text-text-primary">Media Library Assets ({cms.media.length})</h3>
+              <p className="text-xs text-text-secondary mt-0.5">Upload images, icons, SVGs, and videos for website content blocks.</p>
+            </div>
+            <button
+              onClick={() => {
+                const name = prompt("Enter asset name (e.g. Hero Banner):", "Custom Asset");
+                const url = prompt("Enter image/video URL:", "/logo.png");
+                if (name && url) {
+                  addMediaItem({
+                    id: `med-${Date.now()}`,
+                    name,
+                    url,
+                    type: "image",
+                    sizeBytes: 15400,
+                    mimeType: "image/png",
+                    folder: "General",
+                    tags: ["custom"],
+                    createdAt: new Date().toISOString()
+                  });
+                  showSaveSuccess("Added asset to Media Library!");
+                }
+              }}
+              className="px-5 py-2.5 rounded-full bg-accent-blue text-white font-bold text-xs shadow-md transition-all hover:bg-blue-600 flex items-center gap-2"
             >
-              {/* Modal Header */}
-              <div className="px-6 py-4 border-b border-glass-border flex items-center justify-between bg-neutral-900/90">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-accent-blue" />
-                  <h2 className="text-lg font-bold text-white">
-                    {projects.some(p => p.id === currentProject.id) ? "Edit Project" : "Create New Project"}
-                  </h2>
+              <Upload className="w-4 h-4" /> Upload Asset
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {cms.media.map((item) => (
+              <GlassCard key={item.id} className="p-3 text-left space-y-2 group relative">
+                <div className="w-full aspect-square rounded-xl bg-bg-secondary border border-glass-border overflow-hidden flex items-center justify-center p-2">
+                  <img src={item.url} alt={item.name} className="w-full h-full object-contain" />
                 </div>
-                <button
-                  onClick={() => setIsEditing(false)}
-                  className="p-2 text-neutral-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Modal Tabs Header */}
-              <div className="px-6 pt-3 bg-black/40 border-b border-glass-border flex items-center gap-2 overflow-x-auto">
-                {[
-                  { id: "basic", label: "Basic Info", icon: Sparkles },
-                  { id: "media", label: "Media & Links", icon: ImageIcon },
-                  { id: "tech", label: "Tech Stack", icon: Code },
-                  { id: "features", label: "Features", icon: ListPlus },
-                  { id: "timeline", label: "Timeline", icon: Calendar },
-                  { id: "changelog", label: "Changelog", icon: GitBranch },
-                  { id: "contributors", label: "Team", icon: Users },
-                  { id: "readme", label: "README Docs", icon: FileText },
-                ].map(t => {
-                  const IconComp = t.icon;
-                  return (
-                    <button
-                      key={t.id}
-                      onClick={() => setActiveTab(t.id)}
-                      className={cn(
-                        "px-3 py-2 rounded-t-xl text-xs font-semibold flex items-center gap-1.5 border-b-2 transition-colors whitespace-nowrap",
-                        activeTab === t.id
-                          ? "border-accent-blue text-accent-blue bg-white/5"
-                          : "border-transparent text-neutral-400 hover:text-white"
-                      )}
-                    >
-                      <IconComp className="w-3.5 h-3.5" />
-                      <span>{t.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Modal Body Form */}
-              <form onSubmit={handleSaveProject} className="p-6 overflow-y-auto space-y-6 flex-1">
-                {/* TAB 1: BASIC INFO */}
-                {activeTab === "basic" && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-text-secondary mb-1">Project ID</label>
-                      <input
-                        type="text"
-                        value={currentProject.id}
-                        onChange={(e) => setCurrentProject({ ...currentProject, id: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-text-secondary mb-1">URL Slug</label>
-                      <input
-                        type="text"
-                        value={currentProject.slug}
-                        onChange={(e) => setCurrentProject({ ...currentProject, slug: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
-                        required
-                      />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label className="block text-xs font-semibold text-text-secondary mb-1">Project Name</label>
-                      <input
-                        type="text"
-                        value={currentProject.name}
-                        onChange={(e) => setCurrentProject({ ...currentProject, name: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
-                        required
-                      />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label className="block text-xs font-semibold text-text-secondary mb-1">Tagline</label>
-                      <input
-                        type="text"
-                        value={currentProject.tagline}
-                        onChange={(e) => setCurrentProject({ ...currentProject, tagline: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-text-secondary mb-1">Category</label>
-                      <select
-                        value={currentProject.category}
-                        onChange={(e) => setCurrentProject({ ...currentProject, category: e.target.value as ProjectCategory })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
-                      >
-                        {["web", "ai", "mobile", "automation", "blockchain", "ml", "devops", "research", "saas", "open-source"].map(c => (
-                          <option key={c} value={c} className="bg-neutral-900">{c}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-text-secondary mb-1">Status</label>
-                      <select
-                        value={currentProject.status}
-                        onChange={(e) => setCurrentProject({ ...currentProject, status: e.target.value as ProjectStatus })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
-                      >
-                        {["completed", "in-progress", "archived", "private"].map(s => (
-                          <option key={s} value={s} className="bg-neutral-900">{s}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-text-secondary mb-1">Version</label>
-                      <input
-                        type="text"
-                        value={currentProject.version}
-                        onChange={(e) => setCurrentProject({ ...currentProject, version: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-text-secondary mb-1">Completion %</label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={currentProject.completionPercent}
-                        onChange={(e) => setCurrentProject({ ...currentProject, completionPercent: Number(e.target.value) })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
-                      />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label className="block text-xs font-semibold text-text-secondary mb-1">Short Description</label>
-                      <textarea
-                        rows={3}
-                        value={currentProject.description}
-                        onChange={(e) => setCurrentProject({ ...currentProject, description: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* TAB 2: MEDIA & LINKS */}
-                {activeTab === "media" && (
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-text-secondary mb-1">Cover Image URL</label>
-                      <input
-                        type="text"
-                        value={currentProject.coverImage}
-                        onChange={(e) => setCurrentProject({ ...currentProject, coverImage: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-text-secondary mb-1">Live Site URL</label>
-                      <input
-                        type="text"
-                        value={currentProject.liveUrl || ""}
-                        onChange={(e) => setCurrentProject({ ...currentProject, liveUrl: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-text-secondary mb-1">GitHub Repo URL</label>
-                      <input
-                        type="text"
-                        value={currentProject.githubUrl || ""}
-                        onChange={(e) => setCurrentProject({ ...currentProject, githubUrl: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all font-semibold"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* TAB 3: TECH STACK */}
-                {activeTab === "tech" && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-bold text-white">Tech Stack Items</h4>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setCurrentProject({
-                            ...currentProject,
-                            techStack: [...currentProject.techStack, { name: "New Tech", category: "frontend" }]
-                          })
-                        }
-                        className="px-3 py-1.5 rounded-lg bg-accent-blue/10 border border-accent-blue/20 text-accent-blue text-xs font-semibold flex items-center gap-1"
-                      >
-                        <Plus className="w-3.5 h-3.5" /> Add Tech
-                      </button>
-                    </div>
-
-                    {currentProject.techStack.map((tech, idx) => (
-                      <div key={idx} className="p-3 rounded-xl bg-black/40 border border-glass-border flex items-center gap-3">
-                        <input
-                          type="text"
-                          value={tech.name}
-                          placeholder="Name"
-                          onChange={(e) => {
-                            const updated = [...currentProject.techStack];
-                            updated[idx].name = e.target.value;
-                            setCurrentProject({ ...currentProject, techStack: updated });
-                          }}
-                          className="flex-1 px-3 py-1.5 rounded-lg bg-black/50 border border-glass-border text-xs text-white"
-                        />
-                        <select
-                          value={tech.category}
-                          onChange={(e) => {
-                            const updated = [...currentProject.techStack];
-                            updated[idx].category = e.target.value as TechCategory;
-                            setCurrentProject({ ...currentProject, techStack: updated });
-                          }}
-                          className="px-2 py-1.5 rounded-lg bg-black/50 border border-glass-border text-xs text-white"
-                        >
-                          {["frontend", "backend", "database", "cloud", "ai", "devops", "auth", "payments"].map(c => (
-                            <option key={c} value={c} className="bg-neutral-900">{c}</option>
-                          ))}
-                        </select>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const updated = currentProject.techStack.filter((_, i) => i !== idx);
-                            setCurrentProject({ ...currentProject, techStack: updated });
-                          }}
-                          className="p-1.5 text-rose-400 hover:bg-rose-500/10 rounded"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* TAB 4: FEATURES */}
-                {activeTab === "features" && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-bold text-white">Features List</h4>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setCurrentProject({
-                            ...currentProject,
-                            features: [...currentProject.features, { title: "New Feature", description: "Description..." }]
-                          })
-                        }
-                        className="px-3 py-1.5 rounded-lg bg-accent-blue/10 border border-accent-blue/20 text-accent-blue text-xs font-semibold flex items-center gap-1"
-                      >
-                        <Plus className="w-3.5 h-3.5" /> Add Feature
-                      </button>
-                    </div>
-
-                    {currentProject.features.map((feat, idx) => (
-                      <div key={idx} className="p-3 rounded-xl bg-black/40 border border-glass-border space-y-2">
-                        <div className="flex items-center justify-between">
-                          <input
-                            type="text"
-                            value={feat.title}
-                            placeholder="Title"
-                            onChange={(e) => {
-                              const updated = [...currentProject.features];
-                              updated[idx].title = e.target.value;
-                              setCurrentProject({ ...currentProject, features: updated });
-                            }}
-                            className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-glass-border text-xs font-bold text-white"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const updated = currentProject.features.filter((_, i) => i !== idx);
-                              setCurrentProject({ ...currentProject, features: updated });
-                            }}
-                            className="ml-2 p-1.5 text-rose-400 hover:bg-rose-500/10 rounded"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                        <textarea
-                          rows={2}
-                          value={feat.description}
-                          placeholder="Description"
-                          onChange={(e) => {
-                            const updated = [...currentProject.features];
-                            updated[idx].description = e.target.value;
-                            setCurrentProject({ ...currentProject, features: updated });
-                          }}
-                          className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-glass-border text-xs text-white"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* TAB 5: TIMELINE */}
-                {activeTab === "timeline" && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-bold text-white">Timeline Milestones</h4>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setCurrentProject({
-                            ...currentProject,
-                            timeline: [
-                              ...currentProject.timeline,
-                              { date: new Date().toISOString().split("T")[0], title: "Milestone", description: "", status: "completed" }
-                            ]
-                          })
-                        }
-                        className="px-3 py-1.5 rounded-lg bg-accent-blue/10 border border-accent-blue/20 text-accent-blue text-xs font-semibold flex items-center gap-1"
-                      >
-                        <Plus className="w-3.5 h-3.5" /> Add Milestone
-                      </button>
-                    </div>
-
-                    {currentProject.timeline.map((entry, idx) => (
-                      <div key={idx} className="p-3 rounded-xl bg-black/40 border border-glass-border flex items-center gap-3">
-                        <input
-                          type="text"
-                          value={entry.date}
-                          placeholder="Date"
-                          onChange={(e) => {
-                            const updated = [...currentProject.timeline];
-                            updated[idx].date = e.target.value;
-                            setCurrentProject({ ...currentProject, timeline: updated });
-                          }}
-                          className="w-28 px-2 py-1 rounded bg-black/50 border border-glass-border text-xs text-white"
-                        />
-                        <input
-                          type="text"
-                          value={entry.title}
-                          placeholder="Title"
-                          onChange={(e) => {
-                            const updated = [...currentProject.timeline];
-                            updated[idx].title = e.target.value;
-                            setCurrentProject({ ...currentProject, timeline: updated });
-                          }}
-                          className="flex-1 px-2 py-1 rounded bg-black/50 border border-glass-border text-xs font-bold text-white"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const updated = currentProject.timeline.filter((_, i) => i !== idx);
-                            setCurrentProject({ ...currentProject, timeline: updated });
-                          }}
-                          className="p-1 text-rose-400"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* TAB 6: CHANGELOG */}
-                {activeTab === "changelog" && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-bold text-white">Changelog Releases</h4>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setCurrentProject({
-                            ...currentProject,
-                            changelog: [
-                              ...currentProject.changelog,
-                              { version: "1.0.0", date: new Date().toISOString().split("T")[0], title: "Release", changes: [], type: "minor" }
-                            ]
-                          })
-                        }
-                        className="px-3 py-1.5 rounded-lg bg-accent-blue/10 border border-accent-blue/20 text-accent-blue text-xs font-semibold flex items-center gap-1"
-                      >
-                        <Plus className="w-3.5 h-3.5" /> Add Release
-                      </button>
-                    </div>
-
-                    {currentProject.changelog.map((change, idx) => (
-                      <div key={idx} className="p-3 rounded-xl bg-black/40 border border-glass-border flex items-center gap-3">
-                        <input
-                          type="text"
-                          value={change.version}
-                          placeholder="Version"
-                          onChange={(e) => {
-                            const updated = [...currentProject.changelog];
-                            updated[idx].version = e.target.value;
-                            setCurrentProject({ ...currentProject, changelog: updated });
-                          }}
-                          className="w-24 px-2 py-1 rounded bg-black/50 border border-glass-border text-xs text-white"
-                        />
-                        <input
-                          type="text"
-                          value={change.title}
-                          placeholder="Title"
-                          onChange={(e) => {
-                            const updated = [...currentProject.changelog];
-                            updated[idx].title = e.target.value;
-                            setCurrentProject({ ...currentProject, changelog: updated });
-                          }}
-                          className="flex-1 px-2 py-1 rounded bg-black/50 border border-glass-border text-xs font-bold text-white"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const updated = currentProject.changelog.filter((_, i) => i !== idx);
-                            setCurrentProject({ ...currentProject, changelog: updated });
-                          }}
-                          className="p-1 text-rose-400"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* TAB 7: CONTRIBUTORS */}
-                {activeTab === "contributors" && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-bold text-white">Team & Contributors</h4>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setCurrentProject({
-                            ...currentProject,
-                            contributors: [...currentProject.contributors, { name: "Name", role: "Role" }]
-                          })
-                        }
-                        className="px-3 py-1.5 rounded-lg bg-accent-blue/10 border border-accent-blue/20 text-accent-blue text-xs font-semibold flex items-center gap-1"
-                      >
-                        <Plus className="w-3.5 h-3.5" /> Add Member
-                      </button>
-                    </div>
-
-                    {currentProject.contributors.map((contrib, idx) => (
-                      <div key={idx} className="p-3 rounded-xl bg-black/40 border border-glass-border flex items-center gap-3">
-                        <input
-                          type="text"
-                          value={contrib.name}
-                          placeholder="Name"
-                          onChange={(e) => {
-                            const updated = [...currentProject.contributors];
-                            updated[idx].name = e.target.value;
-                            setCurrentProject({ ...currentProject, contributors: updated });
-                          }}
-                          className="flex-1 px-2 py-1 rounded bg-black/50 border border-glass-border text-xs font-bold text-white"
-                        />
-                        <input
-                          type="text"
-                          value={contrib.role}
-                          placeholder="Role"
-                          onChange={(e) => {
-                            const updated = [...currentProject.contributors];
-                            updated[idx].role = e.target.value;
-                            setCurrentProject({ ...currentProject, contributors: updated });
-                          }}
-                          className="flex-1 px-2 py-1 rounded bg-black/50 border border-glass-border text-xs text-white"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const updated = currentProject.contributors.filter((_, i) => i !== idx);
-                            setCurrentProject({ ...currentProject, contributors: updated });
-                          }}
-                          className="p-1 text-rose-400"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* TAB 8: README DOCS */}
-                {activeTab === "readme" && (
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-text-secondary mb-1">README Markdown Content</label>
-                      <textarea
-                        rows={12}
-                        value={currentProject.readme || ""}
-                        placeholder="# Project Title..."
-                        onChange={(e) => setCurrentProject({ ...currentProject, readme: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-xs text-text-primary font-mono focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue/30 transition-all"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Modal Actions Footer */}
-                <div className="pt-4 border-t border-glass-border flex items-center justify-end gap-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-text-primary truncate">{item.name}</span>
                   <button
-                    type="button"
-                    onClick={() => setIsEditing(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-text-secondary hover:text-white hover:bg-white/5 transition-colors"
+                    onClick={() => deleteMediaItem(item.id)}
+                    className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition-colors"
                   >
-                    Cancel
+                    <Trash2 className="w-3.5 h-3.5" />
                   </button>
-                  <GlassButton type="submit" variant="primary">
-                    Save Changes
-                  </GlassButton>
                 </div>
-              </form>
-            </motion.div>
+              </GlassCard>
+            ))}
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
 
-      {/* JSON Backup / Import Modal */}
-      <AnimatePresence>
-        {showJsonModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-2xl bg-neutral-900 border border-glass-border rounded-2xl p-6 shadow-2xl"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-white">Import Projects JSON</h3>
-                <button onClick={() => setShowJsonModal(false)} className="text-neutral-400 hover:text-white">
-                  <X className="w-5 h-5" />
-                </button>
+      {/* ─────────────────────────────────────────────────────────────
+          TAB 6: NAVIGATION & FOOTER
+         ───────────────────────────────────────────────────────────── */}
+      {activeTab === "navigation" && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-left">
+          <GlassCard className="p-6 space-y-5">
+            <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+              <Compass className="w-4 h-4 text-accent-blue" /> Navbar Navigation Items ({cms.navigation.items.length})
+            </h3>
+            <div className="space-y-3">
+              {cms.navigation.items.map((item) => (
+                <div key={item.id} className="p-3 rounded-xl bg-bg-secondary/60 border border-glass-border flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-mono font-bold text-text-muted">#{item.order}</span>
+                    <span className="text-xs font-bold text-text-primary">{item.label}</span>
+                    <span className="text-[10px] font-mono text-accent-blue">{item.href}</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-emerald-500 font-bold">Visible</span>
+                </div>
+              ))}
+            </div>
+          </GlassCard>
+
+          <GlassCard className="p-6 space-y-5">
+            <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+              <FileText className="w-4 h-4 text-indigo-400" /> Footer Newsletter & Copyright
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-text-secondary block mb-1">Newsletter Headline</label>
+                <input
+                  type="text"
+                  value={cms.footer.newsletterHeadline}
+                  onChange={(e) => updateFooter({ newsletterHeadline: e.target.value })}
+                  className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+                />
               </div>
-              <p className="text-xs text-text-secondary mb-4">
-                Paste a JSON array of `Project` objects below to bulk import or overwrite current projects.
-              </p>
-              <textarea
-                rows={10}
-                value={jsonInput}
-                onChange={(e) => setJsonInput(e.target.value)}
-                placeholder="[ { 'id': '1', 'name': '...' } ]"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-bg-secondary/60 border border-glass-border text-xs font-mono text-text-primary mb-4 focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue/30 transition-all"
+              <div>
+                <label className="text-xs font-bold text-text-secondary block mb-1">Copyright Text</label>
+                <input
+                  type="text"
+                  value={cms.footer.copyrightText}
+                  onChange={(e) => updateFooter({ copyrightText: e.target.value })}
+                  className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+                />
+              </div>
+            </div>
+          </GlassCard>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TAB 7: THEME & STYLING
+         ───────────────────────────────────────────────────────────── */}
+      {activeTab === "theme" && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-left">
+          <GlassCard className="p-6 space-y-5">
+            <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+              <Palette className="w-4 h-4 text-accent-blue" /> Color Palette Engine
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { label: "Accent Blue", key: "accentBlue", val: cms.theme.colors.accentBlue },
+                { label: "Accent Cyan", key: "accentCyan", val: cms.theme.colors.accentCyan },
+                { label: "Accent Indigo", key: "accentIndigo", val: cms.theme.colors.accentIndigo }
+              ].map((c) => (
+                <div key={c.key} className="p-3 rounded-xl bg-bg-secondary border border-glass-border space-y-1.5">
+                  <label className="text-xs font-bold text-text-secondary block">{c.label}</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={c.val}
+                      onChange={(e) => updateTheme({ colors: { ...cms.theme.colors, [c.key]: e.target.value } })}
+                      className="w-8 h-8 rounded cursor-pointer border-none"
+                    />
+                    <span className="text-xs font-mono font-bold text-text-primary">{c.val}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </GlassCard>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TAB 8: SEO ENGINE
+         ───────────────────────────────────────────────────────────── */}
+      {activeTab === "seo" && (
+        <GlassCard className="p-6 text-left space-y-5 max-w-3xl">
+          <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+            <Search className="w-4 h-4 text-accent-blue" /> Global SEO Metadata
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs font-bold text-text-secondary block mb-1">Default Meta Title</label>
+              <input
+                type="text"
+                value={cms.seo.defaultTitle}
+                onChange={(e) => updateSEO({ defaultTitle: e.target.value })}
+                className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
               />
-              <div className="flex items-center justify-end gap-3">
-                <button
-                  onClick={() => setShowJsonModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-text-secondary"
-                >
-                  Cancel
-                </button>
-                <GlassButton onClick={handleImportJson} variant="primary">
-                  Import & Save
-                </GlassButton>
-              </div>
-            </motion.div>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-text-secondary block mb-1">Default Meta Description</label>
+              <textarea
+                rows={3}
+                value={cms.seo.defaultDescription}
+                onChange={(e) => updateSEO({ defaultDescription: e.target.value })}
+                className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium"
+              />
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+        </GlassCard>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TAB 9: AUDIT LOGS & VERSION SNAPSHOTS
+         ───────────────────────────────────────────────────────────── */}
+      {activeTab === "audit-snapshots" && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-left">
+          <div className="lg:col-span-6 space-y-6">
+            <GlassCard className="p-6 space-y-4">
+              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                <History className="w-4 h-4 text-indigo-400" /> Version Snapshots ({cms.snapshots.length})
+              </h3>
+              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                {cms.snapshots.map((snap) => (
+                  <div key={snap.id} className="p-3.5 rounded-xl bg-bg-secondary/60 border border-glass-border flex items-center justify-between">
+                    <div>
+                      <h4 className="text-xs font-bold text-text-primary">{snap.versionName}</h4>
+                      <p className="text-[10px] text-text-secondary font-mono">{new Date(snap.timestamp).toLocaleString()}</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        rollbackSnapshot(snap.id);
+                        showSaveSuccess(`Rolled back to [${snap.versionName}]`);
+                      }}
+                      className="px-3 py-1.5 rounded-full bg-accent-blue text-white text-[10px] font-bold hover:bg-blue-600 transition-colors"
+                    >
+                      Rollback
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </GlassCard>
+          </div>
+
+          <div className="lg:col-span-6 space-y-6">
+            <GlassCard className="p-6 space-y-4">
+              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                <Download className="w-4 h-4 text-emerald-400" /> Import JSON Backup
+              </h3>
+              <textarea
+                rows={5}
+                placeholder="Paste CMS Backup JSON string here..."
+                value={jsonBackupInput}
+                onChange={(e) => setJsonBackupInput(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
+              />
+              <button
+                onClick={handleImportBackup}
+                className="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-500 transition-colors"
+              >
+                Restore from JSON Backup
+              </button>
+            </GlassCard>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
