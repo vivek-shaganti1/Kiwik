@@ -30,7 +30,7 @@ export function Navbar() {
         scrolled ? 'backdrop-blur-xl bg-glass-bg border-b border-glass-border shadow-sm' : 'bg-transparent border-b border-transparent'
       )}
     >
-      <div className="w-full max-w-[1400px] flex items-center justify-between">
+      <div className="w-full max-w-[1400px] flex items-center justify-between relative">
         <Link href="/" className="flex items-center gap-2.5 group">
           <motion.div
             whileHover={{ scale: 1.1, rotate: 6 }}
@@ -44,8 +44,8 @@ export function Navbar() {
           </span>
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-6">
+        {/* Desktop Nav - Absolutely Centered */}
+        <nav className="hidden md:flex items-center gap-6 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <Link href="/" className="text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
             Home
           </Link>
