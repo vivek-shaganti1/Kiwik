@@ -29,7 +29,7 @@ import { AIChatbot } from "@/components/home/ai-chatbot";
 import { EcosystemPipeline } from "@/components/home/ecosystem-pipeline";
 import { FeaturePillars } from "@/components/home/feature-pillars";
 import { FeaturedProductsGrid } from "@/components/home/featured-products-grid";
-import { PremiumDeviceShowcase } from "@/components/home/premium-device-showcase";
+import { FutureVision } from "@/components/home/future-vision";
 import { useProjects } from "@/stores/projects-store";
 import { useSiteCMSStore } from "@/stores/site-cms-store";
 import { GlassCard } from "@/components/glass/glass-card";
@@ -47,6 +47,9 @@ export default function HomePage() {
   const capabilities = cms.capabilities || { sectionTitle: "Our Capabilities", items: [] };
   const trust = cms.trust || { sectionTitle: "Trust & Delivery", items: [] };
   const howWeWork = cms.howWeWork || { badge: "Execution Workflow", sectionTitle: "How We Work", steps: [] };
+
+  // Dynamic Projects loaded from the CMS database store to reflect edits immediately
+  const featuredCMS = projects.slice(0, 3);
 
   const getIcon = (iconName: string) => {
     switch (iconName) {
@@ -91,7 +94,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FEATURED PRODUCTS SECTION (3D Cover-Flow Center Carousel) */}
+      {/* FEATURED PRODUCTS SECTION (Matching Reference Screenshot 2) */}
       <FeaturedProductsGrid />
 
       {/* SECTION B: HOW WE WORK (5-Step Engineering Pipeline) */}
@@ -201,8 +204,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* PREMIUM MULTI-DEVICE SHOWCASE SECTION (Replacing old Enterprise Kernel) */}
-      <PremiumDeviceShowcase />
+      {/* THE FUTURE WE ARE BUILDING (Cosmic Horizon reference section) */}
+      <FutureVision />
 
       {/* Floating AI voice search assistant */}
       <AIChatbot />
