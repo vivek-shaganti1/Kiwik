@@ -2,8 +2,9 @@
 
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Grid3X3, List, Clock, Filter, Search } from "lucide-react";
+import { Grid3X3, List, Clock, Filter, Search, Sparkles } from "lucide-react";
 import { useProjects } from "@/stores/projects-store";
+import { PremiumShowcaseCard } from "@/components/projects/premium-showcase-card";
 import { ProjectCard } from "@/components/projects/project-card";
 import { ProjectStatus, ProjectCategory, SortMode } from "@/types";
 import { cn } from "@/lib/utils";
@@ -22,7 +23,7 @@ export default function ProjectsPage() {
     const cats = new Set<string>();
     projects.forEach(p => cats.add(p.category));
     return ["all", ...Array.from(cats)] as (ProjectCategory | "all")[];
-  }, []);
+  }, [projects]);
   
   const filteredAndSorted = useMemo(() => {
     let result = projects.filter(p => {
@@ -45,64 +46,84 @@ export default function ProjectsPage() {
     });
     
     return result;
-  }, [search, statusFilter, categoryFilter, sortMode]);
+  }, [projects, search, statusFilter, categoryFilter, sortMode]);
 
   return (
-    <div className="min-h-screen pt-24 pb-16 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
-      <div className="mb-12">
-        <h1 className="text-4xl md:text-5xl font-serif font-semibold mb-4">All Projects</h1>
-        <p className="text-text-secondary text-lg">Showing {filteredAndSorted.length} project{filteredAndSorted.length !== 1 ? 's' : ''}</p>
-      </div>
+    <div className="min-h-screen pt-24 pb-20 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto select-none">
       
-      {/* Controls */}
+      {/* ─────────────────────────────────────────────────────────────
+          FEATURED PRODUCTS SHOWCASE HEADER (Matching Reference Screenshot)
+         ───────────────────────────────────────────────────────────── */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-center max-w-3xl mx-auto mb-12 space-y-3"
+      >
+        <span className="text-xs font-mono font-bold uppercase tracking-[0.2em] text-[#52525B] dark:text-[#A1A1AA]">
+          FEATURED PRODUCTS
+        </span>
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-semibold tracking-tight text-[#18181B] dark:text-white leading-[1.05]">
+          Next-Generation Enterprise Stack
+        </h1>
+        <p className="text-xs sm:text-sm text-[#71717A] dark:text-[#A1A1AA] font-sans font-medium max-w-xl mx-auto">
+          Explore world-class autonomous systems, managed cloud platforms, payment engines, and developer infrastructure powered by Kiwik.
+        </p>
+      </motion.div>
+      
+      {/* ─────────────────────────────────────────────────────────────
+          FLOATING CONTROLS & SEARCH BAR
+         ───────────────────────────────────────────────────────────── */}
       <div className="flex flex-col md:flex-row gap-4 mb-8">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#71717A]" />
           <input 
             type="text" 
-            placeholder="Search projects..." 
+            placeholder="Search products by name or capability..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-glass-bg border border-glass-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent text-text-primary placeholder:text-text-secondary/50"
+            className="w-full pl-10 pr-4 py-2.5 bg-white/80 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm text-[#18181B] dark:text-white placeholder:text-black/40 dark:placeholder:text-white/40 shadow-sm transition-all"
           />
         </div>
         
         <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
-          <div className="flex bg-glass-bg border border-glass-border rounded-xl p-1 shrink-0">
-            <button onClick={() => setLayout("grid")} className={cn("p-2 rounded-lg transition-colors", layout === "grid" ? "bg-glass-bg-hover text-text-primary" : "text-text-secondary hover:text-text-primary")} aria-label="Grid layout"><Grid3X3 className="w-4 h-4" /></button>
-            <button onClick={() => setLayout("rows")} className={cn("p-2 rounded-lg transition-colors", layout === "rows" ? "bg-glass-bg-hover text-text-primary" : "text-text-secondary hover:text-text-primary")} aria-label="Rows layout"><List className="w-4 h-4" /></button>
-            <button onClick={() => setLayout("timeline")} className={cn("p-2 rounded-lg transition-colors", layout === "timeline" ? "bg-glass-bg-hover text-text-primary" : "text-text-secondary hover:text-text-primary")} aria-label="Timeline layout"><Clock className="w-4 h-4" /></button>
+          <div className="flex bg-white/80 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-1 shrink-0 shadow-sm">
+            <button onClick={() => setLayout("grid")} className={cn("p-2 rounded-xl transition-colors", layout === "grid" ? "bg-black/10 dark:bg-white/15 text-[#18181B] dark:text-white" : "text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white")} aria-label="Grid layout"><Grid3X3 className="w-4 h-4" /></button>
+            <button onClick={() => setLayout("rows")} className={cn("p-2 rounded-xl transition-colors", layout === "rows" ? "bg-black/10 dark:bg-white/15 text-[#18181B] dark:text-white" : "text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white")} aria-label="Rows layout"><List className="w-4 h-4" /></button>
+            <button onClick={() => setLayout("timeline")} className={cn("p-2 rounded-xl transition-colors", layout === "timeline" ? "bg-black/10 dark:bg-white/15 text-[#18181B] dark:text-white" : "text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white")} aria-label="Timeline layout"><Clock className="w-4 h-4" /></button>
           </div>
           
           <select 
             value={sortMode} 
             onChange={(e) => setSortMode(e.target.value as SortMode)}
-            className="bg-glass-bg border border-glass-border rounded-xl px-4 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent appearance-none cursor-pointer shrink-0"
+            className="bg-white/80 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl px-4 py-2 text-xs font-mono font-semibold text-[#18181B] dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer shrink-0 shadow-sm"
           >
-            <option value="newest" className="bg-bg-elevated text-text-primary">Newest</option>
-            <option value="oldest" className="bg-bg-elevated text-text-primary">Oldest</option>
-            <option value="recently-updated" className="bg-bg-elevated text-text-primary">Recently Updated</option>
-            <option value="alphabetical" className="bg-bg-elevated text-text-primary">Alphabetical</option>
-            <option value="most-viewed" className="bg-bg-elevated text-text-primary">Most Viewed</option>
-            <option value="popularity" className="bg-bg-elevated text-text-primary">Popularity</option>
+            <option value="newest" className="bg-[#18181B] text-white">Newest Release</option>
+            <option value="oldest" className="bg-[#18181B] text-white">Oldest Release</option>
+            <option value="recently-updated" className="bg-[#18181B] text-white">Recently Updated</option>
+            <option value="alphabetical" className="bg-[#18181B] text-white">Alphabetical</option>
+            <option value="most-viewed" className="bg-[#18181B] text-white">Most Viewed</option>
+            <option value="popularity" className="bg-[#18181B] text-white">Popularity</option>
           </select>
         </div>
       </div>
       
-      {/* Filters */}
-      <div className="flex flex-col gap-4 mb-10">
-        <div className="flex items-center gap-4 overflow-x-auto pb-2 scrollbar-hide">
-          <span className="text-sm font-medium text-text-secondary whitespace-nowrap">Status:</span>
+      {/* ─────────────────────────────────────────────────────────────
+          FLOATING CATEGORY & STATUS FILTER PILLS
+         ───────────────────────────────────────────────────────────── */}
+      <div className="flex flex-col gap-3 mb-10">
+        <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+          <span className="text-xs font-mono font-bold uppercase tracking-wider text-black/50 dark:text-white/50 whitespace-nowrap">Status:</span>
           <div className="flex gap-2">
             {(["all", "live", "completed", "in-progress", "archived"] as const).map(status => (
               <button 
                 key={status}
                 onClick={() => setStatusFilter(status as any)}
                 className={cn(
-                  "px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors border",
+                  "px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all border",
                   statusFilter === status 
-                    ? "bg-[var(--accent)] text-white border-[var(--accent)]" 
-                    : "bg-glass-bg border-glass-border text-text-secondary hover:border-glass-border-hover hover:text-text-primary"
+                    ? "bg-[#18181B] text-white dark:bg-white dark:text-black border-transparent shadow-md" 
+                    : "bg-white/60 dark:bg-white/5 border-black/10 dark:border-white/10 text-black/70 dark:text-white/70 hover:bg-white dark:hover:bg-white/10"
                 )}
               >
                 {status.replace("-", " ")}
@@ -111,18 +132,18 @@ export default function ProjectsPage() {
           </div>
         </div>
         
-        <div className="flex items-center gap-4 overflow-x-auto pb-2 scrollbar-hide">
-          <span className="text-sm font-medium text-text-secondary whitespace-nowrap">Category:</span>
+        <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+          <span className="text-xs font-mono font-bold uppercase tracking-wider text-black/50 dark:text-white/50 whitespace-nowrap">Category:</span>
           <div className="flex gap-2">
             {categories.map(cat => (
               <button 
                 key={cat}
                 onClick={() => setCategoryFilter(cat)}
                 className={cn(
-                  "px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors border capitalize",
+                  "px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all border capitalize",
                   categoryFilter === cat 
-                    ? "bg-[var(--accent)] text-white border-[var(--accent)]" 
-                    : "bg-glass-bg border-glass-border text-text-secondary hover:border-glass-border-hover hover:text-text-primary"
+                    ? "bg-[#18181B] text-white dark:bg-white dark:text-black border-transparent shadow-md" 
+                    : "bg-white/60 dark:bg-white/5 border-black/10 dark:border-white/10 text-black/70 dark:text-white/70 hover:bg-white dark:hover:bg-white/10"
                 )}
               >
                 {cat.replace("-", " ")}
@@ -132,12 +153,14 @@ export default function ProjectsPage() {
         </div>
       </div>
       
-      {/* Projects */}
+      {/* ─────────────────────────────────────────────────────────────
+          2-COLUMN LARGE PREMIUM PRODUCT SHOWCASE GRID
+         ───────────────────────────────────────────────────────────── */}
       {filteredAndSorted.length === 0 ? (
-        <div className="text-center py-20 bg-glass-bg border border-glass-border rounded-2xl">
-          <Filter className="w-12 h-12 text-text-secondary mx-auto mb-4 opacity-50" />
-          <h3 className="text-xl font-medium mb-2">No projects found</h3>
-          <p className="text-text-secondary">Try adjusting your filters or search query.</p>
+        <div className="text-center py-24 bg-white/60 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-3xl">
+          <Filter className="w-12 h-12 text-black/30 dark:text-white/30 mx-auto mb-4" />
+          <h3 className="text-xl font-serif font-semibold mb-2 text-[#18181B] dark:text-white">No products found</h3>
+          <p className="text-xs sm:text-sm text-black/50 dark:text-white/50">Try adjusting your filters or search query.</p>
         </div>
       ) : (
         <motion.div 
@@ -149,10 +172,10 @@ export default function ProjectsPage() {
           initial="hidden"
           animate="show"
           className={cn(
-            "grid gap-6",
-            layout === "grid" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : "",
+            "grid gap-8 sm:gap-10",
+            layout === "grid" ? "grid-cols-1 lg:grid-cols-2" : "",
             layout === "rows" ? "grid-cols-1" : "",
-            layout === "timeline" ? "grid-cols-1 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-divider before:to-transparent" : ""
+            layout === "timeline" ? "grid-cols-1 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-black/10 dark:before:via-white/10 before:to-transparent" : ""
           )}
         >
           <AnimatePresence mode="popLayout">
@@ -160,10 +183,10 @@ export default function ProjectsPage() {
               <motion.div
                 key={project.id}
                 layout
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 30, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                 className={cn(
                   "h-full",
                   layout === "rows" ? "w-full" : "",
@@ -173,17 +196,12 @@ export default function ProjectsPage() {
                   ) : ""
                 )}
               >
-                {layout === "timeline" && (
-                  <div className={cn(
-                    "absolute top-10 w-4 h-4 rounded-full bg-[var(--bg-primary)] border-2 border-[var(--accent)] z-10 hidden md:block",
-                    index % 2 === 0 ? "-right-[2.1rem]" : "-left-[2.1rem]"
-                  )} />
-                )}
-                {layout === "timeline" && (
-                  <div className="absolute top-10 left-5 w-4 h-4 rounded-full bg-[var(--bg-primary)] border-2 border-[var(--accent)] z-10 -translate-x-1/2 md:hidden" />
-                )}
-                <div className={cn("h-full", layout === "timeline" ? "pl-12 md:pl-0" : "")}>
-                  <ProjectCard project={project} />
+                <div className="h-full">
+                  {layout === "grid" ? (
+                    <PremiumShowcaseCard project={project} />
+                  ) : (
+                    <ProjectCard project={project} />
+                  )}
                 </div>
               </motion.div>
             ))}
