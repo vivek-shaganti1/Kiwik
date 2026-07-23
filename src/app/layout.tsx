@@ -33,6 +33,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { OSWorkspaceWrapper } from "@/components/layout/os-workspace-wrapper";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -51,10 +53,12 @@ export default function RootLayout({
         <ThemeProvider>
           <IntroSplash />
           <CursorGlow />
-          <Navbar />
-          <CommandPalette />
-          <main className="flex-1 pt-[72px]">{children}</main>
-          <Footer />
+          <OSWorkspaceWrapper>
+            <Navbar />
+            <CommandPalette />
+            <main className="flex-1 pt-[72px]">{children}</main>
+            <Footer />
+          </OSWorkspaceWrapper>
         </ThemeProvider>
       </body>
     </html>

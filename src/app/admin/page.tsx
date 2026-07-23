@@ -218,6 +218,28 @@ export default function AdminPage() {
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
+  const handleExportBackup = () => {
+    const jsonStr = exportJSONBackup();
+    const blob = new Blob([jsonStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `kiwik-cms-backup-${new Date().toISOString().split("T")[0]}.json`;
+    a.click();
+    showToast("Exported JSON backup file!");
+  };
+
+  const handleImportBackup = () => {
+    if (!jsonBackupInput.trim()) return;
+    const success = importJSONBackup(jsonBackupInput);
+    if (success) {
+      showToast("Successfully imported JSON backup!");
+      setJsonBackupInput("");
+    } else {
+      alert("Invalid JSON configuration string.");
+    }
+  };
+
   const handleOpenNewProjectModal = () => {
     setEditingProject({
       ...emptyProject,
@@ -344,39 +366,18 @@ export default function AdminPage() {
     showToast("Added trust assurance item!");
   };
 
-  const handleExportBackup = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(exportJSONBackup());
-    const downloadAnchor = document.createElement("a");
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `kiwik_cms_backup_${Date.now()}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-    showToast("CMS Backup exported!");
-  };
 
-  const handleImportBackup = () => {
-    if (!jsonBackupInput.trim()) return;
-    const success = importJSONBackup(jsonBackupInput);
-    if (success) {
-      showToast("CMS Backup restored!");
-      setJsonBackupInput("");
-    } else {
-      alert("Invalid JSON Backup format.");
-    }
-  };
 
   return (
-    <div className="min-h-screen bg-bg-primary text-text-primary pt-24 pb-16 px-4 sm:px-6 md:px-8 max-w-[1500px] mx-auto select-none">
-      
+    <div className="min-h-screen pt-24 pb-20 px-4 sm:px-6 md:px-8 max-w-[1400px] mx-auto space-y-6">
       {/* Toast Notification */}
       <AnimatePresence>
         {toastMessage && (
           <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.9 }}
-            className="fixed top-6 right-6 z-50 px-5 py-3 rounded-full bg-emerald-600 text-white font-semibold text-xs shadow-2xl flex items-center gap-2 border border-emerald-400/40"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-6 right-6 z-[100] px-4 py-2.5 rounded-xl bg-accent text-white font-semibold text-xs shadow-lg flex items-center gap-2"
           >
             <CheckCircle2 className="w-4 h-4" />
             {toastMessage}
@@ -384,78 +385,6 @@ export default function AdminPage() {
         )}
       </AnimatePresence>
 
-      {/* Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 border-b border-divider pb-6 text-left">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-text-primary tracking-tight">
-              Kiwik.1 Enterprise Website CMS
-            </h1>
-          </div>
-          <p className="text-xs text-text-secondary mt-1 font-medium">
-            Full Interactive Edit Access. Priority ordering, duplicate, status filters, markdown READMEs, rotating phrases, navigation, theme, and projects live.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3 flex-wrap">
-          <button
-            onClick={() => {
-              createSnapshot(`Snapshot-${new Date().toLocaleTimeString()}`, "Manual snapshot backup");
-              showToast("Saved version snapshot!");
-            }}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-glass-bg border border-glass-border hover:bg-glass-bg-hover text-xs font-semibold shadow-sm transition-all cursor-pointer"
-          >
-            <History className="w-3.5 h-3.5 text-accent-blue" />
-            Save Snapshot
-          </button>
-          <button
-            onClick={handleExportBackup}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-glass-bg border border-glass-border hover:bg-glass-bg-hover text-xs font-semibold shadow-sm transition-all cursor-pointer"
-          >
-            <Download className="w-3.5 h-3.5 text-indigo-400" />
-            Export JSON
-          </button>
-          <Link
-            href="/"
-            target="_blank"
-            className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold text-xs shadow-md transition-all hover:scale-102"
-          >
-            <Eye className="w-3.5 h-3.5" />
-            Live Website
-          </Link>
-        </div>
-      </div>
-
-      {/* Navigation Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar border-b border-divider/60">
-        {[
-          { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-3.5 h-3.5" /> },
-          { id: "visual-editor", label: "Visual Editor", icon: <Eye className="w-3.5 h-3.5" /> },
-          { id: "hero", label: "Hero CMS", icon: <Sparkles className="w-3.5 h-3.5" /> },
-          { id: "sections", label: "Page Sections", icon: <Layers className="w-3.5 h-3.5" /> },
-          { id: "projects", label: "Projects CMS", icon: <Database className="w-3.5 h-3.5" /> },
-          { id: "media", label: "Media Library", icon: <ImageIcon className="w-3.5 h-3.5" /> },
-          { id: "navigation", label: "Nav & Footer", icon: <Compass className="w-3.5 h-3.5" /> },
-          { id: "theme", label: "Theme & Styling", icon: <Palette className="w-3.5 h-3.5" /> },
-          { id: "seo", label: "SEO Engine", icon: <Search className="w-3.5 h-3.5" /> },
-          { id: "audit-snapshots", label: "Audit & Versioning", icon: <History className="w-3.5 h-3.5" /> }
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id as AdminTab)}
-            className={cn(
-              "flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all whitespace-nowrap cursor-pointer",
-              activeTab === tab.id
-                ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-md font-bold"
-                : "bg-glass-bg border border-glass-border text-text-secondary hover:text-text-primary hover:bg-glass-bg-hover"
-            )}
-          >
-            {tab.icon}
-            <span>{tab.label}</span>
-          </button>
-        ))}
-      </div>
 
       {/* ─────────────────────────────────────────────────────────────
           TAB 1: DASHBOARD

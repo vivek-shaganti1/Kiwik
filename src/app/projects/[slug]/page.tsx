@@ -32,6 +32,8 @@ import { GlassButton } from "@/components/glass/glass-button";
 import { useHistoryStore } from "@/stores/history-store";
 import { cn } from "@/lib/utils";
 
+import { KiwikWindow, KiwikBadge, KiwikButton, KiwikStat, KiwikCard } from "@/components/ui/kiwik-primitives";
+
 export default function ProjectDetailPage() {
   const projects = useProjects();
   const params = useParams();
@@ -79,13 +81,6 @@ export default function ProjectDetailPage() {
     { id: "contributors", label: "Team / Contributors", icon: <Users className="w-3.5 h-3.5" />, condition: project.contributors && project.contributors.length > 0 }
   ].filter(s => s.condition !== false);
 
-  const categoryGradients: Record<string, string> = {
-    ai: "from-violet-500/10 via-purple-500/5 to-transparent",
-    web: "from-blue-500/10 via-cyan-500/5 to-transparent",
-    mobile: "from-emerald-500/10 via-teal-500/5 to-transparent",
-  };
-  const gradient = categoryGradients[project.category] || "from-gray-500/10 via-slate-500/5 to-transparent";
-
   const handleSectionScroll = (id: string) => {
     setActiveTab(id);
     const element = document.getElementById(id);
@@ -97,66 +92,67 @@ export default function ProjectDetailPage() {
   };
 
   return (
-    <div className="min-h-screen pb-32 bg-bg-primary/30 relative">
+    <div className="min-h-screen pb-32 relative">
       {/* Absolute top linear reading progress bar */}
       <div className="fixed top-0 left-0 right-0 h-1 bg-neutral-800/40 z-[60]">
         <motion.div 
-          className="h-full bg-accent-blue origin-left"
+          className="h-full bg-accent origin-left"
           style={{ scaleX: scrollProgress / 100 }}
         />
       </div>
 
       {/* Hero Header Area */}
-      <div className={cn("relative pt-32 pb-16 px-4 sm:px-6 md:px-8 bg-gradient-to-b", gradient)}>
-        <div className="absolute inset-0 bg-bg-primary/90 opacity-95 -z-10" />
-        <div className="max-w-[1400px] mx-auto">
-          <Link href="/projects" className="inline-flex items-center gap-2 text-xs font-semibold text-text-secondary hover:text-text-primary transition-colors mb-6 uppercase tracking-wider">
-            <ArrowLeft className="w-3 h-3" /> Back to systems
-          </Link>
-          
+      <div className="relative pt-28 pb-12 px-4 sm:px-6 md:px-8 max-w-[1400px] mx-auto">
+        <KiwikWindow title={`Kiwik OS Module — ${project.name}`}>
+          <div className="mb-6">
+            <Link href="/projects" className="inline-flex items-center gap-1.5 text-xs font-semibold text-text-secondary hover:text-text-primary transition-colors uppercase tracking-wider">
+              <ArrowLeft className="w-3.5 h-3.5" /> Back to projects ecosystem
+            </Link>
+          </div>
+
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             <div>
-              <div className="flex flex-wrap items-center gap-2 mb-4">
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-glass-bg border border-glass-border">
-                  <div className={cn("w-1.5 h-1.5 rounded-full", {
-                    "bg-emerald-500 animate-pulse": project.status === "completed",
-                    "bg-amber-500 animate-pulse": project.status === "in-progress",
-                    "bg-rose-500": project.status === "archived",
-                  })} />
-                  <span className="text-[10px] font-mono font-bold capitalize text-text-primary">{project.status.replace('-', ' ')}</span>
-                </div>
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <KiwikBadge
+                  variant={project.status === "completed" ? "success" : project.status === "in-progress" ? "warning" : "danger"}
+                  pulse
+                >
+                  {project.status.replace('-', ' ')}
+                </KiwikBadge>
+
                 {project.version && (
-                  <div className="px-2.5 py-1 rounded-full bg-glass-bg border border-glass-border text-[10px] font-mono font-medium text-text-secondary">
-                    {project.version}
-                  </div>
+                  <KiwikBadge variant="neutral" className="font-mono">
+                    v{project.version}
+                  </KiwikBadge>
                 )}
-                <div className="px-2.5 py-1 rounded-full bg-accent-blue/10 border border-accent-blue/20 text-[10px] font-mono font-bold text-accent-blue uppercase tracking-wider">
+
+                <KiwikBadge variant="accent" className="font-mono font-bold">
                   {project.category}
-                </div>
+                </KiwikBadge>
               </div>
-              
-              <h1 className="text-4xl md:text-5xl font-serif font-bold text-text-primary mb-3 tracking-tight">
+
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-text-primary tracking-tight">
                 {project.name}
               </h1>
-              <p className="text-base text-text-secondary max-w-2xl font-medium leading-relaxed">
+              <p className="mt-2 text-sm sm:text-base text-text-secondary max-w-2xl font-medium leading-relaxed">
                 {project.tagline}
               </p>
             </div>
-            
-            <div className="flex items-center gap-3 relative z-10">
+
+            <div className="flex items-center gap-3 shrink-0">
               {project.githubUrl && (
-                <GlassButton variant="secondary" size="sm" className="gap-2 text-xs font-semibold border-glass-border" onClick={() => window.open(project.githubUrl, '_blank')}>
-                  <Code className="w-3.5 h-3.5" /> Source Code
-                </GlassButton>
+                <KiwikButton variant="secondary" size="sm" icon={<Code className="w-3.5 h-3.5" />} onClick={() => window.open(project.githubUrl, '_blank')}>
+                  Source Code
+                </KiwikButton>
               )}
               {project.liveUrl && (
-                <GlassButton variant="primary" size="sm" className="gap-2 text-xs font-semibold" onClick={() => window.open(project.liveUrl, '_blank')}>
-                  <ExternalLink className="w-3.5 h-3.5" /> Live Deploy
-                </GlassButton>
+                <KiwikButton variant="primary" size="sm" glow icon={<ExternalLink className="w-3.5 h-3.5" />} onClick={() => window.open(project.liveUrl, '_blank')}>
+                  Live Launch
+                </KiwikButton>
               )}
             </div>
           </div>
-        </div>
+        </KiwikWindow>
       </div>
 
       {/* Main Documentation portal grid layout */}
