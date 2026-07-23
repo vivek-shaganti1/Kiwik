@@ -4,108 +4,68 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-// Curated art-directed images for circular orbit carousel
-const RIBBON_IMAGES = [
-  {
-    id: "img-1",
-    url: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=400&auto=format&fit=crop",
-    title: "Abstract Neon Palms",
-    aspect: "w-[180px] sm:w-[220px] h-[260px] sm:h-[300px]"
-  },
-  {
-    id: "img-2",
-    url: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=400&auto=format&fit=crop",
-    title: "Liquid Chroma",
-    aspect: "w-[160px] sm:w-[190px] h-[240px] sm:h-[270px]"
-  },
-  {
-    id: "img-3",
-    url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
-    title: "Portrait Studio Light",
-    aspect: "w-[150px] sm:w-[180px] h-[220px] sm:h-[250px]"
-  },
-  {
-    id: "img-4",
-    url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=400&auto=format&fit=crop",
-    title: "Red Roses",
-    aspect: "w-[140px] sm:w-[160px] h-[190px] sm:h-[220px]"
-  },
-  {
-    id: "img-5",
-    url: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=400&auto=format&fit=crop",
-    title: "Quantum Motion",
-    aspect: "w-[130px] sm:w-[150px] h-[170px] sm:h-[200px]"
-  },
-  {
-    id: "img-6",
-    url: "https://images.unsplash.com/photo-1563241527-3004b7be0ffd?q=80&w=400&auto=format&fit=crop",
-    title: "White Porcelain Roses",
-    aspect: "w-[130px] sm:w-[150px] h-[170px] sm:h-[200px]"
-  },
-  {
-    id: "img-7",
-    url: "https://images.unsplash.com/photo-1518837695005-2083093ee35b?q=80&w=400&auto=format&fit=crop",
-    title: "Offroad Expedition",
-    aspect: "w-[140px] sm:w-[160px] h-[190px] sm:h-[220px]"
-  },
-  {
-    id: "img-8",
-    url: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?q=80&w=400&auto=format&fit=crop",
-    title: "Deep Tunnel Forest",
-    aspect: "w-[150px] sm:w-[180px] h-[220px] sm:h-[250px]"
-  },
-  {
-    id: "img-9",
-    url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop",
-    title: "Amber Glass Droplets",
-    aspect: "w-[160px] sm:w-[190px] h-[240px] sm:h-[270px]"
-  },
-  {
-    id: "img-10",
-    url: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=400&auto=format&fit=crop",
-    title: "Wildflower Meadow",
-    aspect: "w-[180px] sm:w-[220px] h-[260px] sm:h-[300px]"
-  }
+// 60+ Curated high-resolution art-directed image pool
+const GALLERY_IMAGE_POOL = [
+  { url: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=500&auto=format&fit=crop", title: "Neon Palms" },
+  { url: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=500&auto=format&fit=crop", title: "Liquid Chroma" },
+  { url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=500&auto=format&fit=crop", title: "Studio Lighting" },
+  { url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=500&auto=format&fit=crop", title: "Red Velvet Roses" },
+  { url: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=500&auto=format&fit=crop", title: "Quantum Motion" },
+  { url: "https://images.unsplash.com/photo-1563241527-3004b7be0ffd?q=80&w=500&auto=format&fit=crop", title: "Porcelain Roses" },
+  { url: "https://images.unsplash.com/photo-1518837695005-2083093ee35b?q=80&w=500&auto=format&fit=crop", title: "Desert Safari" },
+  { url: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?q=80&w=500&auto=format&fit=crop", title: "Deep Emerald Forest" },
+  { url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=500&auto=format&fit=crop", title: "Amber Glass Droplets" },
+  { url: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=500&auto=format&fit=crop", title: "Alpine Meadow" },
+  { url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=500&auto=format&fit=crop", title: "Modernist Villa" },
+  { url: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=500&auto=format&fit=crop", title: "Yosemite Valley" },
+  { url: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=500&auto=format&fit=crop", title: "Architectural Symmetry" },
+  { url: "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=500&auto=format&fit=crop", title: "Cosmic Nebula" },
+  { url: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=500&auto=format&fit=crop", title: "Hyper Crimson Footwear" },
+  { url: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?q=80&w=500&auto=format&fit=crop", title: "Vintage Camera Macro" },
+  { url: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?q=80&w=500&auto=format&fit=crop", title: "Glacial Ice Cavern" },
+  { url: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=500&auto=format&fit=crop", title: "Cyberpunk Arcade" },
+  { url: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?q=80&w=500&auto=format&fit=crop", title: "Spring Botanical" },
+  { url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=500&auto=format&fit=crop", title: "Maldives Horizon" }
 ];
 
 export function ImageRibbon() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [rotationAngle, setRotationAngle] = useState(0);
+  const [offset, setOffset] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Mouse Parallax Values
+  // Mouse Parallax
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  const springConfig = { damping: 50, stiffness: 200, mass: 0.4 };
+  const springConfig = { damping: 50, stiffness: 220, mass: 0.4 };
   const smoothX = useSpring(mouseX, springConfig);
   const smoothY = useSpring(mouseY, springConfig);
 
-  const parallaxX = useTransform(smoothX, [-0.5, 0.5], ["-15px", "15px"]);
+  const parallaxX = useTransform(smoothX, [-0.5, 0.5], ["-16px", "16px"]);
   const parallaxY = useTransform(smoothY, [-0.5, 0.5], ["-10px", "10px"]);
 
-  // Continuous Circular Motion RequestAnimationFrame Loop
+  // Continuous Emitter Stream Motion
   useEffect(() => {
     let animationFrameId: number;
     let lastTime = performance.now();
 
-    const animateCircularOrbit = (time: number) => {
+    const animateEmitter = (time: number) => {
       const delta = (time - lastTime) / 1000;
       lastTime = time;
 
       if (!isPaused) {
-        // Orbit speed: 0.15 radians per second
-        setRotationAngle((prev) => (prev + delta * 0.25) % (Math.PI * 2));
+        // Continuous horizontal scroll speed (24px/sec)
+        setOffset((prev) => prev + delta * 28);
       }
 
-      animationFrameId = requestAnimationFrame(animateCircularOrbit);
+      animationFrameId = requestAnimationFrame(animateEmitter);
     };
 
-    animationFrameId = requestAnimationFrame(animateCircularOrbit);
+    animationFrameId = requestAnimationFrame(animateEmitter);
     return () => cancelAnimationFrame(animationFrameId);
   }, [isPaused]);
 
-  // Mouse move handler
+  // Passive mouse position tracker
   useEffect(() => {
     let ticking = false;
     const handleMouseMove = (e: MouseEvent) => {
@@ -123,94 +83,112 @@ export function ImageRibbon() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [mouseX, mouseY]);
 
-  const numImages = RIBBON_IMAGES.length;
-  const radiusX = 520; // Horizontal radius of circular ellipse
-  const radiusY = 45;  // Vertical curve height of circular ellipse
+  // 12 Visible Emitter Cards distributed across panorama width
+  const totalCards = 12;
+  const spacing = 185; // Distance between card anchors in px
+  const totalSpan = totalCards * spacing;
 
   return (
     <div
       ref={containerRef}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative w-full max-w-[1400px] h-[360px] sm:h-[420px] mx-auto flex items-center justify-center overflow-visible select-none transform-gpu"
+      className="relative w-full max-w-[1550px] h-[340px] sm:h-[400px] mx-auto flex items-center justify-center overflow-visible select-none transform-gpu my-2 sm:my-4"
     >
-      {/* ─────────────────────────────────────────────────────────────
-          ORGANIC BLACK CAPSULE / BOWTIE BACKDROP
-         ───────────────────────────────────────────────────────────── */}
-      <motion.div
-        initial={{ width: 0, opacity: 0 }}
-        animate={{ width: "92%", opacity: 1 }}
-        transition={{ duration: 1.2, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-16 sm:h-20 bg-[#000000] rounded-full z-0 opacity-90 shadow-2xl pointer-events-none transform-gpu"
-        style={{
-          clipPath: "polygon(0% 0%, 100% 0%, 92% 50%, 100% 100%, 0% 100%, 8% 50%)"
-        }}
-      />
+      {/* Ultra-subtle floating center guide line */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] h-px bg-gradient-to-r from-transparent via-black/[0.08] to-transparent pointer-events-none z-0" />
+
+      {/* Subtle Ambient Radial Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-32 bg-amber-500/5 rounded-full blur-3xl pointer-events-none z-0" />
 
       {/* ─────────────────────────────────────────────────────────────
-          CIRCULAR ORBIT STREAM OF CARDS
+          INFINITE EMITTER GALLERY STREAM
          ───────────────────────────────────────────────────────────── */}
       <motion.div
         style={{ x: parallaxX, y: parallaxY }}
-        className="relative w-full h-full flex items-center justify-center transform-gpu will-change-transform"
+        className="relative w-full h-full flex items-center justify-center transform-gpu will-change-transform z-10"
       >
-        {RIBBON_IMAGES.map((img, idx) => {
-          // Circular angle offset for each image in the orbit
-          const angle = rotationAngle + (idx * (Math.PI * 2)) / numImages;
+        {Array.from({ length: totalCards }).map((_, idx) => {
+          // Calculate infinite wrapped horizontal position
+          const basePos = (idx * spacing + offset) % totalSpan;
+          const centeredX = basePos - totalSpan / 2 + spacing / 2;
 
-          // 3D Circular Orbit Trigonometry
-          const x = Math.cos(angle) * radiusX;
-          const y = Math.sin(angle) * radiusY;
-          const zDepth = Math.sin(angle); // -1 (back) to +1 (front)
+          // Normalized distance from screen center (-1 to 1)
+          const normDist = centeredX / (totalSpan / 2);
+          const absNorm = Math.abs(normDist);
 
-          // Dynamic scale, opacity, and rotateY based on circular depth position
-          const scale = 0.72 + (zDepth + 1) * 0.22; // 0.72 -> 1.16
-          const opacity = 0.55 + (zDepth + 1) * 0.225; // 0.55 -> 1.0
-          const zIndex = Math.round((zDepth + 1) * 20); // Z-index layering
-          const rotateY = -Math.cos(angle) * 22; // Tilt outward into circle
-          const rotateZ = Math.sin(angle) * 6;   // Dynamic subtle roll angle
+          // Card image assignment based on position
+          const imgIndex = Math.abs(Math.floor((offset + idx * 45) / 100)) % GALLERY_IMAGE_POOL.length;
+          const imgData = GALLERY_IMAGE_POOL[imgIndex];
+
+          // ── Composition & Cinematic Depth Scaling ──
+          // Center remains tighter (smaller cards, 14px radius)
+          // Edges become wider & larger (larger cards, 22px radius)
+          const isCenter = absNorm < 0.25;
+          const isMedium = absNorm >= 0.25 && absNorm < 0.65;
+
+          const cardHeight = isCenter
+            ? "h-[130px] sm:h-[150px] w-[130px] sm:w-[150px]"
+            : isMedium
+            ? "h-[210px] sm:h-[250px] w-[150px] sm:w-[180px]"
+            : "h-[300px] sm:h-[350px] w-[210px] sm:w-[260px]";
+
+          const borderRadius = isCenter
+            ? "rounded-[14px]"
+            : isMedium
+            ? "rounded-[18px]"
+            : "rounded-[22px]";
+
+          // Rotation curves outwards towards edges (-12deg to +12deg)
+          const rotateZ = normDist * 13;
+
+          // Vertical Sine Wave Floating
+          const floatY = Math.sin((basePos * 0.015) + (offset * 0.05)) * 8;
+
+          // Layering & Opacity Fade out near viewport edges
+          const opacity = absNorm > 0.88 ? Math.max(0, 1 - (absNorm - 0.88) * 8) : 1;
+          const zIndex = Math.round((1 - absNorm) * 20) + 10;
 
           return (
             <motion.div
-              key={img.id}
+              key={`emitter-card-${idx}`}
               style={{
                 position: "absolute",
-                x,
-                y,
-                scale,
+                x: centeredX,
+                y: floatY,
+                rotateZ: `${rotateZ}deg`,
                 opacity,
                 zIndex,
-                rotateY: `${rotateY}deg`,
-                rotateZ: `${rotateZ}deg`,
               }}
               whileHover={{
-                scale: scale * 1.18,
-                rotateY: 0,
+                scale: 1.1,
                 rotateZ: 0,
-                zIndex: 50,
-                transition: { type: "spring", stiffness: 350, damping: 20 }
+                y: floatY - 12,
+                zIndex: 60,
+                transition: { type: "spring", stiffness: 350, damping: 22 }
               }}
               className={cn(
-                "relative rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border border-white/30 transition-shadow duration-300 cursor-pointer group shrink-0 transform-gpu will-change-transform",
-                img.aspect
+                "relative overflow-hidden cursor-pointer group shrink-0 transition-all duration-300 transform-gpu will-change-transform shadow-[0_20px_50px_rgba(0,0,0,0.07)] hover:shadow-[0_30px_70px_rgba(0,0,0,0.14)] border border-black/[0.08]",
+                cardHeight,
+                borderRadius
               )}
             >
-              {/* Image Asset */}
+              {/* Native Image Element */}
               <img
-                src={img.url}
-                alt={img.title}
+                src={imgData.url}
+                alt={imgData.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 transform-gpu"
                 loading="eager"
                 decoding="async"
               />
 
-              {/* Specular Highlight Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-white/20 opacity-60 group-hover:opacity-10 transition-opacity" />
+              {/* Soft Specular Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-white/10 opacity-40 group-hover:opacity-10 transition-opacity" />
 
               {/* Title Badge on Hover */}
-              <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                <span className="text-[9px] font-mono font-bold text-white bg-black/70 backdrop-blur-md px-2 py-1 rounded-md border border-white/10 truncate block">
-                  {img.title}
+              <div className="absolute bottom-2.5 left-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                <span className="text-[10px] font-sans font-semibold text-white bg-black/75 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/15 truncate block text-center">
+                  {imgData.title}
                 </span>
               </div>
             </motion.div>

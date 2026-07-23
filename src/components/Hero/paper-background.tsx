@@ -10,25 +10,28 @@ interface PaperBackgroundProps {
 
 export function PaperBackground({ className, children }: PaperBackgroundProps) {
   return (
-    <div className={cn("relative w-full min-h-screen bg-[#FFFFFF] dark:bg-[#0A0C10] text-[#18181B] dark:text-[#F4F4F5] overflow-hidden transition-colors duration-500 select-none", className)}>
-      {/* 3% Dotted Paper Grid (18px Spacing) */}
+    <div className={cn("relative w-full min-h-screen bg-[#FAFAF8] dark:bg-[#0A0C10] text-[#18181B] dark:text-[#F4F4F5] overflow-hidden transition-colors duration-500 select-none", className)}>
+      {/* Subtle 2-3% Dotted Paper Grid (18px Spacing) */}
       <div 
-        className="absolute inset-0 pointer-events-none z-0 opacity-[0.04] dark:opacity-[0.07]" 
+        className="absolute inset-0 pointer-events-none z-0 opacity-[0.03] dark:opacity-[0.06]" 
         style={{
           backgroundImage: `radial-gradient(#18181b 1.2px, transparent 1.2px)`,
           backgroundSize: `18px 18px`
         }}
       />
 
-      {/* Subtle Radial Lighting (Brighter Center, Soft Edges) */}
-      <div className="absolute inset-0 pointer-events-none z-0 bg-radial-[circle_at_center,rgba(255,255,255,0.7)_0%,transparent_80%] dark:bg-radial-[circle_at_center,rgba(59,130,246,0.08)_0%,transparent_80%]" />
+      {/* Soft Radial Center Light */}
+      <div className="absolute inset-0 pointer-events-none z-0 bg-radial-[circle_at_center,rgba(255,255,255,0.8)_0%,transparent_75%] dark:bg-radial-[circle_at_center,rgba(59,130,246,0.06)_0%,transparent_75%]" />
 
-      {/* Micro Paper Noise Texture */}
+      {/* Soft Vignette on Edges */}
+      <div className="absolute inset-0 pointer-events-none z-0 bg-radial-[circle_at_center,transparent_60%,rgba(24,24,27,0.035)_100%]" />
+
+      {/* Extremely Soft Noise Texture */}
       <div 
         style={{ 
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
         }}
-        className="absolute inset-0 pointer-events-none z-0 opacity-[0.025] mix-blend-multiply dark:mix-blend-overlay"
+        className="absolute inset-0 pointer-events-none z-0 opacity-[0.018] mix-blend-multiply dark:mix-blend-overlay"
       />
 
       <div className="relative z-10">{children}</div>
