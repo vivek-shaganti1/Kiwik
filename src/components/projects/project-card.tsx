@@ -9,6 +9,8 @@ import { GlassSpotlightCard } from "@/components/glass/glass-spotlight-card";
 import { useFavoritesStore } from "@/stores/favorites-store";
 import { cn, relativeTime } from "@/lib/utils";
 
+import { ProjectImage } from "@/components/ui/project-image";
+
 interface ProjectCardProps {
   project: Project;
 }
@@ -44,13 +46,13 @@ export function ProjectCard({ project }: ProjectCardProps) {
         <div className={cn("relative h-[180px] w-full bg-gradient-to-br overflow-hidden border-b border-glass-border", gradient)}>
           {/* Architectural Grid pattern */}
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:16px_16px] [mask-image:radial-gradient(ellipse_at_center,black_70%,transparent_100%)] opacity-40 pointer-events-none" />
-          {project.coverImage && (
-            <img
-              src={project.coverImage}
-              alt={project.name}
-              className="w-full h-full object-cover opacity-50 group-hover:scale-102 group-hover:opacity-75 transition-all duration-700"
-            />
-          )}
+          
+          <ProjectImage
+            src={project.coverImage}
+            alt={project.name}
+            category={project.category}
+            className="w-full h-full object-cover opacity-60 group-hover:scale-102 group-hover:opacity-85 transition-all duration-700"
+          />
 
           <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-bg-primary/10 to-transparent" />
 

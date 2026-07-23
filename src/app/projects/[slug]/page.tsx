@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
+import { ProjectImage } from "@/components/ui/project-image";
 import { 
   ExternalLink, 
   Star, 
@@ -282,9 +283,10 @@ export default function ProjectDetailPage() {
                         className="aspect-video relative rounded-xl overflow-hidden cursor-zoom-in bg-glass-bg border border-glass-border group" 
                         onClick={() => setLightboxImage(img.src)}
                       >
-                        <img 
+                        <ProjectImage 
                           src={img.src} 
                           alt={img.alt || `Preview ${i}`} 
+                          category={project.category}
                           className="w-full h-full object-cover opacity-70 group-hover:scale-102 group-hover:opacity-95 transition-all duration-500" 
                         />
                       </div>

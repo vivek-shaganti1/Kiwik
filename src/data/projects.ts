@@ -128,10 +128,10 @@ npm run dev
     completionPercent: 100,
     liveUrl: "https://ai.criska.dev",
     githubUrl: "https://github.com/criska/criska-ai",
-    coverImage: "/images/criska-ai-cover.jpg",
+    coverImage: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
     images: [
-      { src: "/images/criska-ai-chat.jpg", alt: "Chat Interface", caption: "Sleek conversational UI" },
-      { src: "/images/criska-ai-code.jpg", alt: "Code Generation", caption: "Intelligent code generation" },
+      { src: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80", alt: "Chat Interface", caption: "Sleek conversational UI" },
+      { src: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=1200&q=80", alt: "Code Generation", caption: "Intelligent code generation" },
     ],
     techStack: [
       { name: "Next.js 15", category: "frontend", color: "#000000" },
@@ -193,9 +193,9 @@ npm run dev
     version: "0.8.0",
     completionPercent: 65,
     githubUrl: "https://github.com/criska/criska-cloud",
-    coverImage: "/images/criska-cloud-cover.jpg",
+    coverImage: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80",
     images: [
-      { src: "/images/criska-cloud-dash.jpg", alt: "Dashboard", caption: "Cloud management dashboard" },
+      { src: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80", alt: "Dashboard", caption: "Cloud management dashboard" },
     ],
     techStack: [
       { name: "Next.js 15", category: "frontend", color: "#000000" },
@@ -253,10 +253,10 @@ npm run dev
     completionPercent: 100,
     liveUrl: "https://pay.criska.dev",
     githubUrl: "https://github.com/criska/criska-pay",
-    coverImage: "/images/criska-pay-cover.jpg",
+    coverImage: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&q=80",
     images: [
-      { src: "/images/criska-pay-checkout.jpg", alt: "Checkout", caption: "Beautiful checkout experience" },
-      { src: "/images/criska-pay-dash.jpg", alt: "Dashboard", caption: "Transaction analytics" },
+      { src: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&q=80", alt: "Checkout", caption: "Beautiful checkout experience" },
+      { src: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&q=80", alt: "Dashboard", caption: "Transaction analytics" },
     ],
     techStack: [
       { name: "React 19", category: "frontend", color: "#61DAFB" },
@@ -312,9 +312,9 @@ npm run dev
     version: "0.3.0",
     completionPercent: 35,
     githubUrl: "https://github.com/criska/criska-os",
-    coverImage: "/images/criska-os-cover.jpg",
+    coverImage: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80",
     images: [
-      { src: "/images/criska-os-desktop.jpg", alt: "Desktop", caption: "CriskaOS desktop environment" },
+      { src: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80", alt: "Desktop", caption: "CriskaOS desktop environment" },
     ],
     techStack: [
       { name: "React 19", category: "frontend", color: "#61DAFB" },
@@ -366,9 +366,9 @@ npm run dev
     completionPercent: 100,
     liveUrl: "https://bot.criska.dev",
     githubUrl: "https://github.com/criska/criska-bot",
-    coverImage: "/images/criska-bot-cover.jpg",
+    coverImage: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?auto=format&fit=crop&w=1200&q=80",
     images: [
-      { src: "/images/criska-bot-commands.jpg", alt: "Commands", caption: "Slash commands interface" },
+      { src: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?auto=format&fit=crop&w=1200&q=80", alt: "Commands", caption: "Slash commands interface" },
     ],
     techStack: [
       { name: "Node.js", category: "backend", color: "#339933" },

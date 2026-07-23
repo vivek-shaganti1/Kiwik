@@ -9,6 +9,16 @@ import { useEffect, useState } from "react";
 import type { Project } from "@/types";
 import { projects as defaultProjects } from "@/data/projects";
 
+const categoryFallbacks: Record<string, string> = {
+  ai: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
+  devops: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80",
+  payments: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&q=80",
+  research: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80",
+  automation: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?auto=format&fit=crop&w=1200&q=80",
+  saas: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&q=80",
+  web: "/images/kiwik-cover.jpg",
+};
+
 interface ProjectsState {
   projects: Project[];
   setProjects: (projects: Project[]) => void;
@@ -87,7 +97,7 @@ export const useProjectsStore = create<ProjectsState>()(
       resetToDefaults: () => set({ projects: defaultProjects }),
     }),
     {
-      name: "kiwik-projects-store",
+      name: "kiwik-projects-store-v2",
     }
   )
 );
@@ -101,5 +111,17 @@ export function useProjects() {
     setHasHydrated(true);
   }, []);
 
-  return hasHydrated ? storeProjects : defaultProjects;
+  const sanitizedProjects = (hasHydrated ? storeProjects : defaultProjects).map(p => {
+    // If coverImage is empty, a broken local path, or invalid, auto-fix with valid default
+    if (!p.coverImage || p.coverImage.startsWith("/images/criska-") || !p.coverImage.includes(".")) {
+      const defaultP = defaultProjects.find(dp => dp.id === p.id || dp.slug === p.slug);
+      return {
+        ...p,
+        coverImage: defaultP?.coverImage || categoryFallbacks[p.category] || "/images/kiwik-cover.jpg"
+      };
+    }
+    return p;
+  });
+
+  return sanitizedProjects;
 }

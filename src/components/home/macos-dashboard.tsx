@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useProjects } from "@/stores/projects-store";
+import { ProjectImage } from "@/components/ui/project-image";
 
 type SidebarTab = "overview" | "projects" | "docs" | "analytics" | "ai" | "settings";
 
@@ -70,7 +71,7 @@ export function MacosDashboard() {
     status: (p.status === "completed" ? "live" : "beta") as "live" | "beta" | "in-progress",
     percent: p.completionPercent || 100,
     category: p.category,
-    image: getProjectImage(p.slug),
+    image: p.coverImage || getProjectImage(p.slug),
     tech: p.techStack ? p.techStack.map(t => t.name).slice(0, 3) : ["React", "TypeScript", "Next.js"],
     github: p.githubUrl,
     liveUrl: p.liveUrl
@@ -226,7 +227,12 @@ export function MacosDashboard() {
                         >
                           {/* Image area */}
                           <div className="relative h-28 overflow-hidden border-b border-divider">
-                            <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500" />
+                            <ProjectImage 
+                              src={p.image} 
+                              alt={p.name} 
+                              category={p.category}
+                              className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500" 
+                            />
                             <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-glass-bg border border-glass-border backdrop-blur-md">
                               <span className={cn(
                                 "w-1.5 h-1.5 rounded-full",

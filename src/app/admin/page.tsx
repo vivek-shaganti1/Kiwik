@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { ProjectImage } from "@/components/ui/project-image";
 import {
   Plus,
   ArrowUp,
@@ -881,10 +882,24 @@ export default function AdminPage() {
                         <label className="text-xs font-bold text-text-secondary block mb-1">Cover Image URL</label>
                         <input
                           type="text"
+                          placeholder="e.g. /images/kiwik-cover.jpg or https://images.unsplash.com/..."
                           value={editingProject.coverImage || ""}
                           onChange={(e) => setEditingProject({ ...editingProject, coverImage: e.target.value })}
                           className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
                         />
+
+                        {/* Live Image Preview */}
+                        <div className="mt-3 space-y-1">
+                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-text-muted">Live Cover Preview:</span>
+                          <div className="h-28 w-full rounded-xl overflow-hidden border border-glass-border relative bg-bg-secondary">
+                            <ProjectImage
+                              src={editingProject.coverImage || ""}
+                              alt={editingProject.name || "Preview"}
+                              category={editingProject.category}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
