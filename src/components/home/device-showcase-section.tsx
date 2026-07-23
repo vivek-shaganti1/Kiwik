@@ -1,308 +1,381 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
-import { ArrowUpRight, Cpu, Cloud, CreditCard, Terminal, Sparkles, ShieldCheck, Activity } from "lucide-react";
+import { motion } from "framer-motion";
+import { 
+  CreditCard, 
+  Calendar, 
+  Briefcase, 
+  MessageSquare, 
+  Share2, 
+  HelpCircle, 
+  CheckCircle,
+  ArrowUpRight,
+  Send,
+  Lock,
+  Globe
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface DeviceItem {
-  id: string;
-  slug: string;
-  name: string;
-  tagline: string;
-  author: string;
-  role: string;
-  status: string;
-  category: string;
-  accentGradient: string;
-  layoutType: "ai" | "cloud" | "pm" | "botanist" | "pay";
-  rotate: number;
-  scale: number;
-  yOffset: number;
-  floatDuration: number;
-  floatDelay: number;
-}
-
-const DEVICES: DeviceItem[] = [
-  {
-    id: "criska-bot",
-    slug: "criska-ai",
-    name: "CriskaBot",
-    tagline: "Viral marketer & Discord AI Companion for growth teams.",
-    author: "John Richardson",
-    role: "Angel Investor & AI Lead",
-    status: "LIVE",
-    category: "AI Marketing",
-    accentGradient: "from-slate-800 via-neutral-900 to-black",
-    layoutType: "ai",
-    rotate: -6,
-    scale: 0.86,
-    yOffset: 16,
-    floatDuration: 14,
-    floatDelay: 0,
-  },
-  {
-    id: "criska-ai",
-    slug: "criska-ai",
-    name: "CriskaAI",
-    tagline: "Product Designer & UI UX Expert powered by neural agents.",
-    author: "Jet Hawken",
-    role: "Product Designer & UI/UX Expert",
-    status: "PRIVATE BETA",
-    category: "AI Ops",
-    accentGradient: "from-blue-600/30 via-indigo-900/40 to-sky-950",
-    layoutType: "pm",
-    rotate: -3,
-    scale: 0.94,
-    yOffset: 4,
-    floatDuration: 12,
-    floatDelay: 2,
-  },
-  {
-    id: "criska-cloud",
-    slug: "criska-cloud",
-    name: "CriskaCloud",
-    tagline: "Product Manager with 15 years of experience built into autonomous infrastructure.",
-    author: "Leslie Putnam",
-    role: "Senior Product Manager",
-    status: "PILOT",
-    category: "Cloud OS",
-    accentGradient: "from-blue-600 via-indigo-600 to-purple-800",
-    layoutType: "cloud",
-    rotate: 0,
-    scale: 1.05,
-    yOffset: -12,
-    floatDuration: 10,
-    floatDelay: 1,
-  },
-  {
-    id: "criska-pay",
-    slug: "criska-pay",
-    name: "CriskaPay",
-    tagline: "Encrypted instant settlement, billing engine & automated ledger.",
-    author: "Taylor Brown",
-    role: "Financial Systems Lead",
-    status: "PROTOTYPE",
-    category: "Fintech",
-    accentGradient: "from-emerald-800 via-teal-900 to-slate-950",
-    layoutType: "botanist",
-    rotate: 3,
-    scale: 0.94,
-    yOffset: 4,
-    floatDuration: 13,
-    floatDelay: 3,
-  },
-  {
-    id: "kiwik-hub",
-    slug: "kiwik-1",
-    name: "Kiwik Hub",
-    tagline: "Viral marketer, helping founders grow their apps exponentially.",
-    author: "Jason Markus",
-    role: "Growth Engineer",
-    status: "LIVE PLATFORM",
-    category: "Developer OS",
-    accentGradient: "from-lime-800 via-emerald-950 to-black",
-    layoutType: "pay",
-    rotate: 6,
-    scale: 0.86,
-    yOffset: 16,
-    floatDuration: 15,
-    floatDelay: 2,
-  },
-];
-
 export function DeviceShowcaseSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
-
-  // Scroll 3D Perspective Rotation Parallax
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-
-  const scrollRotateX = useTransform(scrollYProgress, [0, 0.5, 1], [8, 0, -8]);
-  const scrollTranslateY = useTransform(scrollYProgress, [0, 1], [60, -40]);
-  const springRotateX = useSpring(scrollRotateX, { damping: 25, stiffness: 120 });
-
-  // Mouse Parallax Physics
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!sectionRef.current) return;
-    const rect = sectionRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setMousePos({ x: x * 18, y: y * 18 });
-  };
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   return (
     <section
-      ref={sectionRef}
-      onMouseMove={handleMouseMove}
       id="device-showcase-section"
-      className="py-32 md:py-44 px-4 sm:px-6 md:px-8 max-w-[1550px] mx-auto relative z-20 select-none overflow-hidden"
+      className="py-20 md:py-28 px-2 sm:px-4 md:px-8 max-w-[1600px] mx-auto relative z-20 select-none overflow-hidden bg-[#FAFAF8] dark:bg-[#07080B]"
     >
       {/* ─────────────────────────────────────────────────────────────
-          SECTION HEADER (Apple / Linear Showcase Style)
+          TOP BADGE: "No Credit Card Required" (Matching Reference Screenshot)
          ───────────────────────────────────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.7 }}
-        className="text-center max-w-3xl mx-auto mb-20 space-y-4"
-      >
-        <span className="text-[12px] font-mono font-bold uppercase tracking-[0.35em] text-neutral-500 dark:text-[#A1A1AA]">
-          FEATURED PRODUCTS
-        </span>
-        <h2 className="text-4xl sm:text-5xl md:text-6xl font-serif font-medium text-neutral-900 dark:text-white tracking-tight leading-[1.05]">
-          Products crafted for modern businesses
-        </h2>
-        <p className="text-sm sm:text-base text-neutral-600 dark:text-[#A1A1AA] font-sans font-medium max-w-[680px] mx-auto leading-relaxed">
-          Every platform is designed as a world-class software product with enterprise engineering excellence.
-        </p>
-      </motion.div>
+      <div className="flex justify-center mb-10 sm:mb-14">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-white/10 border border-neutral-200 dark:border-white/15 text-neutral-600 dark:text-neutral-300 text-xs font-sans font-medium shadow-sm">
+          <CreditCard className="w-3.5 h-3.5 text-neutral-400" />
+          <span className="line-through decoration-neutral-400">No Credit Card Required</span>
+        </div>
+      </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          5 FLOATING DEVICE SHOWCASE LAYER (Matching Screenshot 1)
+          5 REALISTIC IPHONE DEVICE MOCKUPS (Pixel-Perfect Match)
          ───────────────────────────────────────────────────────────── */}
-      <motion.div
-        style={{
-          rotateX: springRotateX,
-          y: scrollTranslateY,
-          transformStyle: "preserve-3d",
-        }}
-        className="relative w-full min-h-[640px] sm:min-h-[720px] flex items-center justify-center gap-3 sm:gap-6 perspective-[1200px] transform-gpu px-2"
-      >
-        {DEVICES.map((device, idx) => {
-          const isHovered = hoveredId === device.id;
-          const isCenter = device.id === "criska-cloud";
+      <div className="relative w-full flex items-center justify-center gap-3 sm:gap-5 md:gap-6 overflow-x-auto pb-8 pt-4 no-scrollbar">
+        
+        {/* ── DEVICE 1: JOHN RICHARDSON (Far Left) ── */}
+        <motion.div
+          onMouseEnter={() => setHoveredIndex(0)}
+          onMouseLeave={() => setHoveredIndex(null)}
+          animate={{
+            y: hoveredIndex === 0 ? -12 : 0,
+            scale: hoveredIndex === 0 ? 1.03 : 0.94,
+          }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          className="relative flex-shrink-0 w-[240px] sm:w-[270px] md:w-[290px] h-[520px] sm:h-[580px] rounded-[44px] bg-black p-2.5 sm:p-3 border-[6px] border-[#1C1D24] shadow-[20px_30px_70px_rgba(0,0,0,0.18)] dark:shadow-[0_30px_90px_rgba(0,0,0,0.7)] flex flex-col justify-between overflow-hidden cursor-pointer group"
+        >
+          <div className="relative w-full h-full rounded-[34px] bg-white text-neutral-900 p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner">
+            
+            {/* Dynamic Island */}
+            <div className="w-16 h-4 mx-auto rounded-full bg-black flex items-center justify-center gap-1.5 mb-3">
+              <div className="w-2 h-2 rounded-full bg-neutral-900" />
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-500/80" />
+            </div>
 
-          return (
-            <motion.div
-              key={device.id}
-              onMouseEnter={() => setHoveredId(device.id)}
-              onMouseLeave={() => setHoveredId(null)}
-              initial={{ opacity: 0, y: 80, scale: 0.9 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: idx * 0.12, ease: [0.16, 1, 0.3, 1] }}
-              style={{
-                zIndex: isHovered ? 50 : isCenter ? 30 : 20 - Math.abs(idx - 2) * 5,
-              }}
-              className="relative flex-1 max-w-[260px] sm:max-w-[290px] transform-gpu transition-all duration-500"
-            >
-              {/* Infinite Subtle Floating Animation */}
-              <motion.div
-                animate={{
-                  y: isHovered ? -12 : [device.yOffset, device.yOffset - 10, device.yOffset],
-                  rotate: isHovered ? 0 : [device.rotate, device.rotate + 0.8, device.rotate],
-                  x: mousePos.x * (idx === 2 ? 0.4 : 0.7),
-                }}
-                transition={{
-                  y: isHovered
-                    ? { duration: 0.3 }
-                    : { repeat: Infinity, duration: device.floatDuration, ease: "easeInOut", delay: device.floatDelay },
-                  rotate: isHovered
-                    ? { duration: 0.3 }
-                    : { repeat: Infinity, duration: device.floatDuration + 2, ease: "easeInOut", delay: device.floatDelay },
-                  x: { type: "spring", damping: 25, stiffness: 120 },
-                }}
-                className={cn(
-                  "relative rounded-[44px] bg-[#090A0F] border-[8px] sm:border-[10px] border-[#1C1D24] p-3.5 shadow-[0_30px_90px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col justify-between h-[520px] sm:h-[580px] transition-all duration-500 cursor-pointer group",
-                  isHovered ? "scale-[1.04] shadow-[0_40px_120px_rgba(59,130,246,0.35)] border-white/30" : ""
-                )}
-              >
-                <Link href={`/projects/${device.slug}`} className="block h-full flex flex-col justify-between">
-                  
-                  {/* Dynamic Island Notch Frame Header */}
-                  <div className="relative w-full flex items-center justify-between pb-3 z-20">
-                    <div className="w-16 h-4 mx-auto rounded-full bg-black/80 border border-white/10 flex items-center justify-center gap-1.5 shadow-inner">
-                      <div className="w-2 h-2 rounded-full bg-[#101116]" />
-                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500/80 animate-pulse" />
-                    </div>
+            {/* Content Header */}
+            <div className="space-y-3 text-left">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-neutral-200 overflow-hidden flex items-center justify-center font-bold text-xs font-serif text-neutral-700">
+                  JR
+                </div>
+                <span className="text-xs font-bold text-neutral-800">John Richardson</span>
+              </div>
+
+              <h3 className="text-lg sm:text-xl font-serif font-bold text-neutral-900 tracking-tight leading-snug">
+                Angel investor in San Antonio, TX
+              </h3>
+
+              <p className="text-[11px] font-sans text-neutral-500 leading-relaxed">
+                Investing in web3 companies focused on DeFi systems and infrastructure.
+              </p>
+
+              <button className="w-full py-2 rounded-full bg-neutral-100 border border-neutral-200 text-neutral-800 text-xs font-bold hover:bg-neutral-200 transition-colors shadow-sm">
+                Apply
+              </button>
+            </div>
+
+            {/* Bottom Projects List */}
+            <div className="pt-3 border-t border-neutral-100 space-y-2 text-left">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Projects</span>
+              
+              <div className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-100 space-y-0.5">
+                <div className="text-xs font-bold text-neutral-800">Cooperative</div>
+                <p className="text-[10px] text-neutral-400">Project description here.</p>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-100 space-y-0.5">
+                <div className="text-xs font-bold text-neutral-800">Ikigai Labs</div>
+                <p className="text-[10px] text-neutral-400">Project description here.</p>
+              </div>
+            </div>
+
+          </div>
+        </motion.div>
+
+        {/* ── DEVICE 2: JET HAWKEN (Mid Left - Product Designer) ── */}
+        <motion.div
+          onMouseEnter={() => setHoveredIndex(1)}
+          onMouseLeave={() => setHoveredIndex(null)}
+          animate={{
+            y: hoveredIndex === 1 ? -12 : -8,
+            scale: hoveredIndex === 1 ? 1.03 : 0.97,
+          }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          className="relative flex-shrink-0 w-[240px] sm:w-[270px] md:w-[290px] h-[530px] sm:h-[590px] rounded-[44px] bg-black p-2.5 sm:p-3 border-[6px] border-[#1C1D24] shadow-[20px_30px_70px_rgba(0,0,0,0.18)] dark:shadow-[0_30px_90px_rgba(0,0,0,0.7)] flex flex-col justify-between overflow-hidden cursor-pointer group"
+        >
+          <div className="relative w-full h-full rounded-[34px] bg-[#EBF2FE] text-neutral-900 p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner">
+            
+            {/* Dynamic Island */}
+            <div className="w-16 h-4 mx-auto rounded-full bg-black flex items-center justify-center gap-1.5 mb-2">
+              <div className="w-2 h-2 rounded-full bg-neutral-900" />
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-500/80" />
+            </div>
+
+            {/* Top Blue Wave Shader */}
+            <div className="absolute top-0 left-0 right-0 h-44 bg-gradient-to-b from-blue-300/40 via-blue-200/20 to-transparent pointer-events-none" />
+
+            {/* Header Content */}
+            <div className="relative z-10 space-y-2.5 text-left">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shadow-md">
+                  JH
+                </div>
+                <span className="text-xs font-bold text-neutral-800">Jet Hawken</span>
+              </div>
+
+              <h3 className="text-lg sm:text-xl font-serif font-bold text-neutral-900 tracking-tight leading-tight">
+                Product Designer & UI UX Expert
+              </h3>
+
+              <p className="text-[10px] sm:text-[11px] font-sans text-neutral-600 leading-relaxed">
+                A seasoned designer with 15 years experience specializing in product design and UI/UX. Known for creating impactful experiences.
+              </p>
+
+              <button className="w-full py-2 rounded-full bg-white text-blue-600 text-xs font-bold hover:bg-blue-50 transition-colors shadow-md border border-blue-100">
+                Book an intro call
+              </button>
+            </div>
+
+            {/* Testimonials Block */}
+            <div className="relative z-10 pt-2 border-t border-blue-200/60 space-y-2 text-left">
+              <div className="flex items-center gap-1 text-[10px] font-bold text-neutral-600">
+                <span className="font-serif italic text-base">“</span> Testimonials
+              </div>
+
+              <div className="p-2.5 rounded-2xl bg-white/80 backdrop-blur-sm border border-blue-100 space-y-1 shadow-sm">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-5 h-5 rounded-full bg-neutral-300 text-[9px] font-bold flex items-center justify-center">JR</div>
+                  <span className="text-[10px] font-bold text-neutral-800">John Richardson</span>
+                </div>
+                <p className="text-[9.5px] text-neutral-600 leading-tight">
+                  "Jet helped us build an incredible platform from start to finish"
+                </p>
+              </div>
+
+              <div className="p-2.5 rounded-2xl bg-white/80 backdrop-blur-sm border border-blue-100 space-y-1 shadow-sm">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-5 h-5 rounded-full bg-blue-500 text-white text-[9px] font-bold flex items-center justify-center">LP</div>
+                  <span className="text-[10px] font-bold text-neutral-800">Leslie Putnam</span>
+                </div>
+                <p className="text-[9.5px] text-neutral-600 leading-tight">
+                  "Is so talented and designs so fast, we beat every deadline..."
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </motion.div>
+
+        {/* ── DEVICE 3: LESLIE PUTNAM (Center Hero - Dark Mode Senior PM) ── */}
+        <motion.div
+          onMouseEnter={() => setHoveredIndex(2)}
+          onMouseLeave={() => setHoveredIndex(null)}
+          animate={{
+            y: hoveredIndex === 2 ? -18 : -16,
+            scale: hoveredIndex === 2 ? 1.06 : 1.02,
+          }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          className="relative flex-shrink-0 w-[260px] sm:w-[290px] md:w-[310px] h-[560px] sm:h-[620px] rounded-[48px] bg-black p-2.5 sm:p-3 border-[7px] border-[#22242D] shadow-[25px_40px_90px_rgba(0,0,0,0.3)] dark:shadow-[0_40px_120px_rgba(0,0,0,0.9)] flex flex-col justify-between overflow-hidden cursor-pointer z-30 group"
+        >
+          <div className="relative w-full h-full rounded-[38px] bg-[#0C0D12] text-white p-4 sm:p-6 flex flex-col justify-between overflow-hidden shadow-inner">
+            
+            {/* Dynamic Island */}
+            <div className="w-18 h-4.5 mx-auto rounded-full bg-black flex items-center justify-center gap-1.5 mb-2">
+              <div className="w-2.5 h-2.5 rounded-full bg-neutral-900" />
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+            </div>
+
+            {/* Glowing Blue Shader Texture Background Top */}
+            <div className="absolute top-0 left-0 right-0 h-52 bg-gradient-to-br from-blue-600/40 via-indigo-600/30 to-transparent blur-xl pointer-events-none" />
+
+            {/* Header Content */}
+            <div className="relative z-10 space-y-3 text-left">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 text-white font-bold text-xs flex items-center justify-center shadow-lg border border-white/20">
+                  LP
+                </div>
+                <span className="text-xs font-bold text-white/90">Leslie Putnam</span>
+              </div>
+
+              <h3 className="text-xl sm:text-2xl font-serif font-bold text-white tracking-tight leading-snug">
+                Product Manager with 15 years of experience.
+              </h3>
+
+              <p className="text-[11px] font-sans text-neutral-300 leading-relaxed">
+                Leslie Putnam is a Senior PM helping teams of designers, developers and stakeholders hit deadlines and build incredible things.
+              </p>
+
+              <button className="w-full py-2.5 rounded-full bg-white text-black text-xs font-bold hover:bg-neutral-100 transition-colors shadow-lg">
+                Contact Me
+              </button>
+            </div>
+
+            {/* Resume Timeline Block */}
+            <div className="relative z-10 pt-3 border-t border-white/10 space-y-2 text-left">
+              <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-white/70">
+                <Briefcase className="w-3 h-3 text-blue-400" />
+                <span>Resume</span>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+                <div className="text-xs font-bold text-white">Senior Product Manager</div>
+                <div className="text-[10px] text-neutral-400">Apple</div>
+                <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/10 text-[9px] font-mono text-neutral-300">
+                  <Calendar className="w-2.5 h-2.5" />
+                  <span>Jan, 2023 - Present</span>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+                <div className="text-xs font-bold text-white">Product Manager</div>
+                <div className="text-[10px] text-neutral-400">Meta Platforms</div>
+                <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/10 text-[9px] font-mono text-neutral-300">
+                  <Calendar className="w-2.5 h-2.5" />
+                  <span>Aug, 2021 - Jan, 2023</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </motion.div>
+
+        {/* ── DEVICE 4: TAYLOR BROWN (Mid Right - Botanist) ── */}
+        <motion.div
+          onMouseEnter={() => setHoveredIndex(3)}
+          onMouseLeave={() => setHoveredIndex(null)}
+          animate={{
+            y: hoveredIndex === 3 ? -12 : -8,
+            scale: hoveredIndex === 3 ? 1.03 : 0.97,
+          }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          className="relative flex-shrink-0 w-[240px] sm:w-[270px] md:w-[290px] h-[530px] sm:h-[590px] rounded-[44px] bg-black p-2.5 sm:p-3 border-[6px] border-[#1C1D24] shadow-[20px_30px_70px_rgba(0,0,0,0.18)] dark:shadow-[0_30px_90px_rgba(0,0,0,0.7)] flex flex-col justify-between overflow-hidden cursor-pointer group"
+        >
+          <div className="relative w-full h-full rounded-[34px] bg-[#0E1F18] text-white p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner">
+            
+            {/* Dynamic Island */}
+            <div className="w-16 h-4 mx-auto rounded-full bg-black flex items-center justify-center gap-1.5 mb-2">
+              <div className="w-2 h-2 rounded-full bg-neutral-900" />
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            </div>
+
+            {/* Botanical Dark Green Background Texture */}
+            <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-emerald-700/40 via-teal-900/30 to-transparent pointer-events-none" />
+
+            {/* Header Content */}
+            <div className="relative z-10 space-y-2.5 text-left">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-emerald-700 text-white font-bold text-xs flex items-center justify-center shadow-md border border-emerald-400/30">
+                  TB
+                </div>
+                <span className="text-xs font-bold text-emerald-100">Taylor Brown</span>
+              </div>
+
+              <h3 className="text-lg sm:text-xl font-serif font-bold text-white tracking-tight leading-snug">
+                Professional botanist sharing plant tips.
+              </h3>
+
+              <p className="text-[10px] sm:text-[11px] font-sans text-emerald-200/80 leading-relaxed">
+                Passionate about plants and sustainability. Through social media, I share expert plant tips and advice.
+              </p>
+
+              <button className="w-full py-2 rounded-full bg-white text-emerald-950 text-xs font-bold hover:bg-emerald-50 transition-colors shadow-md">
+                Book a call about your plants
+              </button>
+            </div>
+
+            {/* Social Icons & FAQ Block */}
+            <div className="relative z-10 pt-2 border-t border-emerald-800/60 space-y-2 text-left">
+              <div className="flex items-center justify-between px-1">
+                {[Globe, MessageSquare, Share2, Send, Lock].map((Icon, idx) => (
+                  <div key={idx} className="w-6 h-6 rounded-full bg-white/10 border border-emerald-500/20 flex items-center justify-center text-emerald-300">
+                    <Icon className="w-3 h-3" />
                   </div>
+                ))}
+              </div>
 
-                  {/* ── SCREEN VISUAL CONTENT (Actual Kiwik Products) ── */}
-                  <div className="relative w-full flex-1 rounded-[32px] overflow-hidden bg-neutral-950 p-4 text-white flex flex-col justify-between shadow-inner">
-                    
-                    {/* Background Shader Gradient */}
-                    <div className={cn("absolute inset-0 bg-gradient-to-br opacity-80", device.accentGradient)} />
+              <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-emerald-500/20 space-y-1">
+                <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-200">
+                  <HelpCircle className="w-3 h-3 text-emerald-400" /> FAQ
+                </div>
+                <p className="text-[9.5px] text-emerald-100 font-medium">
+                  How long have you been a botanist?
+                </p>
+                <p className="text-[9px] text-emerald-300/80">
+                  I've been passionate about plants for over 8 years.
+                </p>
+              </div>
+            </div>
 
-                    {/* Top Screen Author Avatar & Header */}
-                    <div className="relative z-10 flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-white/20 border border-white/30 flex items-center justify-center font-bold text-xs font-serif text-white shadow-md">
-                        {device.author[0]}
-                      </div>
-                      <div className="text-left">
-                        <h4 className="text-[11px] font-bold font-sans text-white leading-tight">{device.author}</h4>
-                        <span className="text-[9px] font-mono text-white/60">{device.role}</span>
-                      </div>
-                    </div>
+          </div>
+        </motion.div>
 
-                    {/* Main Screen Headline & Interactive Product UI */}
-                    <div className="relative z-10 my-auto space-y-2 pt-4">
-                      <h3 className="text-lg sm:text-xl font-serif font-bold text-white tracking-tight leading-snug">
-                        {device.name}
-                      </h3>
-                      <p className="text-[11px] font-sans text-white/80 leading-relaxed line-clamp-3">
-                        {device.tagline}
-                      </p>
-                    </div>
+        {/* ── DEVICE 5: JASON MARKUS (Far Right - Viral Marketer) ── */}
+        <motion.div
+          onMouseEnter={() => setHoveredIndex(4)}
+          onMouseLeave={() => setHoveredIndex(null)}
+          animate={{
+            y: hoveredIndex === 4 ? -12 : 0,
+            scale: hoveredIndex === 4 ? 1.03 : 0.94,
+          }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          className="relative flex-shrink-0 w-[240px] sm:w-[270px] md:w-[290px] h-[520px] sm:h-[580px] rounded-[44px] bg-black p-2.5 sm:p-3 border-[6px] border-[#1C1D24] shadow-[20px_30px_70px_rgba(0,0,0,0.18)] dark:shadow-[0_30px_90px_rgba(0,0,0,0.7)] flex flex-col justify-between overflow-hidden cursor-pointer group"
+        >
+          <div className="relative w-full h-full rounded-[34px] bg-[#0D150B] text-white p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner">
+            
+            {/* Dynamic Island */}
+            <div className="w-16 h-4 mx-auto rounded-full bg-black flex items-center justify-center gap-1.5 mb-2">
+              <div className="w-2 h-2 rounded-full bg-neutral-900" />
+              <div className="w-1.5 h-1.5 rounded-full bg-lime-500" />
+            </div>
 
-                    {/* Interactive Animated Widgets on Device Screens */}
-                    <div className="relative z-10 pt-3 space-y-2">
-                      {device.layoutType === "ai" && (
-                        <div className="p-2.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-between text-[10px] font-mono">
-                          <span className="text-white/80">Neural Assistant</span>
-                          <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold">● Active</span>
-                        </div>
-                      )}
+            {/* Lime Gradient Background Top */}
+            <div className="absolute top-0 left-0 right-0 h-44 bg-gradient-to-b from-lime-600/40 via-emerald-800/20 to-transparent pointer-events-none" />
 
-                      {device.layoutType === "cloud" && (
-                        <div className="p-3 rounded-xl bg-black/60 backdrop-blur-md border border-white/20 space-y-1.5">
-                          <div className="flex items-center justify-between text-[10px] font-mono text-white/70">
-                            <span>Cluster Status</span>
-                            <span className="text-emerald-400 font-bold">99.98%</span>
-                          </div>
-                          <div className="h-8 w-full flex items-end gap-1">
-                            {[40, 70, 55, 90, 65, 100, 80, 60, 85].map((h, i) => (
-                              <div key={i} className="flex-1 bg-blue-400 rounded-t-sm" style={{ height: `${h}%` }} />
-                            ))}
-                          </div>
-                        </div>
-                      )}
+            {/* Header Content */}
+            <div className="relative z-10 space-y-2.5 text-left">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-lime-600 text-black font-bold text-xs flex items-center justify-center shadow-md">
+                  JM
+                </div>
+                <span className="text-xs font-bold text-lime-200">Jason Markus</span>
+              </div>
 
-                      {device.layoutType === "pay" && (
-                        <div className="p-2.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-between text-[10px] font-mono">
-                          <span className="text-white/70">Total Volume</span>
-                          <span className="text-emerald-300 font-bold">$1.4M</span>
-                        </div>
-                      )}
+              <h3 className="text-lg sm:text-xl font-serif font-bold text-white tracking-tight leading-snug">
+                Viral marketer, helping founders grow their apps.
+              </h3>
 
-                      {device.layoutType === "botanist" && (
-                        <div className="p-2.5 rounded-xl bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-between text-[10px] font-mono">
-                          <span className="text-white/70">Instant Settlement</span>
-                          <span className="text-emerald-400 font-bold">✓ Verified</span>
-                        </div>
-                      )}
+              <p className="text-[10px] sm:text-[11px] font-sans text-neutral-300 leading-relaxed line-clamp-3">
+                I am Jason Markus, a viral marketer specializing in helping founders grow their apps through innovative strategies and modern marketing techniques.
+              </p>
 
-                      {/* Action Pill Button inside Screen */}
-                      <div className="w-full py-2 rounded-full bg-white text-black font-sans font-bold text-[11px] flex items-center justify-center gap-1 shadow-lg group-hover:bg-blue-50 transition-colors">
-                        <span>Explore Product</span>
-                        <ArrowUpRight className="w-3 h-3" />
-                      </div>
-                    </div>
+              <button className="w-full py-2 rounded-full bg-white text-black text-xs font-bold hover:bg-neutral-100 transition-colors shadow-md">
+                Purchase a marketing plan
+              </button>
+            </div>
 
-                  </div>
+            {/* Contact Form Block */}
+            <div className="relative z-10 pt-2 border-t border-lime-900/60 space-y-1.5 text-left">
+              <span className="text-[10px] font-bold text-lime-300">Contact Jason Markus</span>
 
-                </Link>
-              </motion.div>
-            </motion.div>
-          );
-        })}
-      </motion.div>
+              <div className="space-y-1 text-[9px] font-mono">
+                <input placeholder="Name" disabled className="w-full px-2.5 py-1 rounded-lg bg-white/10 border border-white/15 text-white placeholder-white/40" />
+                <input placeholder="Email" disabled className="w-full px-2.5 py-1 rounded-lg bg-white/10 border border-white/15 text-white placeholder-white/40" />
+                <input placeholder="Phone" disabled className="w-full px-2.5 py-1 rounded-lg bg-white/10 border border-white/15 text-white placeholder-white/40" />
+              </div>
+            </div>
+
+          </div>
+        </motion.div>
+
+      </div>
     </section>
   );
 }
