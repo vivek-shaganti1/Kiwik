@@ -26,7 +26,7 @@ import type {
 
 const defaultCMSData: SiteCMSData = {
   settings: {
-    siteName: "Kiwik.1",
+    siteName: "Kiwik",
     tagline: "The Operating System for Digital Products",
     logoUrl: "/logo.png",
     faviconUrl: "/favicon.ico",

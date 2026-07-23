@@ -53,24 +53,29 @@ export function Navbar() {
         )}
       >
         {/* ─────────────────────────────────────────────────────────────
-            DEDICATED LOGO CAPSULE SECTION ([ Rounded Icon ] Kiwik.1)
+            LUXURY BRANDING SECTION (52x52px Glass Container + 42px Editorial Wordmark "Kiwik")
            ───────────────────────────────────────────────────────────── */}
-        <Link href="/" className="flex items-center gap-3 group relative z-10">
+        <Link href="/" className="flex items-center gap-[18px] group relative z-10">
           <motion.div
-            whileHover={{ scale: 1.04, rotate: 2 }}
-            whileTap={{ scale: 0.96 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
-            className="w-12 h-12 rounded-2xl bg-white dark:bg-white/10 border border-black/8 dark:border-white/15 shadow-sm flex items-center justify-center p-2.5 group-hover:border-blue-500/40 group-hover:shadow-md transition-all"
+            whileHover={{ scale: 1.05, rotate: 2 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="w-[52px] h-[52px] rounded-[18px] bg-[#0A0C10]/[0.04] dark:bg-white/[0.06] border border-black/10 dark:border-white/[0.12] shadow-[0_2px_10px_rgba(0,0,0,0.04)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center p-2.5 group-hover:border-blue-500/40 group-hover:shadow-md transition-all"
           >
             <img 
               src={navCMS.logoUrl || "/logo.png"} 
               alt="Kiwik Logo" 
-              className="w-7 h-7 object-contain drop-shadow-sm group-hover:scale-105 transition-transform" 
+              className="w-[36px] h-[36px] object-contain drop-shadow-sm group-hover:scale-105 transition-transform" 
             />
           </motion.div>
-          <span className="text-2xl sm:text-[30px] font-serif font-bold text-[#111111] dark:text-white tracking-[-0.03em] group-hover:opacity-90 transition-opacity">
-            {navCMS.logoText || "Kiwik.1"}
-          </span>
+
+          <motion.span
+            whileHover={{ x: 2 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="text-[30px] sm:text-[36px] md:text-[42px] font-serif font-bold text-[#111111] dark:text-white tracking-[-0.04em] leading-none select-none"
+          >
+            {(navCMS.logoText || "Kiwik").replace(/\.1$/, "")}
+          </motion.span>
         </Link>
 
         {/* ─────────────────────────────────────────────────────────────

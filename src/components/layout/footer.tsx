@@ -126,7 +126,7 @@ export function Footer() {
           {/* Brand block */}
           <div className="sm:col-span-2 md:col-span-6 lg:col-span-3 space-y-4 text-left pr-0 lg:pr-4">
             <div className="flex items-center gap-2">
-              <span className="text-lg font-serif font-bold text-slate-800 dark:text-white tracking-tight">Kiwik.1</span>
+              <span className="text-lg font-serif font-bold text-slate-800 dark:text-white tracking-tight">Kiwik</span>
             </div>
             <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed max-w-sm font-semibold">
               The operating system for digital products. Build, ship, document, and scale your ideas with engineering excellence.
