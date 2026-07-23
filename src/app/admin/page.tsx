@@ -182,6 +182,26 @@ export default function AdminPage() {
   const [jsonBackupInput, setJsonBackupInput] = useState("");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Live Visitor Stats Telemetry
+  const [visitorStats, setVisitorStats] = useState({ total: 1, active: 1 });
+
+  useEffect(() => {
+    const fetchVisitorStats = () => {
+      fetch("/api/visitors")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && typeof data.total === "number") {
+            setVisitorStats({ total: data.total, active: data.active });
+          }
+        })
+        .catch((err) => console.error("Error fetching visitor telemetry:", err));
+    };
+
+    fetchVisitorStats();
+    const interval = setInterval(fetchVisitorStats, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
@@ -442,8 +462,19 @@ export default function AdminPage() {
          ───────────────────────────────────────────────────────────── */}
       {activeTab === "dashboard" && (
         <div className="space-y-8 text-left">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
             {[
+              { 
+                label: "Live Visitors", 
+                val: visitorStats.active, 
+                icon: <Users className="w-5 h-5 text-emerald-400" />,
+                isLive: true 
+              },
+              { 
+                label: "Total Site Visits", 
+                val: visitorStats.total, 
+                icon: <Eye className="w-5 h-5 text-cyan-400" /> 
+              },
               { label: "Active Projects", val: projects.length, icon: <Layers className="w-5 h-5 text-accent-blue" /> },
               { label: "Rotating Phrases", val: cms.hero.rotatingWords.length, icon: <Sparkles className="w-5 h-5 text-indigo-400" /> },
               { label: "Nav Items", val: cms.navigation.items.length, icon: <Compass className="w-5 h-5 text-cyan-400" /> },
@@ -451,8 +482,11 @@ export default function AdminPage() {
             ].map((st, i) => (
               <GlassCard key={i} className="p-5 flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] uppercase font-mono tracking-wider text-text-secondary font-bold">{st.label}</p>
-                  <h3 className="text-2xl font-bold text-text-primary font-mono mt-1">{st.val}</h3>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    {st.isLive && <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />}
+                    <p className="text-[10px] uppercase font-mono tracking-wider text-text-secondary font-bold">{st.label}</p>
+                  </div>
+                  <h3 className="text-2xl font-bold text-text-primary font-mono">{st.val}</h3>
                 </div>
                 <div className="p-3 rounded-2xl bg-bg-secondary border border-glass-border">{st.icon}</div>
               </GlassCard>

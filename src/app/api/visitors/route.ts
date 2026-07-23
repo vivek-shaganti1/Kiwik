@@ -1,24 +1,51 @@
 import { NextResponse } from "next/server";
 
-// Keep visitor metrics in-memory to prevent filesystem writes
-// in the watched project directory which triggers Next.js dev server hot reload loops.
-let visitorMetrics = {
-  total: 35247,
-  active: 6,
+// Dynamic in-memory visitor tracking (no static dummy values)
+const globalForVisitors = globalThis as unknown as {
+  totalVisits: number;
+  activeSessions: Map<string, number>;
 };
 
-export async function GET() {
-  // Simulate active session fluctuation
-  const change = Math.random() > 0.5 ? 1 : -1;
-  visitorMetrics.active = Math.max(2, Math.min(30, visitorMetrics.active + change));
-  return NextResponse.json(visitorMetrics);
+if (typeof globalForVisitors.totalVisits === "undefined") {
+  globalForVisitors.totalVisits = 1;
+}
+if (!globalForVisitors.activeSessions) {
+  globalForVisitors.activeSessions = new Map<string, number>();
 }
 
-export async function POST() {
-  visitorMetrics.total += 1;
-  // Fluctuate active visitors slightly
-  if (Math.random() > 0.6) {
-    visitorMetrics.active = Math.max(2, Math.min(30, visitorMetrics.active + 1));
+const ACTIVE_WINDOW_MS = 2 * 60 * 1000; // 2 minutes active window
+
+function cleanupAndGetActive(): number {
+  const now = Date.now();
+  for (const [id, timestamp] of globalForVisitors.activeSessions.entries()) {
+    if (now - timestamp > ACTIVE_WINDOW_MS) {
+      globalForVisitors.activeSessions.delete(id);
+    }
   }
-  return NextResponse.json(visitorMetrics);
+  return Math.max(1, globalForVisitors.activeSessions.size);
+}
+
+export async function GET(req: Request) {
+  const activeCount = cleanupAndGetActive();
+  return NextResponse.json({
+    total: globalForVisitors.totalVisits,
+    active: activeCount,
+  });
+}
+
+export async function POST(req: Request) {
+  globalForVisitors.totalVisits += 1;
+
+  const clientIp =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    `session-${Math.random().toString(36).substring(2, 9)}`;
+
+  globalForVisitors.activeSessions.set(clientIp, Date.now());
+  const activeCount = cleanupAndGetActive();
+
+  return NextResponse.json({
+    total: globalForVisitors.totalVisits,
+    active: activeCount,
+  });
 }
