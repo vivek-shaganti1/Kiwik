@@ -22,7 +22,7 @@ export function AIChatbot() {
     {
       id: "welcome",
       sender: "bot",
-      text: "Hello! I am Kiwik.1 AI assistant. Ask me anything about Criska's projects, tech stack, or team members. You can also use the microphone to talk to me!",
+      text: "Hello! I am Kiwik.1 AI assistant. Ask me anything about Kiwik's projects, tech stack, or team members. You can also use the microphone to talk to me!",
       timestamp: new Date(),
     },
   ]);
@@ -176,12 +176,12 @@ export function AIChatbot() {
       "kiwi": "kiwik.1",
       "kyiv": "kiwik.1",
       "civic": "kiwik.1",
-      "chris gayle": "criskaai",
-      "chris copy": "criskapay",
-      "chris cloud": "criskacloud",
-      "crescent cloud": "criskacloud",
-      "chris os": "criskaos",
-      "chris bot": "criskabot",
+      "chris gayle": "kiwikai",
+      "chris copy": "payflow",
+      "chris cloud": "nimbuscloud",
+      "crescent cloud": "nimbuscloud",
+      "chris os": "novaos",
+      "chris bot": "kiwikbot",
       "text tag": "tech stack",
       "text tags": "tech stack",
       "tech tag": "tech stack",
@@ -204,7 +204,7 @@ export function AIChatbot() {
     // 3. Handle list queries ("list all the projects", etc.)
     const isListQuery = query.includes("list") || query.includes("all projects") || query.includes("all the projects") || query.includes("what are the projects") || query.includes("projects mentioned") || query.includes("show all");
     if (isListQuery) {
-      text = `Here is a complete list of the **${projects.length} Criska projects** currently active:\n\n` +
+      text = `Here is a complete list of the **${projects.length} Kiwik projects** currently active:\n\n` +
         projects.map((p, i) => `${i + 1}. **${p.name}** (${p.category}) — *${p.tagline}*`).join("\n") +
         `\n\nAsk me about any specific project or their tech stack to get live telemetry!`;
       return { text, matchedProjects: projects };
@@ -228,7 +228,7 @@ export function AIChatbot() {
         text = `Here is our team and contributors who engineered the projects:\n\n` + 
           uniqueContributors.map(c => `* **${c.name}** (${c.role}) — Worked on: *${c.projects.join(", ")}*`).join("\n");
       } else {
-        text = "Our systems indicate the projects are engineered and maintained by **Criska Core Team**.";
+        text = "Our systems indicate the projects are engineered and maintained by **Kiwik Core Team**.";
       }
       return { text, matchedProjects };
     }
@@ -269,7 +269,7 @@ export function AIChatbot() {
         text = `Here is a summary of the **README.md** documentation for **${matched.name}**:\n\n* **Description**: ${matched.description}\n* **Key Stack**: ${matched.techStack.slice(0, 5).map((t: any) => t.name).join(", ")}\n* **Details**: Check out the full markdown tab on its detail page below!`;
         return { text, matchedProjects: [matched] };
       } else {
-        text = "Which project's README would you like to explore? (e.g. CriskaAI, CriskaCloud, CriskaPay)";
+        text = "Which project's README would you like to explore? (e.g. KiwikAI, NimbusCloud, PayFlow)";
         return { text, matchedProjects };
       }
     }
@@ -295,9 +295,9 @@ export function AIChatbot() {
 
     // Fallbacks
     if (query.includes("hello") || query.includes("hi ") || query.includes("hey")) {
-      text = "Hi there! Welcome to Kiwik.1. Ask me about our projects (like CriskaAI, CriskaCloud), tech stack, or edge latency stats!";
+      text = "Hi there! Welcome to Kiwik.1. Ask me about our projects (like KiwikAI, NimbusCloud), tech stack, or edge latency stats!";
     } else {
-      text = `I'm here to help you navigate our ecosystems! I'm indexing **${projects.length} Criska projects**: ${projects.map(p => p.name).join(", ")}. Ask me about their tech stacks, README files, or team members!`;
+      text = `I'm here to help you navigate our ecosystems! I'm indexing **${projects.length} Kiwik projects**: ${projects.map(p => p.name).join(", ")}. Ask me about their tech stacks, README files, or team members!`;
     }
 
     return { text, matchedProjects };

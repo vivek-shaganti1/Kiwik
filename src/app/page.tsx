@@ -38,7 +38,7 @@ export default function HomePage() {
   
   const cms = useSiteCMSStore((state) => state.cms);
   const featuredSection = cms.featuredSection || {
-    title: "Explore Criska Products",
+    title: "Explore Kiwik Products",
     subtitle: "Understand what each product does, who it helps, its current status, and request real-time access. Fully synchronised with the Admin CMS panel."
   };
   const capabilities = cms.capabilities || { sectionTitle: "Our Capabilities", items: [] };

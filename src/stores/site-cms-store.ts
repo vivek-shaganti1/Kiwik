@@ -30,7 +30,7 @@ const defaultCMSData: SiteCMSData = {
     tagline: "The Operating System for Digital Products",
     logoUrl: "/logo.png",
     faviconUrl: "/favicon.ico",
-    copyrightText: "© 2026 Criska Kiwik Inc. All rights reserved.",
+    copyrightText: "© 2026 Kiwik Inc. All rights reserved.",
     contactEmail: "shagantivivekgoud@gmail.com",
     contactPhone: "+1 (800) 555-KIWIK",
     address: "San Francisco, CA & Remote Global",
@@ -96,7 +96,7 @@ const defaultCMSData: SiteCMSData = {
     ctaButtonVisible: true
   },
   featuredSection: {
-    title: "Explore Criska Products",
+    title: "Explore Kiwik Products",
     subtitle: "Understand what each product does, who it helps, its current status, and request real-time access. Fully synchronised with the Admin CMS panel."
   },
   capabilities: {
@@ -154,7 +154,7 @@ const defaultCMSData: SiteCMSData = {
         id: "col-3",
         title: "Company & Legal",
         links: [
-          { id: "fl-9", label: "About Criska", href: "/#about" },
+          { id: "fl-9", label: "About Kiwik", href: "/#about" },
           { id: "fl-10", label: "Privacy Policy", href: "/privacy" },
           { id: "fl-11", label: "Terms of Service", href: "/terms" },
           { id: "fl-12", label: "Security & SOC 2", href: "/security" }
@@ -166,7 +166,7 @@ const defaultCMSData: SiteCMSData = {
       { id: "soc-2", platform: "Twitter / X", url: "https://twitter.com", iconName: "Twitter" },
       { id: "soc-3", platform: "LinkedIn", url: "https://linkedin.com", iconName: "Linkedin" }
     ],
-    copyrightText: "© 2026 Criska Kiwik Inc. All rights reserved.",
+    copyrightText: "© 2026 Kiwik Inc. All rights reserved.",
     newsletterHeadline: "Stay Updated with Kiwik Releases",
     newsletterDescription: "Subscribe for new project updates, AI telemetry enhancements, and OS features.",
     newsletterButtonText: "Subscribe",
@@ -235,7 +235,7 @@ const defaultCMSData: SiteCMSData = {
     defaultTitle: "Kiwik.1 | Operating System for Digital Products",
     titleTemplate: "%s | Kiwik.1",
     defaultDescription: "Unified workspace for projects, documentation, deployments, analytics, and AI assistant layers.",
-    defaultKeywords: ["Kiwik", "Operating System", "Developer Tools", "AI", "Projects", "Criska"],
+    defaultKeywords: ["Kiwik", "Operating System", "Developer Tools", "AI", "Projects", "Platform"],
     openGraphImage: "/images/og-kiwik.jpg",
     twitterHandle: "@shagantivivekgoud",
     canonicalDomain: "https://kiwik-xi.vercel.app",

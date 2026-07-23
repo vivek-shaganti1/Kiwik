@@ -70,7 +70,7 @@ export function TechRadar() {
           Powered by Next-Generation Stack
         </h2>
         <p className="text-text-secondary text-sm sm:text-base">
-          Click a category to explore the modern architecture powering the Criska project ecosystem.
+          Click a category to explore the modern architecture powering the Kiwik project ecosystem.
         </p>
       </div>
 

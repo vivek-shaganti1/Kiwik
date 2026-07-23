@@ -8,24 +8,24 @@ import { CursorGlow } from "@/components/effects/cursor-glow";
 import { IntroSplash } from "@/components/layout/intro-splash";
 
 export const metadata: Metadata = {
-  title: "Kiwik.1 — The Operating System of Criska Projects",
+  title: "Kiwik.1 — The Operating System for Digital Products",
   description:
-    "Premium project showcase platform for Criska. Explore our portfolio of AI, web, mobile, and automation projects with immersive documentation and cinematic design.",
-  keywords: ["Kiwik", "Criska", "portfolio", "projects", "showcase", "glassmorphism"],
-  authors: [{ name: "Criska" }],
+    "Premium project showcase platform for Kiwik.1. Explore our portfolio of AI, web, mobile, and automation projects with immersive documentation and cinematic design.",
+  keywords: ["Kiwik", "portfolio", "projects", "showcase", "glassmorphism", "system"],
+  authors: [{ name: "Kiwik Engineering" }],
   openGraph: {
-    title: "Kiwik.1 — The Operating System of Criska Projects",
+    title: "Kiwik.1 — The Operating System for Digital Products",
     description:
-      "Premium project showcase platform for Criska. Explore our portfolio with cinematic design.",
+      "Premium project showcase platform for Kiwik.1. Explore our portfolio with cinematic design.",
     type: "website",
     url: "https://kiwik.one",
     siteName: "Kiwik.1",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kiwik.1 — The Operating System of Criska Projects",
+    title: "Kiwik.1 — The Operating System for Digital Products",
     description:
-      "Premium project showcase platform for Criska.",
+      "Premium project showcase platform for Kiwik.1.",
   },
   robots: {
     index: true,

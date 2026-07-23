@@ -138,13 +138,13 @@ export function Footer() {
 
             {/* Social Icons row */}
             <div className="flex items-center gap-3 pt-2">
-              <Link href="https://github.com/criska" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+              <Link href="https://github.com/kiwik" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
                 <GithubIcon className="w-4 h-4" />
               </Link>
-              <Link href="https://x.com/criska" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+              <Link href="https://x.com/kiwik" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
                 <XIcon className="w-4 h-4" />
               </Link>
-              <Link href="https://discord.gg/criska" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+              <Link href="https://discord.gg/kiwik" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
                 <DiscordIcon className="w-4 h-4" />
               </Link>
               <Link href="https://linkedin.com" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
@@ -186,7 +186,7 @@ export function Footer() {
           <div className="text-left space-y-3.5 col-span-1">
             <h5 className="text-[11px] font-mono tracking-widest text-slate-900 dark:text-white uppercase font-bold">Company</h5>
             <ul className="space-y-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">About Criska</span></li>
+              <li><span className="opacity-45 cursor-not-allowed text-slate-400">About Kiwik</span></li>
               <li><Link href="#timeline-section" className="hover:text-slate-900 dark:hover:text-white transition-colors">How We Work</Link></li>
               <li><span className="opacity-45 cursor-not-allowed text-slate-400">Careers</span></li>
               <li><span className="opacity-45 cursor-not-allowed text-slate-400">Partners</span></li>
@@ -216,7 +216,7 @@ export function Footer() {
               <div className="flex gap-2.5 items-start">
                 <Mail className="w-4 h-4 text-indigo-500 dark:text-indigo-400 mt-0.5 shrink-0" />
                 <div>
-                  <a href="mailto:hello@criska.dev" className="text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors">hello@criska.dev</a>
+                  <a href="mailto:hello@kiwik.one" className="text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors">hello@kiwik.one</a>
                   <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-semibold">We usually reply within 24 hours</p>
                 </div>
               </div>
@@ -224,7 +224,7 @@ export function Footer() {
               <div className="flex gap-2.5 items-start border-t border-slate-300/40 dark:border-white/10 pt-3">
                 <MapPin className="w-4 h-4 text-indigo-500 dark:text-indigo-400 mt-0.5 shrink-0" />
                 <div>
-                  <span className="text-xs font-bold text-slate-700 dark:text-slate-200">Criska HQ</span>
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-200">Kiwik HQ</span>
                   <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-semibold">Internet, Everywhere</p>
                 </div>
               </div>
@@ -246,10 +246,10 @@ export function Footer() {
           
           {/* Copyright block */}
           <div className="text-left space-y-1 select-none">
-            <div className="text-xs font-bold text-slate-800 dark:text-white">© {new Date().getFullYear()} Criska. All rights reserved.</div>
+            <div className="text-xs font-bold text-slate-800 dark:text-white">© {new Date().getFullYear()} Kiwik Inc. All rights reserved.</div>
             <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold leading-relaxed">
-              Kiwik.1 is a registered trademark of Criska. <br />
-              Built with ❤️ by the Criska Engineering Team.
+              Kiwik.1 — The Operating System for Digital Products. <br />
+              Built with precision by the Kiwik Engineering Team.
             </p>
           </div>
 

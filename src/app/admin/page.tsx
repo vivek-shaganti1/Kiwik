@@ -98,7 +98,7 @@ const emptyProject: Project = {
   architecture: "",
   lastUpdated: new Date().toISOString().split("T")[0],
   createdAt: new Date().toISOString().split("T")[0],
-  owner: "Criska",
+  owner: "Kiwik Engineering",
   stars: 0,
   forks: 0,
   views: 0,
