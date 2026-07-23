@@ -44,6 +44,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { LenisProvider } from "@/components/providers/lenis-provider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -60,12 +62,14 @@ export default function RootLayout({
         }}
       >
         <ThemeProvider>
-          <IntroSplash />
-          <CursorGlow />
-          <Navbar />
-          <CommandPalette />
-          <main className="flex-1 pt-[72px] overflow-x-hidden w-full max-w-full">{children}</main>
-          <Footer />
+          <LenisProvider>
+            <IntroSplash />
+            <CursorGlow />
+            <Navbar />
+            <CommandPalette />
+            <main className="flex-1 pt-[72px] overflow-x-hidden w-full max-w-full">{children}</main>
+            <Footer />
+          </LenisProvider>
         </ThemeProvider>
       </body>
     </html>
