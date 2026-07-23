@@ -2,49 +2,49 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, ArrowUpRight, Cpu, Cloud, CreditCard, Layers, ShieldCheck, Terminal, StopCircle } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Cpu, ShieldCheck, Terminal } from "lucide-react";
 import { useProjects } from "@/stores/projects-store";
 import { cn } from "@/lib/utils";
 
 // Category Ambient Color Config for Morphing Background
 const CATEGORY_COLORS: Record<string, { glow: string; text: string; badge: string }> = {
   ai: {
-    glow: "rgba(168, 85, 247, 0.22)",
+    glow: "rgba(168, 85, 247, 0.18)",
     text: "text-purple-400",
-    badge: "bg-purple-500/10 text-purple-300 border-purple-500/30",
+    badge: "bg-purple-500/10 text-purple-600 dark:text-purple-300 border-purple-500/30",
   },
   cloud: {
-    glow: "rgba(59, 130, 246, 0.22)",
+    glow: "rgba(59, 130, 246, 0.18)",
     text: "text-blue-400",
-    badge: "bg-blue-500/10 text-blue-300 border-blue-500/30",
+    badge: "bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-500/30",
   },
   payments: {
-    glow: "rgba(16, 185, 129, 0.22)",
+    glow: "rgba(16, 185, 129, 0.18)",
     text: "text-emerald-400",
-    badge: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30",
+    badge: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border-emerald-500/30",
   },
   automation: {
-    glow: "rgba(249, 115, 22, 0.22)",
+    glow: "rgba(249, 115, 22, 0.18)",
     text: "text-orange-400",
-    badge: "bg-orange-500/10 text-orange-300 border-orange-500/30",
+    badge: "bg-orange-500/10 text-orange-600 dark:text-orange-300 border-orange-500/30",
   },
   web: {
-    glow: "rgba(14, 165, 233, 0.22)",
+    glow: "rgba(14, 165, 233, 0.18)",
     text: "text-sky-400",
-    badge: "bg-sky-500/10 text-sky-300 border-sky-500/30",
+    badge: "bg-sky-500/10 text-sky-600 dark:text-sky-300 border-sky-500/30",
   },
   saas: {
-    glow: "rgba(99, 102, 241, 0.22)",
+    glow: "rgba(99, 102, 241, 0.18)",
     text: "text-indigo-400",
-    badge: "bg-indigo-500/10 text-indigo-300 border-indigo-500/30",
+    badge: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 border-indigo-500/30",
   },
 };
 
 const DEFAULT_COLOR = {
-  glow: "rgba(148, 163, 184, 0.22)",
+  glow: "rgba(148, 163, 184, 0.18)",
   text: "text-slate-300",
-  badge: "bg-slate-500/10 text-slate-300 border-slate-500/30",
+  badge: "bg-slate-500/10 text-slate-600 dark:text-slate-300 border-slate-500/30",
 };
 
 export function AppleCoverflowCarousel() {
@@ -116,18 +116,18 @@ export function AppleCoverflowCarousel() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [total]);
 
-  // Autoplay every 7 seconds (pauses on hover)
+  // Autoplay every 6 seconds (pauses on hover)
   useEffect(() => {
     if (isPaused) return;
     const interval = setInterval(() => {
       handleNext();
-    }, 7000);
+    }, 6000);
     return () => clearInterval(interval);
   }, [isPaused, total]);
 
   // Mouse Wheel Navigation
   const handleWheel = (e: React.WheelEvent) => {
-    if (Math.abs(e.deltaX) > 30) {
+    if (Math.abs(e.deltaX) > 25) {
       if (e.deltaX > 0) handleNext();
       else handlePrev();
     }
@@ -142,38 +142,34 @@ export function AppleCoverflowCarousel() {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onWheel={handleWheel}
-      className="relative w-full max-w-[1400px] min-h-[680px] sm:min-h-[740px] mx-auto flex flex-col items-center justify-center select-none overflow-hidden transform-gpu py-8"
+      className="relative w-full max-w-[1400px] min-h-[660px] sm:min-h-[720px] mx-auto flex flex-col items-center justify-center select-none overflow-hidden py-4"
     >
       {/* ─────────────────────────────────────────────────────────────
-          MORPHING AMBIENT BACKGROUND BACKLIGHT (Crossfades 600ms)
+          MORPHING AMBIENT BACKGROUND BACKLIGHT (Smooth 500ms)
          ───────────────────────────────────────────────────────────── */}
       <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] h-[480px] rounded-full blur-[120px] pointer-events-none z-0"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[420px] rounded-full blur-[100px] pointer-events-none z-0"
         animate={{ background: colorStyle.glow }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.5 }}
       />
 
       {/* ─────────────────────────────────────────────────────────────
-          3D COVER-FLOW CAROUSEL CONTAINER
+          3D COVER-FLOW CAROUSEL CONTAINER (Hardware Accelerated)
          ───────────────────────────────────────────────────────────── */}
-      <div className="relative w-full h-[520px] sm:h-[600px] flex items-center justify-center perspective-[1200px] z-10 overflow-visible">
+      <div className="relative w-full h-[500px] sm:h-[560px] flex items-center justify-center perspective-[1200px] z-10 overflow-visible">
         {displayProjects.map((project, idx) => {
-          // Calculate offset position relative to active card
           let offset = idx - activeIndex;
           if (offset > total / 2) offset -= total;
           if (offset < -total / 2) offset += total;
 
           const isCenter = offset === 0;
-          const isLeft = offset === -1 || (offset < 0 && Math.abs(offset) < total / 2);
-          const isRight = offset === 1 || (offset > 0 && Math.abs(offset) < total / 2);
 
-          // 3D Perspective Calculations for Cover Flow
-          const translateX = offset * 420; // Distance between side cards
+          // Hardware Accelerated Transforms (No CSS filters during animation for 60 FPS)
+          const translateX = offset * 420;
           const scale = isCenter ? 1 : 0.82;
-          const opacity = isCenter ? 1 : Math.abs(offset) === 1 ? 0.45 : 0;
-          const rotateY = offset * -20; // Cover-Flow tilt angle (-20deg left, +20deg right)
+          const opacity = isCenter ? 1 : Math.abs(offset) === 1 ? 0.35 : 0;
+          const rotateY = offset * -18;
           const zIndex = 30 - Math.abs(offset) * 10;
-          const blur = isCenter ? "blur(0px)" : "blur(4px)";
 
           return (
             <motion.div
@@ -185,13 +181,12 @@ export function AppleCoverflowCarousel() {
                 rotateY: `${rotateY}deg`,
                 opacity,
                 zIndex,
-                filter: blur,
               }}
-              transition={{ type: "spring", stiffness: 220, damping: 25 }}
+              transition={{ type: "spring", stiffness: 320, damping: 28 }}
               style={{ transformStyle: "preserve-3d" }}
               className={cn(
-                "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[92%] max-w-[1150px] h-[480px] sm:h-[560px] rounded-[32px] bg-[#0A0C12] border border-white/10 shadow-[0_30px_90px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col lg:flex-row cursor-pointer transition-all duration-500 transform-gpu",
-                isCenter ? "pointer-events-auto" : "pointer-events-auto hover:opacity-75"
+                "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[92%] max-w-[1150px] h-[460px] sm:h-[540px] rounded-[32px] bg-[#0A0C12] border border-white/10 shadow-[0_30px_90px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col lg:flex-row cursor-pointer transition-all duration-300 transform-gpu",
+                isCenter ? "pointer-events-auto" : "pointer-events-auto hover:opacity-60"
               )}
             >
               {/* ── 70% CINEMATIC PRODUCT VISUAL AREA ── */}
@@ -200,24 +195,19 @@ export function AppleCoverflowCarousel() {
                 {/* Background Specular Grid */}
                 <div className="absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px] opacity-[0.04] pointer-events-none" />
 
-                {/* ── Visual Variant per Category ── */}
+                {/* Visual Variant per Category */}
                 {project.category.toLowerCase() === "ai" && (
                   <div className="relative w-full h-full flex items-center justify-center">
-                    <div className="w-48 h-48 sm:w-64 sm:h-64 rounded-full bg-gradient-to-tr from-purple-600 via-rose-600 to-amber-500 opacity-80 blur-2xl animate-pulse" />
-                    <div className="absolute w-40 h-40 sm:w-52 sm:h-52 rounded-full bg-gradient-to-br from-purple-500 via-rose-500 to-amber-400 shadow-[0_0_90px_rgba(168,85,247,0.7)] flex items-center justify-center group-hover:scale-105 transition-transform duration-700">
-                      <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center">
-                        <Cpu className="w-12 h-12 text-purple-300 animate-pulse" />
+                    <div className="w-44 h-44 sm:w-60 sm:h-60 rounded-full bg-gradient-to-tr from-purple-600 via-rose-600 to-amber-500 opacity-80 blur-xl" />
+                    <div className="absolute w-36 h-36 sm:w-48 sm:h-48 rounded-full bg-gradient-to-br from-purple-500 via-rose-500 to-amber-400 shadow-[0_0_80px_rgba(168,85,247,0.6)] flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+                      <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center">
+                        <Cpu className="w-10 h-10 text-purple-300" />
                       </div>
                     </div>
                     {/* Audio Bar Overlay */}
                     <div className="absolute bottom-6 left-6 right-6 px-4 py-3 rounded-2xl bg-black/60 backdrop-blur-xl border border-white/20 flex items-center justify-between shadow-2xl">
                       <div className="flex items-center gap-3">
                         <span className="text-xs font-mono text-white/90 font-semibold">02:04 Neural Operations Assistant</span>
-                        <div className="flex items-end gap-1 h-4">
-                          {[50, 80, 60, 100, 70, 90, 45, 85].map((h, i) => (
-                            <div key={i} className="w-1 bg-purple-400 rounded-full animate-pulse" style={{ height: `${h}%` }} />
-                          ))}
-                        </div>
                       </div>
                       <span className="px-2.5 py-1 rounded-full bg-purple-500/20 text-[10px] font-mono text-purple-300 font-bold">● Active Agent</span>
                     </div>
@@ -227,7 +217,7 @@ export function AppleCoverflowCarousel() {
                 {project.category.toLowerCase() === "cloud" && (
                   <div className="relative w-full h-full flex items-center justify-center">
                     <div className="absolute inset-0 bg-gradient-to-tr from-blue-950 via-slate-900 to-slate-950 opacity-90" />
-                    <div className="w-56 h-56 rounded-3xl bg-gradient-to-br from-blue-600/30 to-indigo-900/40 border border-blue-500/20 rotate-12 blur-sm" />
+                    <div className="w-52 h-52 rounded-3xl bg-gradient-to-br from-blue-600/30 to-indigo-900/40 border border-blue-500/20 rotate-12" />
                     <div className="relative z-10 w-[88%] p-6 rounded-2xl bg-black/70 backdrop-blur-xl border border-white/20 shadow-2xl space-y-3">
                       <div className="flex items-center justify-between text-xs font-mono">
                         <span className="text-white/60">Cluster Telemetry</span>
@@ -339,44 +329,44 @@ export function AppleCoverflowCarousel() {
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          FLOATING NAVIGATION CONTROLS (← Dots Progress →)
+          FLOATING NAVIGATION CONTROLS (Light & Dark Mode Support)
          ───────────────────────────────────────────────────────────── */}
       <div className="flex items-center gap-6 mt-6 z-20">
         
-        {/* Left Arrow Glass Button (48px) */}
+        {/* Left Arrow Button */}
         <button
           onClick={handlePrev}
-          className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white hover:bg-white/20 hover:scale-110 active:scale-95 transition-all shadow-lg cursor-pointer"
+          className="w-11 h-11 rounded-full bg-black/5 dark:bg-white/10 backdrop-blur-xl border border-black/10 dark:border-white/15 flex items-center justify-center text-neutral-800 dark:text-white hover:bg-black/10 dark:hover:bg-white/20 active:scale-95 transition-all shadow-md cursor-pointer"
           aria-label="Previous project"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-4 h-4" />
         </button>
 
-        {/* Interactive Progress Step Indicators (01 / 04) */}
-        <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/15 text-xs font-mono text-white">
+        {/* Interactive Progress Step Indicators */}
+        <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-black/5 dark:bg-white/10 backdrop-blur-xl border border-black/10 dark:border-white/15 text-xs font-mono text-neutral-800 dark:text-white">
           {displayProjects.map((_, i) => (
             <button
               key={i}
               onClick={() => setActiveIndex(i)}
               className={cn(
-                "h-2 rounded-full transition-all duration-500 cursor-pointer",
-                activeIndex === i ? "w-7 bg-white" : "w-2 bg-white/30 hover:bg-white/50"
+                "h-2 rounded-full transition-all duration-300 cursor-pointer",
+                activeIndex === i ? "w-6 bg-neutral-900 dark:bg-white" : "w-2 bg-neutral-400/60 dark:bg-white/30 hover:bg-neutral-600 dark:hover:bg-white/50"
               )}
               aria-label={`Go to project ${i + 1}`}
             />
           ))}
-          <span className="ml-2 text-[10px] text-white/60 font-bold">
+          <span className="ml-2 text-[10px] text-neutral-600 dark:text-white/60 font-bold">
             0{activeIndex + 1} / 0{total}
           </span>
         </div>
 
-        {/* Right Arrow Glass Button (48px) */}
+        {/* Right Arrow Button */}
         <button
           onClick={handleNext}
-          className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white hover:bg-white/20 hover:scale-110 active:scale-95 transition-all shadow-lg cursor-pointer"
+          className="w-11 h-11 rounded-full bg-black/5 dark:bg-white/10 backdrop-blur-xl border border-black/10 dark:border-white/15 flex items-center justify-center text-neutral-800 dark:text-white hover:bg-black/10 dark:hover:bg-white/20 active:scale-95 transition-all shadow-md cursor-pointer"
           aria-label="Next project"
         >
-          <ArrowRight className="w-5 h-5" />
+          <ArrowRight className="w-4 h-4" />
         </button>
 
       </div>
