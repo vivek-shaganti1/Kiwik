@@ -1,0 +1,84 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const SAMPLE_PROMPTS = [
+  "Design a product launch campaign for a new sneaker drop...",
+  "Build an autonomous AI agent workflow for customer onboarding...",
+  "Generate a 3D glassmorphic dashboard design system...",
+  "Architect a zero-latency serverless cloud infrastructure..."
+];
+
+export function PromptCTA() {
+  const [promptIndex, setPromptIndex] = useState(0);
+  const [displayedText, setDisplayedText] = useState("");
+  const [isTyping, setIsTyping] = useState(true);
+  const [userPrompt, setUserPrompt] = useState("");
+
+  useEffect(() => {
+    if (userPrompt) return; // Pause auto typewriter if user is typing custom text
+
+    const currentFullPrompt = SAMPLE_PROMPTS[promptIndex];
+    let charIdx = 0;
+
+    const typingInterval = setInterval(() => {
+      if (charIdx <= currentFullPrompt.length) {
+        setDisplayedText(currentFullPrompt.slice(0, charIdx));
+        charIdx++;
+      } else {
+        clearInterval(typingInterval);
+        setTimeout(() => {
+          setPromptIndex((prev) => (prev + 1) % SAMPLE_PROMPTS.length);
+        }, 3000);
+      }
+    }, 45);
+
+    return () => clearInterval(typingInterval);
+  }, [promptIndex, userPrompt]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const activeText = userPrompt || displayedText;
+    if (!activeText) return;
+    alert(`Submitting prompt request to Kiwik AI Agent: "${activeText}"`);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: 1.8, ease: [0.16, 1, 0.3, 1] }}
+      className="w-full max-w-xl mx-auto px-4 select-none"
+    >
+      <form
+        onSubmit={handleSubmit}
+        className="relative flex items-center bg-[#18181B] text-white p-2 rounded-full border border-white/10 shadow-2xl hover:border-white/20 transition-all group"
+      >
+        {/* Bowtie / Capsule Icon badge */}
+        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0 ml-1 text-white/80 group-hover:text-white group-hover:scale-105 transition-all">
+          <div className="w-4 h-2.5 rounded-full bg-gradient-to-r from-orange-400 via-pink-500 to-indigo-400" />
+        </div>
+
+        {/* Input Text / Animated Typewriter */}
+        <input
+          type="text"
+          value={userPrompt || displayedText}
+          onChange={(e) => setUserPrompt(e.target.value)}
+          placeholder="Brief our AI agent..."
+          className="flex-1 bg-transparent px-3 text-xs font-sans font-medium text-white/90 placeholder-white/40 focus:outline-none truncate"
+        />
+
+        {/* Action Submit Button */}
+        <button
+          type="submit"
+          className="w-8 h-8 rounded-full bg-white/15 hover:bg-white text-white hover:text-black flex items-center justify-center shrink-0 transition-all cursor-pointer shadow-md group-hover:scale-105"
+        >
+          <ArrowRight className="w-4 h-4" />
+        </button>
+      </form>
+    </motion.div>
+  );
+}

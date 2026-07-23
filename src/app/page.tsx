@@ -21,9 +21,7 @@ import {
   ArrowUpRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { AuroraBackground } from "@/components/effects/aurora-background";
-import { CosmicParticleCanvas } from "@/components/effects/cosmic-particle-canvas";
-import { AnimatedHero } from "@/components/ui/animated-hero";
+import { MeliusHero } from "@/components/Hero/melius-hero";
 import { Centerpiece } from "@/components/home/centerpiece";
 import { MacosDashboard } from "@/components/home/macos-dashboard";
 import { AiRaycastPanel } from "@/components/home/ai-raycast-panel";
@@ -72,11 +70,8 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen text-text-primary overflow-x-hidden relative">
-      <AuroraBackground intensity="medium" />
-      <CosmicParticleCanvas />
-
-      {/* Premium Animated Operating System Hero Component */}
-      <AnimatedHero onWatchOverview={() => setIsVideoModalOpen(true)} />
+      {/* Pixel-Perfect Melius Reference Hero Experience */}
+      <MeliusHero />
 
       {/* THE CRISKA ECOSYSTEM PIPELINE (Matching Reference Image) */}
       <EcosystemPipeline />
