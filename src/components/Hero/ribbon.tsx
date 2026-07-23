@@ -4,71 +4,82 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-// Curated high-res art-directed imagery matching the reference screenshots
-const RIBBON_IMAGES = [
+// 12 Curated art-directed images matching Melius reference screenshot proportions
+const CURVED_RIBBON_ITEMS = [
+  // FAR LEFT (Large, Tilted Inward towards user)
   {
     id: "img-1",
     url: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=800&auto=format&fit=crop",
     title: "Abstract Neon Palms",
     aspect: "w-[240px] sm:w-[280px] h-[340px] sm:h-[380px]",
-    rotate: -20,
+    rotateY: -22,
     scale: 1.35,
     offsetY: 0
   },
   {
     id: "img-2",
-    url: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=800&auto=format&fit=crop",
-    title: "Liquid Chroma",
-    aspect: "w-[190px] sm:w-[220px] h-[280px] sm:h-[320px]",
-    rotate: -12,
-    scale: 1.15,
-    offsetY: -10
+    url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=800&auto=format&fit=crop",
+    title: "Minimal Architecture",
+    aspect: "w-[200px] sm:w-[230px] h-[300px] sm:h-[340px]",
+    rotateY: -16,
+    scale: 1.2,
+    offsetY: -5
   },
   {
     id: "img-3",
-    url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop",
-    title: "Portrait Studio Light",
-    aspect: "w-[160px] sm:w-[190px] h-[240px] sm:h-[270px]",
-    rotate: -6,
-    scale: 1.0,
-    offsetY: 5
+    url: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=800&auto=format&fit=crop",
+    title: "Liquid Chroma",
+    aspect: "w-[170px] sm:w-[195px] h-[250px] sm:h-[285px]",
+    rotateY: -10,
+    scale: 1.05,
+    offsetY: 4
   },
   {
     id: "img-4",
+    url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop",
+    title: "Portrait Studio Light",
+    aspect: "w-[145px] sm:w-[165px] h-[210px] sm:h-[235px]",
+    rotateY: -5,
+    scale: 0.95,
+    offsetY: -2
+  },
+  {
+    id: "img-5",
     url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800&auto=format&fit=crop",
     title: "Red Roses",
-    aspect: "w-[140px] sm:w-[160px] h-[190px] sm:h-[220px]",
-    rotate: -2,
+    aspect: "w-[125px] sm:w-[140px] h-[160px] sm:h-[185px]",
+    rotateY: -2,
     scale: 0.85,
     offsetY: 0
   },
 
-  // CENTER SPLIT PAIR (Center Bowtie Anchor)
+  // CENTER BOWTIE ANCHOR PAIR (Small 1:1 Square Cards)
   {
-    id: "img-center-left",
+    id: "img-center-1",
     url: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=800&auto=format&fit=crop",
     title: "Quantum Motion",
-    aspect: "w-[110px] sm:w-[130px] h-[125px] sm:h-[145px]",
-    rotate: 0,
+    aspect: "w-[100px] sm:w-[115px] h-[105px] sm:h-[120px]",
+    rotateY: 0,
     scale: 0.75,
     offsetY: 0
   },
   {
-    id: "img-center-right",
+    id: "img-center-2",
     url: "https://images.unsplash.com/photo-1563241527-3004b7be0ffd?q=80&w=800&auto=format&fit=crop",
     title: "White Porcelain Roses",
-    aspect: "w-[110px] sm:w-[130px] h-[125px] sm:h-[145px]",
-    rotate: 0,
+    aspect: "w-[100px] sm:w-[115px] h-[105px] sm:h-[120px]",
+    rotateY: 0,
     scale: 0.75,
     offsetY: 0
   },
 
+  // RIGHT FLANKING (Increasing height & scale outwards)
   {
     id: "img-7",
     url: "https://images.unsplash.com/photo-1518837695005-2083093ee35b?q=80&w=800&auto=format&fit=crop",
     title: "Offroad Expedition",
-    aspect: "w-[140px] sm:w-[160px] h-[190px] sm:h-[220px]",
-    rotate: 2,
+    aspect: "w-[125px] sm:w-[140px] h-[160px] sm:h-[185px]",
+    rotateY: 2,
     scale: 0.85,
     offsetY: 0
   },
@@ -76,26 +87,36 @@ const RIBBON_IMAGES = [
     id: "img-8",
     url: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?q=80&w=800&auto=format&fit=crop",
     title: "Deep Tunnel Forest",
-    aspect: "w-[160px] sm:w-[190px] h-[240px] sm:h-[270px]",
-    rotate: 6,
-    scale: 1.0,
-    offsetY: -5
+    aspect: "w-[145px] sm:w-[165px] h-[210px] sm:h-[235px]",
+    rotateY: 5,
+    scale: 0.95,
+    offsetY: -2
   },
   {
     id: "img-9",
     url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop",
     title: "Amber Glass Droplets",
-    aspect: "w-[190px] sm:w-[220px] h-[280px] sm:h-[320px]",
-    rotate: 12,
-    scale: 1.15,
-    offsetY: 10
+    aspect: "w-[170px] sm:w-[195px] h-[250px] sm:h-[285px]",
+    rotateY: 10,
+    scale: 1.05,
+    offsetY: 4
   },
   {
     id: "img-10",
+    url: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?q=80&w=800&auto=format&fit=crop",
+    title: "Ocean Waves",
+    aspect: "w-[200px] sm:w-[230px] h-[300px] sm:h-[340px]",
+    rotateY: 16,
+    scale: 1.2,
+    offsetY: -5
+  },
+  // FAR RIGHT (Large, Tilted Inward towards user)
+  {
+    id: "img-11",
     url: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=800&auto=format&fit=crop",
     title: "Wildflower Meadow",
     aspect: "w-[240px] sm:w-[280px] h-[340px] sm:h-[380px]",
-    rotate: 20,
+    rotateY: 22,
     scale: 1.35,
     offsetY: 0
   }
@@ -105,7 +126,7 @@ export function ImageRibbon() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
-  // Mouse Parallax Values
+  // Mouse Parallax Motion Trackers
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const smoothX = useSpring(mouseX, { damping: 40, stiffness: 180 });
@@ -124,8 +145,8 @@ export function ImageRibbon() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [mouseX, mouseY]);
 
-  // Double-buffered stream for seamless infinite motion
-  const infiniteRibbon = [...RIBBON_IMAGES, ...RIBBON_IMAGES];
+  // Double array to create seamless loop without gaps
+  const infiniteRibbon = [...CURVED_RIBBON_ITEMS, ...CURVED_RIBBON_ITEMS];
 
   return (
     <div 
@@ -147,7 +168,7 @@ export function ImageRibbon() {
       />
 
       {/* ─────────────────────────────────────────────────────────────
-          PARALLAX 3D CURVED HORIZONTAL CONVEYOR STREAM
+          3D PERSPECTIVE CURVED RIBBON CONVEYOR STREAM
          ───────────────────────────────────────────────────────────── */}
       <motion.div
         style={{
@@ -163,12 +184,12 @@ export function ImageRibbon() {
             x: ["0%", "-50%"]
           }}
           transition={{
-            duration: 30,
+            duration: 32,
             ease: "linear",
             repeat: Infinity,
             repeatType: "loop"
           }}
-          className="flex items-center gap-3 sm:gap-4 w-max px-4 will-change-transform"
+          className="flex items-center gap-3.5 sm:gap-5 w-max px-4 will-change-transform"
           style={{
             transformStyle: "preserve-3d"
           }}
@@ -185,8 +206,8 @@ export function ImageRibbon() {
                 animate={{
                   y: isHovered ? img.offsetY - 20 : img.offsetY,
                   scale: isHovered ? img.scale * 1.15 : img.scale,
-                  rotateY: isHovered ? 0 : img.rotate,
-                  z: isHovered ? 80 : 0
+                  rotateY: isHovered ? 0 : img.rotateY,
+                  z: isHovered ? 90 : 0
                 }}
                 transition={{
                   type: "spring",
@@ -194,17 +215,17 @@ export function ImageRibbon() {
                   damping: 22
                 }}
                 className={cn(
-                  "relative rounded-2xl overflow-hidden shadow-2xl border border-white/20 transition-shadow cursor-pointer shrink-0 group transform-gpu backdrop-blur-none bg-black/40",
+                  "relative rounded-2xl overflow-hidden shadow-2xl border border-white/20 transition-all cursor-pointer shrink-0 group transform-gpu bg-black/40",
                   img.aspect
                 )}
                 style={{
                   transformStyle: "preserve-3d",
                   boxShadow: isHovered 
-                    ? "0 30px 60px -15px rgba(0,0,0,0.8), 0 0 30px rgba(255,255,255,0.4)"
+                    ? "0 30px 60px -15px rgba(0,0,0,0.85), 0 0 30px rgba(255,255,255,0.4)"
                     : "0 20px 40px -10px rgba(0,0,0,0.6)"
                 }}
               >
-                {/* Native High-Res Image with 100% Opacity */}
+                {/* High-Resolution Artwork Image */}
                 <img
                   src={img.url}
                   alt={img.title}
@@ -212,10 +233,10 @@ export function ImageRibbon() {
                   loading="eager"
                 />
 
-                {/* Ambient Specular Highlight */}
+                {/* Specular Highlight Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-white/10 opacity-50 group-hover:opacity-10 transition-opacity" />
 
-                {/* Micro Title Badge on Hover */}
+                {/* Title Badge on Hover */}
                 <div className="absolute bottom-2.5 left-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                   <span className="text-[10px] font-mono font-bold text-white bg-black/80 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/15 truncate block">
                     {img.title}
