@@ -110,9 +110,9 @@
    ═══════════════════════════════════════════════════════════════ */
 
 [data-theme="light"] {
-  --bg-primary: #f4f6fb; /* Multi-layered frosted ice-slate */
-  --bg-secondary: #eaedf5; /* Crisp panel background */
-  --bg-tertiary: #dfded5;
+  --bg-primary: #fafaf8; /* Pure clean paper white */
+  --bg-secondary: #f4f4f0; /* Crisp panel background */
+  --bg-tertiary: #e5e5e0;
   --bg-elevated: #ffffff;
 
   --text-primary: #0f172a;

@@ -48,8 +48,8 @@ export function Navbar() {
         className={cn(
           'pointer-events-auto w-[92%] max-w-[1650px] h-[68px] sm:h-[72px] rounded-full transition-all duration-500 border flex items-center justify-between px-4 sm:px-6 relative select-none',
           scrolled 
-            ? 'scale-[0.99] bg-white/90 dark:bg-[#0A0C12]/92 backdrop-blur-[28px] backdrop-saturate-[180%] border-black/[0.08] dark:border-white/15 shadow-[0_25px_70px_rgba(0,0,0,0.12)] dark:shadow-[0_25px_70px_rgba(0,0,0,0.7)]' 
-            : 'bg-white/82 dark:bg-[#0A0C12]/82 backdrop-blur-[24px] backdrop-saturate-[180%] border-black/[0.05] dark:border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)]'
+            ? 'scale-[0.99] bg-white/95 dark:bg-[#07080B]/95 backdrop-blur-[28px] backdrop-saturate-[180%] border-black/[0.08] dark:border-white/15 shadow-[0_25px_70px_rgba(0,0,0,0.1)] dark:shadow-[0_25px_70px_rgba(0,0,0,0.7)]' 
+            : 'bg-white/95 dark:bg-[#07080B]/95 backdrop-blur-[24px] backdrop-saturate-[180%] border-black/[0.06] dark:border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.06)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)]'
         )}
       >
         {/* ─────────────────────────────────────────────────────────────
@@ -60,7 +60,7 @@ export function Navbar() {
             whileHover={{ scale: 1.04, rotate: 2 }}
             whileTap={{ scale: 0.96 }}
             transition={{ type: "spring", stiffness: 400, damping: 20 }}
-            className="w-12 h-12 rounded-2xl bg-white dark:bg-white/10 border border-black/5 dark:border-white/15 shadow-sm flex items-center justify-center p-2.5 group-hover:border-blue-500/40 group-hover:shadow-md transition-all"
+            className="w-12 h-12 rounded-2xl bg-white dark:bg-white/10 border border-black/8 dark:border-white/15 shadow-sm flex items-center justify-center p-2.5 group-hover:border-blue-500/40 group-hover:shadow-md transition-all"
           >
             <img 
               src={navCMS.logoUrl || "/logo.png"} 
