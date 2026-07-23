@@ -201,9 +201,10 @@ export function Centerpiece() {
           }}
           className="relative z-30 w-28 h-28 flex flex-col items-center justify-center"
         >
-          <img src="/logo.png" alt="Kiwik OS Refraction Logo" className="w-20 h-20 object-contain" />
+          <img src="/logo.png" alt="Kiwik OS Refraction Logo" className="w-20 h-20 object-contain dark:hidden" />
+          <img src="/logo-dark.png" alt="Kiwik OS Refraction Logo" className="w-20 h-20 object-contain hidden dark:block" />
           <span className="text-[11px] font-mono tracking-widest text-text-primary/80 mt-1.5 uppercase font-bold select-none">
-            KIWIK.1
+            KIWIK
           </span>
         </motion.div>
 

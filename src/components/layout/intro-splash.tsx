@@ -46,7 +46,8 @@ export function IntroSplash() {
               }}
               className="relative filter drop-shadow-2xl"
             >
-              <img src="/logo.png" alt="Kiwik Logo" className="w-32 h-32 md:w-40 md:h-40 object-contain" style={{ imageRendering: "auto" }} />
+              <img src="/logo.png" alt="Kiwik Logo" className="w-32 h-32 md:w-40 md:h-40 object-contain dark:hidden" style={{ imageRendering: "auto" }} />
+              <img src="/logo-dark.png" alt="Kiwik Logo" className="w-32 h-32 md:w-40 md:h-40 object-contain hidden dark:block" style={{ imageRendering: "auto" }} />
             </motion.div>
 
             <motion.div
@@ -56,7 +57,7 @@ export function IntroSplash() {
               className="text-center space-y-1.5"
             >
               <h1 className="text-3xl font-serif font-bold tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-text-primary to-text-secondary">
-                KIWIK.1
+                KIWIK
               </h1>
               <p className="text-[10px] font-mono tracking-[0.25em] text-text-secondary uppercase">
                 Initializing Edge Core OS...
