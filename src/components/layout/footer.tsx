@@ -138,7 +138,7 @@ export function Footer() {
 
             {/* Social Icons row */}
             <div className="flex items-center gap-3 pt-2">
-              <Link href="https://github.com/kiwik" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+              <Link href="https://github.com/shagantivivekgoud" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
                 <GithubIcon className="w-4 h-4" />
               </Link>
               <Link href="https://x.com/kiwik" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
@@ -216,7 +216,7 @@ export function Footer() {
               <div className="flex gap-2.5 items-start">
                 <Mail className="w-4 h-4 text-indigo-500 dark:text-indigo-400 mt-0.5 shrink-0" />
                 <div>
-                  <a href="mailto:hello@kiwik.one" className="text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors">hello@kiwik.one</a>
+                  <a href="mailto:hello@kiwik.dev" className="text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors">hello@kiwik.dev</a>
                   <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-semibold">We usually reply within 24 hours</p>
                 </div>
               </div>
@@ -246,10 +246,10 @@ export function Footer() {
           
           {/* Copyright block */}
           <div className="text-left space-y-1 select-none">
-            <div className="text-xs font-bold text-slate-800 dark:text-white">© {new Date().getFullYear()} Kiwik Inc. All rights reserved.</div>
+            <div className="text-xs font-bold text-slate-800 dark:text-white">© {new Date().getFullYear()} Kiwik. All rights reserved.</div>
             <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold leading-relaxed">
-              Kiwik.1 — The Operating System for Digital Products. <br />
-              Built with precision by the Kiwik Engineering Team.
+              Kiwik.1 is a registered trademark of Kiwik Inc. <br />
+              Built with ❤️ by the Kiwik Engineering Team.
             </p>
           </div>
 

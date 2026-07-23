@@ -235,7 +235,7 @@ const defaultCMSData: SiteCMSData = {
     defaultTitle: "Kiwik.1 | Operating System for Digital Products",
     titleTemplate: "%s | Kiwik.1",
     defaultDescription: "Unified workspace for projects, documentation, deployments, analytics, and AI assistant layers.",
-    defaultKeywords: ["Kiwik", "Operating System", "Developer Tools", "AI", "Projects", "Platform"],
+    defaultKeywords: ["Kiwik", "Operating System", "Developer Tools", "AI", "Projects"],
     openGraphImage: "/images/og-kiwik.jpg",
     twitterHandle: "@shagantivivekgoud",
     canonicalDomain: "https://kiwik-xi.vercel.app",

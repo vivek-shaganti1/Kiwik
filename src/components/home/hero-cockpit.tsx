@@ -76,8 +76,8 @@ export function HeroCockpit() {
           <div className="space-y-1 text-[11px] text-text-secondary">
             <p className="text-emerald-400 font-bold">Active Kiwik Projects:</p>
             <p>1. <span className="text-text-primary font-bold">Kiwik.1</span> [Web] - 72% Completed - In Progress</p>
-            <p>2. <span className="text-text-primary font-bold">KiwikAI</span> [AI] - 100% Completed - Live</p>
-            <p>3. <span className="text-text-primary font-bold">NimbusCloud</span> [DevOps] - 65% Completed - In Progress</p>
+            <p>2. <span className="text-text-primary font-bold">CriskaAI</span> [AI] - 100% Completed - Live</p>
+            <p>3. <span className="text-text-primary font-bold">CriskaCloud</span> [DevOps] - 65% Completed - In Progress</p>
             <p>4. <span className="text-text-primary font-bold">FlowEngine</span> [Automation] - 90% Completed - Live</p>
           </div>
         );
@@ -95,7 +95,7 @@ export function HeroCockpit() {
         break;
 
       case "about":
-        response = "🔮 Kiwik.1 is the central operating system for digital projects, crafted with Next.js 15, React 19, and Glassmorphic layers.";
+        response = "🔮 Kiwik.1 is the central operating system for Kiwik projects, crafted with Next.js 15, React 19, and Glassmorphic layers.";
         type = "info";
         break;
 
@@ -223,8 +223,8 @@ export function HeroCockpit() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {[
                     { name: "Kiwik.1 OS", status: "In Progress", percent: 72, category: "Web OS", color: "from-blue-500 to-cyan-500" },
-                    { name: "KiwikAI Platform", status: "Completed", percent: 100, category: "AI Assistant", color: "from-violet-500 to-purple-500" },
-                    { name: "NimbusCloud", status: "In Progress", percent: 65, category: "DevOps", color: "from-emerald-500 to-teal-500" },
+                    { name: "CriskaAI Platform", status: "Completed", percent: 100, category: "AI Assistant", color: "from-violet-500 to-purple-500" },
+                    { name: "CriskaCloud", status: "In Progress", percent: 65, category: "DevOps", color: "from-emerald-500 to-teal-500" },
                     { name: "FlowEngine", status: "Completed", percent: 90, category: "Automation", color: "from-amber-500 to-orange-500" },
                   ].map((item, idx) => (
                     <div key={idx} className="p-3 rounded-lg bg-glass-bg border border-glass-border flex items-center justify-between gap-3 hover:border-glass-border-hover transition-colors">

@@ -8,32 +8,30 @@ import { CursorGlow } from "@/components/effects/cursor-glow";
 import { IntroSplash } from "@/components/layout/intro-splash";
 
 export const metadata: Metadata = {
-  title: "Kiwik.1 — The Operating System for Digital Products",
+  title: "Kiwik.1 — The Operating System for Modern Projects",
   description:
-    "Premium project showcase platform for Kiwik.1. Explore our portfolio of AI, web, mobile, and automation projects with immersive documentation and cinematic design.",
-  keywords: ["Kiwik", "portfolio", "projects", "showcase", "glassmorphism", "system"],
-  authors: [{ name: "Kiwik Engineering" }],
+    "Premium project showcase platform for Kiwik. Explore our portfolio of AI, web, mobile, and automation projects with immersive documentation and cinematic design.",
+  keywords: ["Kiwik", "portfolio", "projects", "showcase", "glassmorphism"],
+  authors: [{ name: "Kiwik Team" }],
   openGraph: {
-    title: "Kiwik.1 — The Operating System for Digital Products",
+    title: "Kiwik.1 — The Operating System for Modern Projects",
     description:
-      "Premium project showcase platform for Kiwik.1. Explore our portfolio with cinematic design.",
+      "Premium project showcase platform. Explore our portfolio with cinematic design.",
     type: "website",
     url: "https://kiwik.one",
     siteName: "Kiwik.1",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kiwik.1 — The Operating System for Digital Products",
+    title: "Kiwik.1 — The Operating System for Modern Projects",
     description:
-      "Premium project showcase platform for Kiwik.1.",
+      "Premium project showcase platform.",
   },
   robots: {
     index: true,
     follow: true,
   },
 };
-
-import { OSWorkspaceWrapper } from "@/components/layout/os-workspace-wrapper";
 
 export default function RootLayout({
   children,
@@ -53,12 +51,10 @@ export default function RootLayout({
         <ThemeProvider>
           <IntroSplash />
           <CursorGlow />
-          <OSWorkspaceWrapper>
-            <Navbar />
-            <CommandPalette />
-            <main className="flex-1 pt-[72px]">{children}</main>
-            <Footer />
-          </OSWorkspaceWrapper>
+          <Navbar />
+          <CommandPalette />
+          <main className="flex-1 pt-[72px]">{children}</main>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

@@ -1,7 +1,7 @@
 {
   "name": "kiwik",
   "version": "1.0.0",
-  "description": "Kiwik.1 — The Operating System for Digital Products",
+  "description": "Kiwik.1 — The Operating System of Criska Projects",
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
@@ -14,9 +14,9 @@
     "portfolio",
     "showcase",
     "glassmorphism",
-    "kiwik"
+    "criska"
   ],
-  "author": "Kiwik Engineering",
+  "author": "Criska",
   "license": "MIT",
   "dependencies": {
     "@radix-ui/react-slot": "^1.3.0",

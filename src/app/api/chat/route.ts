@@ -9,7 +9,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ fallback: true, error: "Using client fallback (No Groq Key configured)" });
     }
 
-    const systemPrompt = `You are the Kiwik.1 AI Assistant, a high-performance system telemetry agent built for Kiwik.1.
+    const systemPrompt = `You are the Kiwik.1 AI Assistant, a high-performance system telemetry agent built for Kiwik.
 You have access to the following projects information from our edge operating system database:
 ${JSON.stringify(projectsContext, null, 2)}
 

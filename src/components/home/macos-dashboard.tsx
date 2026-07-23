@@ -40,7 +40,7 @@ interface DashboardProject {
 export function MacosDashboard() {
   const [activeTab, setActiveTab] = useState<SidebarTab>("projects");
   const [searchQuery, setSearchQuery] = useState("");
-  const [favorites, setFavorites] = useState<string[]>(["Kiwik AI"]);
+  const [favorites, setFavorites] = useState<string[]>(["Kiwik.1"]);
 
   React.useEffect(() => {
     const handleSwitchTab = (e: Event) => {
@@ -57,8 +57,8 @@ export function MacosDashboard() {
 
   const getProjectImage = (slug: string) => {
     if (slug === 'kiwik') return "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80";
-    if (slug === 'nimbus-cloud' || slug === 'nimbuscloud') return "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=400&q=80";
-    if (slug === 'kiwik-ai' || slug === 'kiwikai') return "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=400&q=80";
+    if (slug === 'criska-cloud' || slug === 'criskacloud') return "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=400&q=80";
+    if (slug === 'criska-ai' || slug === 'criskaai') return "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=400&q=80";
     return "https://images.unsplash.com/photo-1642790106117-e829e14a795f?auto=format&fit=crop&w=400&q=80";
   };
 
@@ -276,7 +276,7 @@ export function MacosDashboard() {
                 >
                   <h3 className="text-sm font-bold text-text-primary">Kiwik OS Control Console</h3>
                   <p className="text-xs text-text-secondary leading-relaxed">
-                    This operating cockpit connects all KiwikAI, NimbusCloud, and FlowEngine platforms. Use the left menu tab switcher to explore documentation libraries, deployment logs, and system settings files.
+                    This operating cockpit connects all CriskaAI, CriskaCloud, and FlowEngine platforms. Use the left menu tab switcher to explore documentation libraries, deployment logs, and system settings files.
                   </p>
                   <div className="grid grid-cols-3 gap-3 pt-2">
                     <div className="p-3 rounded-xl bg-glass-bg border border-glass-border text-center">

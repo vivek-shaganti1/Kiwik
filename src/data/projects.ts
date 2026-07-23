@@ -9,9 +9,9 @@ export const projects: Project[] = [
     id: "1",
     slug: "kiwik",
     name: "Kiwik.1",
-    tagline: "The Operating System for Digital Products",
+    tagline: "The Operating System for Modern Projects",
     description:
-      "The central command center for every digital product. A premium portfolio and project management platform featuring cinematic glassmorphism, enterprise-grade architecture, and immersive documentation — designed to feel like a $100M startup product.",
+      "The central command center for every project. A premium portfolio and project management platform featuring cinematic glassmorphism, enterprise-grade architecture, and immersive documentation — designed to feel like a $100M startup product.",
     longDescription:
       "Kiwik.1 is more than a portfolio — it is the operating system that powers the entire Kiwik project ecosystem. Every project, every deployment, every piece of documentation lives here. Built with Next.js 15, React 19, and a custom glassmorphism design system, Kiwik.1 combines the polish of Linear, the aesthetics of Apple, and the power of Vercel into a single platform. The admin CMS lets you manage projects without touching code, while the public-facing showcase delivers a cinematic experience to every visitor.",
     status: "in-progress",
@@ -20,7 +20,7 @@ export const projects: Project[] = [
     version: "1.0.0-beta",
     completionPercent: 72,
     liveUrl: "https://kiwik.one",
-    githubUrl: "https://github.com/kiwik/kiwik",
+    githubUrl: "https://github.com/shagantivivekgoud/kiwik",
     coverImage: "/images/kiwik-cover.jpg",
     images: [
       { src: "/images/kiwik-hero.jpg", alt: "Kiwik Hero", caption: "The hero section with aurora background" },
@@ -70,11 +70,11 @@ export const projects: Project[] = [
     ],
     readme: `# Kiwik.1
 
-The Operating System for Digital Products.
+The Operating System for Modern Projects.
 
 ## Overview
 
-Kiwik.1 is the central command center for every Kiwik project. Built with Next.js 15, React 19, and a custom glassmorphism design system.
+Kiwik.1 is the central command center for every project. Built with Next.js 15, React 19, and a custom glassmorphism design system.
 
 ## Features
 
@@ -114,24 +114,24 @@ npm run dev
   },
   {
     id: "2",
-    slug: "kiwik-ai",
-    name: "KiwikAI",
+    slug: "criska-ai",
+    name: "CriskaAI",
     tagline: "Intelligent Assistant for Everything",
     description:
       "An advanced AI-powered assistant platform that combines natural language understanding, task automation, and intelligent code generation into a seamless conversational experience.",
     longDescription:
-      "KiwikAI leverages cutting-edge large language models combined with a custom retrieval-augmented generation pipeline to provide contextually aware responses. The platform features multi-modal input support, real-time streaming, plugin architecture for extensibility, and enterprise-grade security. Built for developers, teams, and organizations that need AI superpowers at their fingertips.",
+      "CriskaAI leverages cutting-edge large language models combined with a custom retrieval-augmented generation pipeline to provide contextually aware responses. The platform features multi-modal input support, real-time streaming, plugin architecture for extensibility, and enterprise-grade security. Built for developers, teams, and organizations that need AI superpowers at their fingertips.",
     status: "completed",
     category: "ai",
     tags: ["ai", "assistant", "nlp", "automation", "chatbot", "llm"],
     version: "2.3.1",
     completionPercent: 100,
-    liveUrl: "https://ai.kiwik.dev",
-    githubUrl: "https://github.com/kiwik/kiwik-ai",
-    coverImage: "/images/kiwik-ai-cover.jpg",
+    liveUrl: "https://ai.criska.dev",
+    githubUrl: "https://github.com/criska/criska-ai",
+    coverImage: "/images/criska-ai-cover.jpg",
     images: [
-      { src: "/images/kiwik-ai-chat.jpg", alt: "Chat Interface", caption: "Sleek conversational UI" },
-      { src: "/images/kiwik-ai-code.jpg", alt: "Code Generation", caption: "Intelligent code generation" },
+      { src: "/images/criska-ai-chat.jpg", alt: "Chat Interface", caption: "Sleek conversational UI" },
+      { src: "/images/criska-ai-code.jpg", alt: "Code Generation", caption: "Intelligent code generation" },
     ],
     techStack: [
       { name: "Next.js 15", category: "frontend", color: "#000000" },
@@ -170,7 +170,7 @@ npm run dev
       { date: "2025-06-01", title: "Plugin System", description: "Extensible plugin architecture", status: "completed" },
       { date: "2025-09-01", title: "Enterprise Edition", description: "SSO, audit logs, compliance", status: "planned" },
     ],
-    readme: `# KiwikAI\n\nIntelligent Assistant for Everything.\n\n## Quick Start\n\n\`\`\`bash\nnpm install\nnpm run dev\n\`\`\`\n\n## Architecture\n\nKiwikAI uses a microservices architecture with a Next.js frontend and FastAPI backend.\n`,
+    readme: `# CriskaAI\n\nIntelligent Assistant for Everything.\n\n## Quick Start\n\n\`\`\`bash\nnpm install\nnpm run dev\n\`\`\`\n\n## Architecture\n\nCriskaAI uses a microservices architecture with a Next.js frontend and FastAPI backend.\n`,
     lastUpdated: "2025-07-18",
     createdAt: "2024-12-01",
     owner: "Vivek Shaganti",
@@ -182,8 +182,8 @@ npm run dev
   },
   {
     id: "3",
-    slug: "nimbus-cloud",
-    name: "NimbusCloud",
+    slug: "criska-cloud",
+    name: "CriskaCloud",
     tagline: "Infrastructure as a Service, Simplified",
     description:
       "A modern cloud infrastructure platform offering serverless computing, managed databases, edge deployments, and real-time monitoring — all through an intuitive dashboard.",
@@ -192,10 +192,10 @@ npm run dev
     tags: ["cloud", "infrastructure", "serverless", "monitoring", "kubernetes"],
     version: "0.8.0",
     completionPercent: 65,
-    githubUrl: "https://github.com/kiwik/nimbus-cloud",
-    coverImage: "/images/nimbus-cloud-cover.jpg",
+    githubUrl: "https://github.com/criska/criska-cloud",
+    coverImage: "/images/criska-cloud-cover.jpg",
     images: [
-      { src: "/images/nimbus-cloud-dash.jpg", alt: "Dashboard", caption: "Cloud management dashboard" },
+      { src: "/images/criska-cloud-dash.jpg", alt: "Dashboard", caption: "Cloud management dashboard" },
     ],
     techStack: [
       { name: "Next.js 15", category: "frontend", color: "#000000" },
@@ -241,8 +241,8 @@ npm run dev
   },
   {
     id: "4",
-    slug: "pay-flow",
-    name: "PayFlow",
+    slug: "criska-pay",
+    name: "CriskaPay",
     tagline: "Payment Infrastructure for Modern Apps",
     description:
       "A developer-first payment gateway supporting credit cards, UPI, crypto, and subscriptions with beautiful checkout experiences and comprehensive fraud detection.",
@@ -251,12 +251,12 @@ npm run dev
     tags: ["payments", "fintech", "api", "subscriptions", "checkout"],
     version: "3.1.0",
     completionPercent: 100,
-    liveUrl: "https://pay.kiwik.dev",
-    githubUrl: "https://github.com/kiwik/pay-flow",
-    coverImage: "/images/pay-flow-cover.jpg",
+    liveUrl: "https://pay.criska.dev",
+    githubUrl: "https://github.com/criska/criska-pay",
+    coverImage: "/images/criska-pay-cover.jpg",
     images: [
-      { src: "/images/pay-flow-checkout.jpg", alt: "Checkout", caption: "Beautiful checkout experience" },
-      { src: "/images/pay-flow-dash.jpg", alt: "Dashboard", caption: "Transaction analytics" },
+      { src: "/images/criska-pay-checkout.jpg", alt: "Checkout", caption: "Beautiful checkout experience" },
+      { src: "/images/criska-pay-dash.jpg", alt: "Dashboard", caption: "Transaction analytics" },
     ],
     techStack: [
       { name: "React 19", category: "frontend", color: "#61DAFB" },
@@ -301,8 +301,8 @@ npm run dev
   },
   {
     id: "5",
-    slug: "nova-os",
-    name: "NovaOS",
+    slug: "criska-os",
+    name: "CriskaOS",
     tagline: "A Web-Based Desktop Operating System",
     description:
       "A concept web-based desktop OS featuring a window management system, file browser, terminal, app store, and beautiful animations — all running in the browser.",
@@ -311,10 +311,10 @@ npm run dev
     tags: ["os", "desktop", "concept", "window-manager", "experimental"],
     version: "0.3.0",
     completionPercent: 35,
-    githubUrl: "https://github.com/kiwik/nova-os",
-    coverImage: "/images/nova-os-cover.jpg",
+    githubUrl: "https://github.com/criska/criska-os",
+    coverImage: "/images/criska-os-cover.jpg",
     images: [
-      { src: "/images/nova-os-desktop.jpg", alt: "Desktop", caption: "NovaOS desktop environment" },
+      { src: "/images/criska-os-desktop.jpg", alt: "Desktop", caption: "CriskaOS desktop environment" },
     ],
     techStack: [
       { name: "React 19", category: "frontend", color: "#61DAFB" },
@@ -354,8 +354,8 @@ npm run dev
   },
   {
     id: "6",
-    slug: "kiwik-bot",
-    name: "KiwikBot",
+    slug: "criska-bot",
+    name: "CriskaBot",
     tagline: "The Ultimate Discord Companion",
     description:
       "A feature-rich Discord bot with AI chat, music playback, moderation tools, custom commands, leveling system, and server analytics — serving 500+ servers.",
@@ -364,11 +364,11 @@ npm run dev
     tags: ["discord", "bot", "moderation", "music", "ai", "community"],
     version: "4.2.0",
     completionPercent: 100,
-    liveUrl: "https://bot.kiwik.dev",
-    githubUrl: "https://github.com/kiwik/kiwik-bot",
-    coverImage: "/images/kiwik-bot-cover.jpg",
+    liveUrl: "https://bot.criska.dev",
+    githubUrl: "https://github.com/criska/criska-bot",
+    coverImage: "/images/criska-bot-cover.jpg",
     images: [
-      { src: "/images/kiwik-bot-commands.jpg", alt: "Commands", caption: "Slash commands interface" },
+      { src: "/images/criska-bot-commands.jpg", alt: "Commands", caption: "Slash commands interface" },
     ],
     techStack: [
       { name: "Node.js", category: "backend", color: "#339933" },
