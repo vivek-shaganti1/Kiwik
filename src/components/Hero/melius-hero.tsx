@@ -10,10 +10,7 @@ import { cn } from "@/lib/utils";
 
 export function MeliusHero() {
   return (
-    <PaperBackground className="min-h-screen flex flex-col justify-between pt-24 pb-12 overflow-hidden">
-      {/* Top Floating Navbar */}
-      <HeroNavbar />
-
+    <PaperBackground className="min-h-screen flex flex-col justify-between pt-12 pb-12 overflow-hidden">
       {/* Hero Center Section */}
       <main className="flex-1 flex flex-col items-center justify-center space-y-6 sm:space-y-10 my-auto text-center px-4 relative z-10">
         
