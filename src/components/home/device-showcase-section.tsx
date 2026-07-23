@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { 
   CreditCard, 
   Calendar, 
@@ -10,7 +10,6 @@ import {
   MessageSquare, 
   Share2, 
   HelpCircle, 
-  CheckCircle,
   ArrowUpRight,
   Send,
   Lock,
@@ -19,17 +18,39 @@ import {
 import { cn } from "@/lib/utils";
 
 export function DeviceShowcaseSection() {
+  const sectionRef = useRef<HTMLDivElement>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  // Scroll parallax translation
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+
+  const scrollY = useTransform(scrollYProgress, [0, 1], [40, -20]);
+  const smoothY = useSpring(scrollY, { damping: 25, stiffness: 120 });
+
+  // Mouse Parallax Physics
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!sectionRef.current) return;
+    const rect = sectionRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setMousePos({ x: x * 12, y: y * 12 });
+  };
 
   return (
     <section
+      ref={sectionRef}
+      onMouseMove={handleMouseMove}
       id="device-showcase-section"
-      className="py-20 md:py-28 px-2 sm:px-4 md:px-8 max-w-[1600px] mx-auto relative z-20 select-none overflow-hidden bg-[#FAFAF8] dark:bg-[#07080B]"
+      className="py-24 sm:py-32 px-0 sm:px-4 max-w-[1700px] mx-auto relative z-20 select-none overflow-hidden bg-[#FAFAF8] dark:bg-[#07080B]"
     >
       {/* ─────────────────────────────────────────────────────────────
-          TOP BADGE: "No Credit Card Required" (Matching Reference Screenshot)
+          TOP BADGE: "No Credit Card Required"
          ───────────────────────────────────────────────────────────── */}
-      <div className="flex justify-center mb-10 sm:mb-14">
+      <div className="flex justify-center mb-12 sm:mb-16">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-white/10 border border-neutral-200 dark:border-white/15 text-neutral-600 dark:text-neutral-300 text-xs font-sans font-medium shadow-sm">
           <CreditCard className="w-3.5 h-3.5 text-neutral-400" />
           <span className="line-through decoration-neutral-400">No Credit Card Required</span>
@@ -37,33 +58,46 @@ export function DeviceShowcaseSection() {
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          5 REALISTIC IPHONE DEVICE MOCKUPS (Pixel-Perfect Match)
+          5 REALISTIC IPHONE 16 PRO HARDWARE MOCKUPS (Infinite Horizon)
          ───────────────────────────────────────────────────────────── */}
-      <div className="relative w-full flex items-center justify-center gap-3 sm:gap-5 md:gap-6 overflow-x-auto pb-8 pt-4 no-scrollbar">
-        
-        {/* ── DEVICE 1: JOHN RICHARDSON (Far Left) ── */}
+      <motion.div
+        style={{ y: smoothY }}
+        className="relative w-full flex items-center justify-center -space-x-4 sm:space-x-3 md:space-x-6 overflow-x-auto pb-12 pt-4 no-scrollbar px-6 sm:px-12"
+      >
+
+        {/* ── PHONE 1: JOHN RICHARDSON (Far Left - Cropped Viewport) ── */}
         <motion.div
           onMouseEnter={() => setHoveredIndex(0)}
           onMouseLeave={() => setHoveredIndex(null)}
           animate={{
-            y: hoveredIndex === 0 ? -12 : 0,
-            scale: hoveredIndex === 0 ? 1.03 : 0.94,
+            y: hoveredIndex === 0 ? -10 : mousePos.y * 0.8,
+            x: mousePos.x * 0.8,
+            scale: hoveredIndex === 0 ? 0.86 : 0.82,
           }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="relative flex-shrink-0 w-[240px] sm:w-[270px] md:w-[290px] h-[520px] sm:h-[580px] rounded-[44px] bg-black p-2.5 sm:p-3 border-[6px] border-[#1C1D24] shadow-[20px_30px_70px_rgba(0,0,0,0.18)] dark:shadow-[0_30px_90px_rgba(0,0,0,0.7)] flex flex-col justify-between overflow-hidden cursor-pointer group"
+          className="relative flex-shrink-0 w-[250px] sm:w-[280px] md:w-[300px] h-[520px] sm:h-[590px] md:h-[630px] rounded-[50px] bg-gradient-to-b from-[#35363F] via-[#1A1B22] to-[#0D0E12] p-[10px] sm:p-[12px] shadow-[25px_35px_80px_rgba(0,0,0,0.18)] dark:shadow-[0_40px_100px_rgba(0,0,0,0.8)] border border-white/20 flex flex-col justify-between overflow-hidden cursor-pointer group z-10"
         >
-          <div className="relative w-full h-full rounded-[34px] bg-white text-neutral-900 p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner">
+          {/* Metallic Side Button Slits */}
+          <div className="absolute -left-[3px] top-28 w-[3px] h-10 bg-neutral-600 rounded-l-md" />
+          <div className="absolute -left-[3px] top-42 w-[3px] h-10 bg-neutral-600 rounded-l-md" />
+          <div className="absolute -right-[3px] top-32 w-[3px] h-14 bg-neutral-600 rounded-r-md" />
+
+          {/* Screen Container */}
+          <div className="relative w-full h-full rounded-[40px] bg-white text-neutral-900 p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner">
             
-            {/* Dynamic Island */}
-            <div className="w-16 h-4 mx-auto rounded-full bg-black flex items-center justify-center gap-1.5 mb-3">
-              <div className="w-2 h-2 rounded-full bg-neutral-900" />
+            {/* Specular Light Reflection Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/20 opacity-30 pointer-events-none z-30" />
+
+            {/* Dynamic Island Notch */}
+            <div className="relative z-40 w-16 h-4 mx-auto rounded-full bg-black flex items-center justify-center gap-1.5 mb-2 shadow-sm">
+              <div className="w-2 h-2 rounded-full bg-[#101116]" />
               <div className="w-1.5 h-1.5 rounded-full bg-blue-500/80" />
             </div>
 
-            {/* Content Header */}
-            <div className="space-y-3 text-left">
+            {/* Header Content */}
+            <div className="relative z-20 space-y-3 text-left">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-neutral-200 overflow-hidden flex items-center justify-center font-bold text-xs font-serif text-neutral-700">
+                <div className="w-8 h-8 rounded-full bg-neutral-200 overflow-hidden flex items-center justify-center font-bold text-xs font-serif text-neutral-700 shadow-sm">
                   JR
                 </div>
                 <span className="text-xs font-bold text-neutral-800">John Richardson</span>
@@ -82,8 +116,8 @@ export function DeviceShowcaseSection() {
               </button>
             </div>
 
-            {/* Bottom Projects List */}
-            <div className="pt-3 border-t border-neutral-100 space-y-2 text-left">
+            {/* Projects List */}
+            <div className="relative z-20 pt-3 border-t border-neutral-100 space-y-2 text-left">
               <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Projects</span>
               
               <div className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-100 space-y-0.5">
@@ -100,30 +134,40 @@ export function DeviceShowcaseSection() {
           </div>
         </motion.div>
 
-        {/* ── DEVICE 2: JET HAWKEN (Mid Left - Product Designer) ── */}
+        {/* ── PHONE 2: JET HAWKEN (Mid Left - Product Designer) ── */}
         <motion.div
           onMouseEnter={() => setHoveredIndex(1)}
           onMouseLeave={() => setHoveredIndex(null)}
           animate={{
-            y: hoveredIndex === 1 ? -12 : -8,
-            scale: hoveredIndex === 1 ? 1.03 : 0.97,
+            y: hoveredIndex === 1 ? -12 : -8 + mousePos.y * 0.5,
+            x: mousePos.x * 0.5,
+            scale: hoveredIndex === 1 ? 0.94 : 0.89,
           }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="relative flex-shrink-0 w-[240px] sm:w-[270px] md:w-[290px] h-[530px] sm:h-[590px] rounded-[44px] bg-black p-2.5 sm:p-3 border-[6px] border-[#1C1D24] shadow-[20px_30px_70px_rgba(0,0,0,0.18)] dark:shadow-[0_30px_90px_rgba(0,0,0,0.7)] flex flex-col justify-between overflow-hidden cursor-pointer group"
+          className="relative flex-shrink-0 w-[255px] sm:w-[285px] md:w-[310px] h-[535px] sm:h-[610px] md:h-[650px] rounded-[52px] bg-gradient-to-b from-[#35363F] via-[#1A1B22] to-[#0D0E12] p-[10px] sm:p-[12px] shadow-[30px_40px_90px_rgba(0,0,0,0.22)] dark:shadow-[0_45px_110px_rgba(0,0,0,0.85)] border border-white/25 flex flex-col justify-between overflow-hidden cursor-pointer group z-20"
         >
-          <div className="relative w-full h-full rounded-[34px] bg-[#EBF2FE] text-neutral-900 p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner">
+          {/* Metallic Side Button Slits */}
+          <div className="absolute -left-[3px] top-28 w-[3px] h-10 bg-neutral-600 rounded-l-md" />
+          <div className="absolute -left-[3px] top-42 w-[3px] h-10 bg-neutral-600 rounded-l-md" />
+          <div className="absolute -right-[3px] top-32 w-[3px] h-14 bg-neutral-600 rounded-r-md" />
+
+          {/* Screen Container */}
+          <div className="relative w-full h-full rounded-[42px] bg-[#EBF2FE] text-neutral-900 p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner">
             
-            {/* Dynamic Island */}
-            <div className="w-16 h-4 mx-auto rounded-full bg-black flex items-center justify-center gap-1.5 mb-2">
-              <div className="w-2 h-2 rounded-full bg-neutral-900" />
+            {/* Specular Light Reflection Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/30 opacity-40 pointer-events-none z-30" />
+
+            {/* Dynamic Island Notch */}
+            <div className="relative z-40 w-16 h-4 mx-auto rounded-full bg-black flex items-center justify-center gap-1.5 mb-2 shadow-sm">
+              <div className="w-2 h-2 rounded-full bg-[#101116]" />
               <div className="w-1.5 h-1.5 rounded-full bg-blue-500/80" />
             </div>
 
             {/* Top Blue Wave Shader */}
-            <div className="absolute top-0 left-0 right-0 h-44 bg-gradient-to-b from-blue-300/40 via-blue-200/20 to-transparent pointer-events-none" />
+            <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-blue-300/40 via-blue-200/20 to-transparent pointer-events-none" />
 
             {/* Header Content */}
-            <div className="relative z-10 space-y-2.5 text-left">
+            <div className="relative z-20 space-y-2.5 text-left">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shadow-md">
                   JH
@@ -145,7 +189,7 @@ export function DeviceShowcaseSection() {
             </div>
 
             {/* Testimonials Block */}
-            <div className="relative z-10 pt-2 border-t border-blue-200/60 space-y-2 text-left">
+            <div className="relative z-20 pt-2 border-t border-blue-200/60 space-y-2 text-left">
               <div className="flex items-center gap-1 text-[10px] font-bold text-neutral-600">
                 <span className="font-serif italic text-base">“</span> Testimonials
               </div>
@@ -174,30 +218,39 @@ export function DeviceShowcaseSection() {
           </div>
         </motion.div>
 
-        {/* ── DEVICE 3: LESLIE PUTNAM (Center Hero - Dark Mode Senior PM) ── */}
+        {/* ── PHONE 3: LESLIE PUTNAM (Center Hero - Titanium iPhone 16 Pro Frame) ── */}
         <motion.div
           onMouseEnter={() => setHoveredIndex(2)}
           onMouseLeave={() => setHoveredIndex(null)}
           animate={{
-            y: hoveredIndex === 2 ? -18 : -16,
-            scale: hoveredIndex === 2 ? 1.06 : 1.02,
+            y: hoveredIndex === 2 ? -20 : -18,
+            scale: hoveredIndex === 2 ? 1.05 : 1.0,
           }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="relative flex-shrink-0 w-[260px] sm:w-[290px] md:w-[310px] h-[560px] sm:h-[620px] rounded-[48px] bg-black p-2.5 sm:p-3 border-[7px] border-[#22242D] shadow-[25px_40px_90px_rgba(0,0,0,0.3)] dark:shadow-[0_40px_120px_rgba(0,0,0,0.9)] flex flex-col justify-between overflow-hidden cursor-pointer z-30 group"
+          className="relative flex-shrink-0 w-[275px] sm:w-[310px] md:w-[335px] h-[570px] sm:h-[650px] md:h-[690px] rounded-[56px] bg-gradient-to-b from-[#444652] via-[#242530] to-[#12131A] p-[12px] sm:p-[14px] shadow-[35px_50px_110px_rgba(0,0,0,0.32)] dark:shadow-[0_50px_140px_rgba(0,0,0,0.95)] border-2 border-white/30 flex flex-col justify-between overflow-hidden cursor-pointer z-40 group"
         >
-          <div className="relative w-full h-full rounded-[38px] bg-[#0C0D12] text-white p-4 sm:p-6 flex flex-col justify-between overflow-hidden shadow-inner">
+          {/* Titanium Metallic Highlights */}
+          <div className="absolute -left-[3px] top-32 w-[3px] h-12 bg-neutral-500 rounded-l-md" />
+          <div className="absolute -left-[3px] top-48 w-[3px] h-12 bg-neutral-500 rounded-l-md" />
+          <div className="absolute -right-[3px] top-36 w-[3px] h-16 bg-neutral-500 rounded-r-md" />
+
+          {/* Screen Container */}
+          <div className="relative w-full h-full rounded-[44px] bg-[#0C0D12] text-white p-4 sm:p-6 flex flex-col justify-between overflow-hidden shadow-inner">
             
-            {/* Dynamic Island */}
-            <div className="w-18 h-4.5 mx-auto rounded-full bg-black flex items-center justify-center gap-1.5 mb-2">
-              <div className="w-2.5 h-2.5 rounded-full bg-neutral-900" />
-              <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+            {/* Glass Specular Reflection Highlight Diagonal */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/25 opacity-50 pointer-events-none z-30" />
+
+            {/* Dynamic Island Notch */}
+            <div className="relative z-40 w-20 h-5 mx-auto rounded-full bg-black flex items-center justify-center gap-2 mb-2 shadow-md">
+              <div className="w-2.5 h-2.5 rounded-full bg-[#101116]" />
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
             </div>
 
-            {/* Glowing Blue Shader Texture Background Top */}
-            <div className="absolute top-0 left-0 right-0 h-52 bg-gradient-to-br from-blue-600/40 via-indigo-600/30 to-transparent blur-xl pointer-events-none" />
+            {/* Glowing Blue Mesh Shader Top */}
+            <div className="absolute top-0 left-0 right-0 h-56 bg-gradient-to-br from-blue-600/40 via-indigo-600/30 to-transparent blur-xl pointer-events-none" />
 
             {/* Header Content */}
-            <div className="relative z-10 space-y-3 text-left">
+            <div className="relative z-20 space-y-3 text-left">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 text-white font-bold text-xs flex items-center justify-center shadow-lg border border-white/20">
                   LP
@@ -219,7 +272,7 @@ export function DeviceShowcaseSection() {
             </div>
 
             {/* Resume Timeline Block */}
-            <div className="relative z-10 pt-3 border-t border-white/10 space-y-2 text-left">
+            <div className="relative z-20 pt-3 border-t border-white/10 space-y-2 text-left">
               <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-white/70">
                 <Briefcase className="w-3 h-3 text-blue-400" />
                 <span>Resume</span>
@@ -247,22 +300,32 @@ export function DeviceShowcaseSection() {
           </div>
         </motion.div>
 
-        {/* ── DEVICE 4: TAYLOR BROWN (Mid Right - Botanist) ── */}
+        {/* ── PHONE 4: TAYLOR BROWN (Mid Right - Botanist) ── */}
         <motion.div
           onMouseEnter={() => setHoveredIndex(3)}
           onMouseLeave={() => setHoveredIndex(null)}
           animate={{
-            y: hoveredIndex === 3 ? -12 : -8,
-            scale: hoveredIndex === 3 ? 1.03 : 0.97,
+            y: hoveredIndex === 3 ? -12 : -8 + mousePos.y * 0.5,
+            x: mousePos.x * 0.5,
+            scale: hoveredIndex === 3 ? 0.94 : 0.89,
           }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="relative flex-shrink-0 w-[240px] sm:w-[270px] md:w-[290px] h-[530px] sm:h-[590px] rounded-[44px] bg-black p-2.5 sm:p-3 border-[6px] border-[#1C1D24] shadow-[20px_30px_70px_rgba(0,0,0,0.18)] dark:shadow-[0_30px_90px_rgba(0,0,0,0.7)] flex flex-col justify-between overflow-hidden cursor-pointer group"
+          className="relative flex-shrink-0 w-[255px] sm:w-[285px] md:w-[310px] h-[535px] sm:h-[610px] md:h-[650px] rounded-[52px] bg-gradient-to-b from-[#35363F] via-[#1A1B22] to-[#0D0E12] p-[10px] sm:p-[12px] shadow-[30px_40px_90px_rgba(0,0,0,0.22)] dark:shadow-[0_45px_110px_rgba(0,0,0,0.85)] border border-white/25 flex flex-col justify-between overflow-hidden cursor-pointer group z-20"
         >
-          <div className="relative w-full h-full rounded-[34px] bg-[#0E1F18] text-white p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner">
+          {/* Metallic Side Button Slits */}
+          <div className="absolute -left-[3px] top-28 w-[3px] h-10 bg-neutral-600 rounded-l-md" />
+          <div className="absolute -left-[3px] top-42 w-[3px] h-10 bg-neutral-600 rounded-l-md" />
+          <div className="absolute -right-[3px] top-32 w-[3px] h-14 bg-neutral-600 rounded-r-md" />
+
+          {/* Screen Container */}
+          <div className="relative w-full h-full rounded-[42px] bg-[#0E1F18] text-white p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner">
             
-            {/* Dynamic Island */}
-            <div className="w-16 h-4 mx-auto rounded-full bg-black flex items-center justify-center gap-1.5 mb-2">
-              <div className="w-2 h-2 rounded-full bg-neutral-900" />
+            {/* Specular Light Reflection Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/30 opacity-40 pointer-events-none z-30" />
+
+            {/* Dynamic Island Notch */}
+            <div className="relative z-40 w-16 h-4 mx-auto rounded-full bg-black flex items-center justify-center gap-1.5 mb-2 shadow-sm">
+              <div className="w-2 h-2 rounded-full bg-[#101116]" />
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             </div>
 
@@ -270,7 +333,7 @@ export function DeviceShowcaseSection() {
             <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-emerald-700/40 via-teal-900/30 to-transparent pointer-events-none" />
 
             {/* Header Content */}
-            <div className="relative z-10 space-y-2.5 text-left">
+            <div className="relative z-20 space-y-2.5 text-left">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-emerald-700 text-white font-bold text-xs flex items-center justify-center shadow-md border border-emerald-400/30">
                   TB
@@ -292,7 +355,7 @@ export function DeviceShowcaseSection() {
             </div>
 
             {/* Social Icons & FAQ Block */}
-            <div className="relative z-10 pt-2 border-t border-emerald-800/60 space-y-2 text-left">
+            <div className="relative z-20 pt-2 border-t border-emerald-800/60 space-y-2 text-left">
               <div className="flex items-center justify-between px-1">
                 {[Globe, MessageSquare, Share2, Send, Lock].map((Icon, idx) => (
                   <div key={idx} className="w-6 h-6 rounded-full bg-white/10 border border-emerald-500/20 flex items-center justify-center text-emerald-300">
@@ -317,22 +380,32 @@ export function DeviceShowcaseSection() {
           </div>
         </motion.div>
 
-        {/* ── DEVICE 5: JASON MARKUS (Far Right - Viral Marketer) ── */}
+        {/* ── PHONE 5: JASON MARKUS (Far Right - Cropped Viewport) ── */}
         <motion.div
           onMouseEnter={() => setHoveredIndex(4)}
           onMouseLeave={() => setHoveredIndex(null)}
           animate={{
-            y: hoveredIndex === 4 ? -12 : 0,
-            scale: hoveredIndex === 4 ? 1.03 : 0.94,
+            y: hoveredIndex === 4 ? -10 : mousePos.y * 0.8,
+            x: mousePos.x * 0.8,
+            scale: hoveredIndex === 4 ? 0.86 : 0.82,
           }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="relative flex-shrink-0 w-[240px] sm:w-[270px] md:w-[290px] h-[520px] sm:h-[580px] rounded-[44px] bg-black p-2.5 sm:p-3 border-[6px] border-[#1C1D24] shadow-[20px_30px_70px_rgba(0,0,0,0.18)] dark:shadow-[0_30px_90px_rgba(0,0,0,0.7)] flex flex-col justify-between overflow-hidden cursor-pointer group"
+          className="relative flex-shrink-0 w-[250px] sm:w-[280px] md:w-[300px] h-[520px] sm:h-[590px] md:h-[630px] rounded-[50px] bg-gradient-to-b from-[#35363F] via-[#1A1B22] to-[#0D0E12] p-[10px] sm:p-[12px] shadow-[25px_35px_80px_rgba(0,0,0,0.18)] dark:shadow-[0_40px_100px_rgba(0,0,0,0.8)] border border-white/20 flex flex-col justify-between overflow-hidden cursor-pointer group z-10"
         >
-          <div className="relative w-full h-full rounded-[34px] bg-[#0D150B] text-white p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner">
+          {/* Metallic Side Button Slits */}
+          <div className="absolute -left-[3px] top-28 w-[3px] h-10 bg-neutral-600 rounded-l-md" />
+          <div className="absolute -left-[3px] top-42 w-[3px] h-10 bg-neutral-600 rounded-l-md" />
+          <div className="absolute -right-[3px] top-32 w-[3px] h-14 bg-neutral-600 rounded-r-md" />
+
+          {/* Screen Container */}
+          <div className="relative w-full h-full rounded-[40px] bg-[#0D150B] text-white p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner">
             
-            {/* Dynamic Island */}
-            <div className="w-16 h-4 mx-auto rounded-full bg-black flex items-center justify-center gap-1.5 mb-2">
-              <div className="w-2 h-2 rounded-full bg-neutral-900" />
+            {/* Specular Light Reflection Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/20 opacity-30 pointer-events-none z-30" />
+
+            {/* Dynamic Island Notch */}
+            <div className="relative z-40 w-16 h-4 mx-auto rounded-full bg-black flex items-center justify-center gap-1.5 mb-2 shadow-sm">
+              <div className="w-2 h-2 rounded-full bg-[#101116]" />
               <div className="w-1.5 h-1.5 rounded-full bg-lime-500" />
             </div>
 
@@ -340,7 +413,7 @@ export function DeviceShowcaseSection() {
             <div className="absolute top-0 left-0 right-0 h-44 bg-gradient-to-b from-lime-600/40 via-emerald-800/20 to-transparent pointer-events-none" />
 
             {/* Header Content */}
-            <div className="relative z-10 space-y-2.5 text-left">
+            <div className="relative z-20 space-y-2.5 text-left">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-lime-600 text-black font-bold text-xs flex items-center justify-center shadow-md">
                   JM
@@ -362,7 +435,7 @@ export function DeviceShowcaseSection() {
             </div>
 
             {/* Contact Form Block */}
-            <div className="relative z-10 pt-2 border-t border-lime-900/60 space-y-1.5 text-left">
+            <div className="relative z-20 pt-2 border-t border-lime-900/60 space-y-1.5 text-left">
               <span className="text-[10px] font-bold text-lime-300">Contact Jason Markus</span>
 
               <div className="space-y-1 text-[9px] font-mono">
@@ -375,7 +448,7 @@ export function DeviceShowcaseSection() {
           </div>
         </motion.div>
 
-      </div>
+      </motion.div>
     </section>
   );
 }
