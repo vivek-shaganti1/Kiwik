@@ -10,6 +10,8 @@ interface GlassSpotlightCardProps extends React.HTMLAttributes<HTMLDivElement> {
   spotlightColor?: string;
 }
 
+import { BorderBeam } from "@/components/effects/border-beam";
+
 export function GlassSpotlightCard({
   children,
   className,
@@ -37,7 +39,7 @@ export function GlassSpotlightCard({
       onMouseLeave={handleMouseLeave}
       whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 25 } }}
       className={cn(
-        "relative overflow-hidden rounded-2xl bg-glass-bg border border-glass-border backdrop-blur-xl shadow-xl transition-colors hover:border-glass-border-hover",
+        "relative overflow-hidden rounded-2xl bg-glass-bg border border-glass-border backdrop-blur-xl shadow-xl transition-colors hover:border-glass-border-hover group",
         className
       )}
       {...(props as any)}
@@ -50,6 +52,9 @@ export function GlassSpotlightCard({
           background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent 40%)`,
         }}
       />
+
+      {/* Laser Border Beam on hover */}
+      {opacity > 0 && <BorderBeam size={250} duration={8} delay={0} colorFrom="#3b82f6" colorTo="#8b5cf6" />}
 
       {/* Top subtle highlight border */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-glass-border to-transparent z-20" />
