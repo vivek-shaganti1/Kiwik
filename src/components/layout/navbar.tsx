@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Command, Search, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeSwitcher } from './theme-switcher';
+import { useThemeStore } from '@/stores/theme-store';
 import { useSiteCMSStore } from '@/stores/site-cms-store';
 
 export function Navbar() {
@@ -16,6 +17,7 @@ export function Navbar() {
   const pathname = usePathname();
 
   const navCMS = useSiteCMSStore((state) => state.cms.navigation);
+  const { mode } = useThemeStore();
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -62,17 +64,10 @@ export function Navbar() {
             transition={{ duration: 0.25 }}
             className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#0A0C10]/[0.04] dark:bg-white/[0.06] border border-black/10 dark:border-white/[0.12] shadow-2xs flex items-center justify-center p-1.5 group-hover:border-blue-500/40 transition-all"
           >
-            {/* Light Mode Logo */}
             <img 
-              src={navCMS.logoUrl || "/logo.png"} 
+              src={mode === 'dark' ? '/logo-dark.png' : (navCMS.logoUrl || '/logo.png')} 
               alt="Kiwik Logo" 
-              className="w-5 h-5 sm:w-6 sm:h-6 object-contain drop-shadow-2xs group-hover:scale-105 transition-transform dark:hidden" 
-            />
-            {/* Dark Mode Logo (White Logo) */}
-            <img 
-              src="/logo-dark.png" 
-              alt="Kiwik Logo" 
-              className="w-5 h-5 sm:w-6 sm:h-6 object-contain drop-shadow-2xs group-hover:scale-105 transition-transform hidden dark:block" 
+              className="w-5 h-5 sm:w-6 sm:h-6 object-contain drop-shadow-2xs group-hover:scale-105 transition-transform" 
             />
           </motion.div>
 
