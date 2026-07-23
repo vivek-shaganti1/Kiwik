@@ -9,6 +9,8 @@ import { ProjectCard } from "@/components/projects/project-card";
 import { ProjectStatus, ProjectCategory, SortMode } from "@/types";
 import { cn } from "@/lib/utils";
 
+import { MovableCardSlider } from "@/components/Hero/movable-card-slider";
+
 type LayoutMode = "grid" | "rows" | "timeline";
 
 export default function ProjectsPage() {
@@ -52,13 +54,13 @@ export default function ProjectsPage() {
     <div className="min-h-screen pt-24 pb-20 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto select-none">
       
       {/* ─────────────────────────────────────────────────────────────
-          FEATURED PRODUCTS SHOWCASE HEADER (Matching Reference Screenshot)
+          FEATURED PRODUCTS SHOWCASE HEADER
          ───────────────────────────────────────────────────────────── */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="text-center max-w-3xl mx-auto mb-12 space-y-3"
+        className="text-center max-w-3xl mx-auto mb-6 space-y-3"
       >
         <span className="text-xs font-mono font-bold uppercase tracking-[0.2em] text-[#52525B] dark:text-[#A1A1AA]">
           FEATURED PRODUCTS
@@ -70,6 +72,13 @@ export default function ProjectsPage() {
           Explore world-class autonomous systems, managed cloud platforms, payment engines, and developer infrastructure powered by Kiwik.
         </p>
       </motion.div>
+
+      {/* ─────────────────────────────────────────────────────────────
+          MOVABLE 3D MODEL STREAM CAROUSEL SLIDER
+         ───────────────────────────────────────────────────────────── */}
+      <div className="mb-12 rounded-3xl bg-[#0A0B10] p-4 sm:p-6 border border-white/10 shadow-2xl">
+        <MovableCardSlider />
+      </div>
       
       {/* ─────────────────────────────────────────────────────────────
           FLOATING CONTROLS & SEARCH BAR
