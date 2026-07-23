@@ -44,6 +44,9 @@ export const metadata: Metadata = {
   },
 };
 
+import { SmoothScrollProvider } from "@/components/effects/smooth-scroll-provider";
+import { PageEntrance } from "@/components/effects/page-entrance";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -60,12 +63,16 @@ export default function RootLayout({
         }}
       >
         <ThemeProvider>
-          <IntroSplash />
-          <CursorGlow />
-          <Navbar />
-          <CommandPalette />
-          <main className="flex-1 pt-[72px] overflow-x-hidden w-full max-w-full">{children}</main>
-          <Footer />
+          <SmoothScrollProvider>
+            <PageEntrance>
+              <IntroSplash />
+              <CursorGlow />
+              <Navbar />
+              <CommandPalette />
+              <main className="flex-1 pt-[72px] overflow-x-hidden w-full max-w-full">{children}</main>
+              <Footer />
+            </PageEntrance>
+          </SmoothScrollProvider>
         </ThemeProvider>
       </body>
     </html>
