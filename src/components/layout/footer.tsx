@@ -120,11 +120,11 @@ export function Footer() {
           </form>
         </div>
 
-        {/* Main Sitemap Grid (xl:grid-cols-7 resolves column wrapping) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-10 xl:gap-6 pb-14 border-b border-slate-300/40 dark:border-white/10">
+        {/* Main Sitemap Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 lg:grid-cols-12 gap-8 lg:gap-6 pb-14 border-b border-slate-300/40 dark:border-white/10 overflow-hidden">
           
-          {/* Brand block (Col 1 & Col 2 span) */}
-          <div className="md:col-span-3 xl:col-span-2 space-y-5 text-left pr-4">
+          {/* Brand block */}
+          <div className="sm:col-span-2 md:col-span-6 lg:col-span-3 space-y-4 text-left pr-0 lg:pr-4">
             <div className="flex items-center gap-2">
               <span className="text-lg font-serif font-bold text-slate-800 dark:text-white tracking-tight">Kiwik.1</span>
             </div>
@@ -137,7 +137,7 @@ export function Footer() {
             </div>
 
             {/* Social Icons row */}
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex items-center gap-2.5 pt-2 flex-wrap">
               <Link href="https://github.com/shagantivivekgoud" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
                 <GithubIcon className="w-4 h-4" />
               </Link>
@@ -157,7 +157,7 @@ export function Footer() {
           </div>
 
           {/* Product links list */}
-          <div className="text-left space-y-3.5 col-span-1">
+          <div className="col-span-1 sm:col-span-1 md:col-span-3 lg:col-span-2 text-left space-y-3">
             <h5 className="text-[11px] font-mono tracking-widest text-slate-900 dark:text-white uppercase font-bold">Product</h5>
             <ul className="space-y-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
               <li><Link href="/projects" className="hover:text-slate-900 dark:hover:text-white transition-colors">Projects</Link></li>
@@ -170,7 +170,7 @@ export function Footer() {
           </div>
 
           {/* Resources links list */}
-          <div className="text-left space-y-3.5 col-span-1">
+          <div className="col-span-1 sm:col-span-1 md:col-span-3 lg:col-span-2 text-left space-y-3">
             <h5 className="text-[11px] font-mono tracking-widest text-slate-900 dark:text-white uppercase font-bold">Resources</h5>
             <ul className="space-y-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
               <li><span className="opacity-45 cursor-not-allowed text-slate-400">Guides</span></li>
@@ -183,7 +183,7 @@ export function Footer() {
           </div>
 
           {/* Company links list */}
-          <div className="text-left space-y-3.5 col-span-1">
+          <div className="col-span-1 sm:col-span-1 md:col-span-3 lg:col-span-2 text-left space-y-3">
             <h5 className="text-[11px] font-mono tracking-widest text-slate-900 dark:text-white uppercase font-bold">Company</h5>
             <ul className="space-y-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
               <li><span className="opacity-45 cursor-not-allowed text-slate-400">About Kiwik</span></li>
@@ -195,28 +195,15 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Legal links list */}
-          <div className="text-left space-y-3.5 col-span-1">
-            <h5 className="text-[11px] font-mono tracking-widest text-slate-900 dark:text-white uppercase font-bold">Legal</h5>
-            <ul className="space-y-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Privacy Policy</span></li>
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Terms of Service</span></li>
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Cookie Policy</span></li>
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Security</span></li>
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Licenses</span></li>
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Compliance</span></li>
-            </ul>
-          </div>
-
           {/* Get in Touch Card */}
-          <div className="p-5 rounded-2xl bg-neutral-200/40 dark:bg-white/5 border border-slate-300/50 dark:border-white/10 flex flex-col gap-4 text-left min-w-[245px] backdrop-blur-xl md:col-span-3 xl:col-span-1">
+          <div className="col-span-1 sm:col-span-2 md:col-span-6 lg:col-span-3 p-5 rounded-2xl bg-neutral-200/40 dark:bg-white/5 border border-slate-300/50 dark:border-white/10 flex flex-col gap-4 text-left backdrop-blur-xl w-full max-w-full">
             <h5 className="text-[11px] font-mono tracking-widest text-slate-900 dark:text-white uppercase font-bold">Get in Touch</h5>
             
             <div className="space-y-3.5">
               <div className="flex gap-2.5 items-start">
                 <Mail className="w-4 h-4 text-indigo-500 dark:text-indigo-400 mt-0.5 shrink-0" />
                 <div>
-                  <a href="mailto:hello@kiwik.dev" className="text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors">hello@kiwik.dev</a>
+                  <a href="mailto:hello@kiwik.dev" className="text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors break-all">hello@kiwik.dev</a>
                   <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-semibold">We usually reply within 24 hours</p>
                 </div>
               </div>

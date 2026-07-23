@@ -41,7 +41,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className="antialiased min-h-screen flex flex-col"
+        className="antialiased min-h-screen flex flex-col overflow-x-hidden w-full max-w-full"
         style={{
           fontFamily: "var(--font-sans)",
           background: "var(--bg-primary)",
@@ -53,7 +53,7 @@ export default function RootLayout({
           <CursorGlow />
           <Navbar />
           <CommandPalette />
-          <main className="flex-1 pt-[72px]">{children}</main>
+          <main className="flex-1 pt-[72px] overflow-x-hidden w-full max-w-full">{children}</main>
           <Footer />
         </ThemeProvider>
       </body>
