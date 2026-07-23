@@ -42,48 +42,48 @@ export function Navbar() {
   return (
     <div className="fixed top-3 inset-x-0 z-50 flex justify-center px-3 sm:px-6 pointer-events-none">
       <motion.header
-        initial={{ y: -30, opacity: 0 }}
+        initial={{ y: -25, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className={cn(
-          'pointer-events-auto w-[92%] max-w-[1650px] h-[68px] sm:h-[72px] rounded-full transition-all duration-500 border flex items-center justify-between px-4 sm:px-6 relative select-none',
+          'pointer-events-auto w-[92%] max-w-[1500px] h-[54px] sm:h-[58px] rounded-full transition-all duration-400 border flex items-center justify-between px-3 sm:px-5 relative select-none',
           scrolled 
-            ? 'scale-[0.99] bg-white/95 dark:bg-[#07080B]/95 backdrop-blur-[28px] backdrop-saturate-[180%] border-black/[0.08] dark:border-white/15 shadow-[0_25px_70px_rgba(0,0,0,0.1)] dark:shadow-[0_25px_70px_rgba(0,0,0,0.7)]' 
-            : 'bg-white/95 dark:bg-[#07080B]/95 backdrop-blur-[24px] backdrop-saturate-[180%] border-black/[0.06] dark:border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.06)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)]'
+            ? 'scale-[0.99] bg-white/95 dark:bg-[#07080B]/95 backdrop-blur-[24px] backdrop-saturate-[180%] border-black/[0.08] dark:border-white/15 shadow-[0_16px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.7)]' 
+            : 'bg-white/95 dark:bg-[#07080B]/95 backdrop-blur-[20px] backdrop-saturate-[180%] border-black/[0.06] dark:border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.05)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.5)]'
         )}
       >
         {/* ─────────────────────────────────────────────────────────────
-            LUXURY BRANDING SECTION (52x52px Glass Container + 42px Editorial Wordmark "Kiwik")
+            SLEEK COMPACT BRANDING SECTION ("Kiwik")
            ───────────────────────────────────────────────────────────── */}
-        <Link href="/" className="flex items-center gap-[18px] group relative z-10">
+        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group relative z-10">
           <motion.div
             whileHover={{ scale: 1.05, rotate: 2 }}
             whileTap={{ scale: 0.95 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="w-[52px] h-[52px] rounded-[18px] bg-[#0A0C10]/[0.04] dark:bg-white/[0.06] border border-black/10 dark:border-white/[0.12] shadow-[0_2px_10px_rgba(0,0,0,0.04)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-center p-2.5 group-hover:border-blue-500/40 group-hover:shadow-md transition-all"
+            transition={{ duration: 0.25 }}
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#0A0C10]/[0.04] dark:bg-white/[0.06] border border-black/10 dark:border-white/[0.12] shadow-2xs flex items-center justify-center p-1.5 group-hover:border-blue-500/40 transition-all"
           >
             <img 
               src={navCMS.logoUrl || "/logo.png"} 
               alt="Kiwik Logo" 
-              className="w-[36px] h-[36px] object-contain drop-shadow-sm group-hover:scale-105 transition-transform" 
+              className="w-5 h-5 sm:w-6 sm:h-6 object-contain drop-shadow-2xs group-hover:scale-105 transition-transform" 
             />
           </motion.div>
 
           <motion.span
-            whileHover={{ x: 2 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="text-[30px] sm:text-[36px] md:text-[42px] font-serif font-bold text-[#111111] dark:text-white tracking-[-0.04em] leading-none select-none"
+            whileHover={{ x: 1.5 }}
+            transition={{ duration: 0.25 }}
+            className="text-xl sm:text-2xl font-serif font-bold text-[#111111] dark:text-white tracking-[-0.03em] leading-none select-none"
           >
             {(navCMS.logoText || "Kiwik").replace(/\.1$/, "")}
           </motion.span>
         </Link>
 
         {/* ─────────────────────────────────────────────────────────────
-            CENTER NAVIGATION LINKS (Inter 500, 15px, 48px Spacing)
+            CENTER NAVIGATION LINKS (Sleek Compact Inter Fonts)
            ───────────────────────────────────────────────────────────── */}
         <nav 
           onMouseLeave={() => setHoveredIndex(null)}
-          className="hidden xl:flex items-center gap-8 lg:gap-10 z-10 px-4 flex-1 justify-center max-w-2xl mx-auto relative"
+          className="hidden xl:flex items-center gap-5 lg:gap-7 z-10 px-2 flex-1 justify-center max-w-xl mx-auto relative"
         >
           {navItems.map((item, idx) => {
             const normalizedHref = item.href.startsWith('#')
@@ -97,7 +97,7 @@ export function Navbar() {
             return (
               <motion.div
                 key={item.id || item.href}
-                whileHover={{ y: -2 }}
+                whileHover={{ y: -1 }}
                 onMouseEnter={() => setHoveredIndex(idx)}
                 className="relative"
               >
@@ -105,17 +105,17 @@ export function Navbar() {
                   href={normalizedHref}
                   onClick={(e) => handleNavClick(e, item.href)}
                   className={cn(
-                    "relative text-[15px] font-medium font-sans px-3 py-1.5 transition-colors duration-200 flex items-center gap-1.5 whitespace-nowrap select-none",
+                    "relative text-xs sm:text-[13px] font-medium font-sans px-2.5 py-1 transition-colors duration-200 flex items-center gap-1.5 whitespace-nowrap select-none",
                     isActive 
-                      ? "text-[#111111] dark:text-white font-semibold" 
-                      : "text-[#444444] dark:text-neutral-300 hover:text-[#111111] dark:hover:text-white"
+                      ? "text-[#111111] dark:text-white font-bold" 
+                      : "text-[#555555] dark:text-neutral-300 hover:text-[#111111] dark:hover:text-white"
                   )}
                 >
-                  {/* Sliding Rounded Glass Hover Highlight */}
+                  {/* Sliding Glass Hover Pill */}
                   {hoveredIndex === idx && (
                     <motion.span
                       layoutId="hoverNavPill"
-                      className="absolute inset-0 bg-neutral-200/60 dark:bg-white/10 rounded-full z-[-1] border border-black/5 dark:border-white/10 shadow-sm"
+                      className="absolute inset-0 bg-neutral-200/60 dark:bg-white/10 rounded-full z-[-1] border border-black/5 dark:border-white/10 shadow-2xs"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
@@ -123,11 +123,11 @@ export function Navbar() {
                     />
                   )}
 
-                  {/* Active Page Tiny Glowing Dot Indicator */}
+                  {/* Active Page Glowing Dot */}
                   {isActive && (
                     <motion.span
                       layoutId="activeNavIndicator"
-                      className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]"
+                      className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.8)]"
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -143,22 +143,22 @@ export function Navbar() {
         </nav>
 
         {/* ─────────────────────────────────────────────────────────────
-            RIGHT SIDE: SEARCH CAPSULE & PRIMARY "ASK KIWIK AI" CTA
+            RIGHT SIDE: COMPACT SEARCH & PRIMARY "ASK KIWIK AI" CTA
            ───────────────────────────────────────────────────────────── */}
-        <div className="hidden md:flex items-center gap-3 relative z-10 flex-shrink-0">
+        <div className="hidden md:flex items-center gap-2.5 relative z-10 flex-shrink-0">
           
-          {/* Merged Search Capsule (Expands on Hover/Focus 200px -> 240px) */}
+          {/* Merged Search Capsule (160px -> 190px) */}
           <motion.button 
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => window.dispatchEvent(new CustomEvent("toggle-command-palette"))}
-            className="w-[180px] lg:w-[200px] hover:w-[240px] focus:w-[240px] transition-all duration-300 h-10 px-3.5 rounded-full bg-neutral-100/90 dark:bg-white/10 border border-black/5 dark:border-white/10 flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white group cursor-pointer shadow-inner"
+            className="w-[150px] lg:w-[170px] hover:w-[190px] focus:w-[190px] transition-all duration-300 h-8 px-3 rounded-full bg-neutral-100/90 dark:bg-white/10 border border-black/5 dark:border-white/10 flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white group cursor-pointer shadow-2xs"
           >
-            <div className="flex items-center gap-2">
-              <Search className="w-3.5 h-3.5 text-neutral-400 group-hover:text-blue-500 transition-colors" />
-              <span className="font-sans font-medium text-[13px]">Search projects...</span>
+            <div className="flex items-center gap-1.5">
+              <Search className="w-3 h-3 text-neutral-400 group-hover:text-blue-500 transition-colors" />
+              <span className="font-sans font-medium text-[11.5px]">Search...</span>
             </div>
-            <kbd className="hidden sm:flex items-center gap-0.5 font-sans text-[10px] font-bold bg-white dark:bg-white/10 px-1.5 py-0.5 rounded-md border border-black/5 dark:border-white/10 text-neutral-500 dark:text-neutral-300 shadow-2xs">
+            <kbd className="hidden sm:flex items-center gap-0.5 font-sans text-[9px] font-bold bg-white dark:bg-white/10 px-1 py-0.5 rounded border border-black/5 dark:border-white/10 text-neutral-500 dark:text-neutral-300">
               <Command className="w-2.5 h-2.5" />K
             </kbd>
           </motion.button>
@@ -166,19 +166,19 @@ export function Navbar() {
           {/* Theme Switcher Button */}
           <ThemeSwitcher />
 
-          {/* Primary CTA Button: Ask Kiwik AI */}
+          {/* Compact Primary CTA Button: Ask Kiwik AI */}
           {navCMS.ctaButtonVisible !== false && (
             <motion.div 
-              whileHover={{ y: -2, scale: 1.03 }} 
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              whileHover={{ y: -1, scale: 1.02 }} 
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.2 }}
             >
               <Link
                 href={navCMS.ctaButtonHref || "#ai"}
                 onClick={(e) => handleNavClick(e, navCMS.ctaButtonHref || "#ai")}
-                className="h-[46px] px-6 rounded-full bg-gradient-to-b from-white to-neutral-100 dark:bg-gradient-to-r dark:from-blue-600 dark:to-indigo-600 border border-black/10 dark:border-white/20 text-[#111111] dark:text-white text-xs font-bold font-sans flex items-center gap-2 transition-all shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(59,130,246,0.35)] hover:shadow-blue-500/20"
+                className="h-[36px] px-4 rounded-full bg-gradient-to-b from-white to-neutral-100 dark:bg-gradient-to-r dark:from-blue-600 dark:to-indigo-600 border border-black/10 dark:border-white/20 text-[#111111] dark:text-white text-xs font-bold font-sans flex items-center gap-1.5 transition-all shadow-sm hover:shadow-blue-500/20"
               >
-                <Sparkles className="w-3.5 h-3.5 text-blue-500 dark:text-blue-200 animate-pulse" />
+                <Sparkles className="w-3 h-3 text-blue-500 dark:text-blue-200 animate-pulse" />
                 <span>{navCMS.ctaButtonText || "Ask Kiwik AI"}</span>
               </Link>
             </motion.div>
@@ -188,10 +188,10 @@ export function Navbar() {
         {/* Mobile Hamburger Drawer Trigger */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="xl:hidden p-2.5 rounded-full hover:bg-neutral-200/50 dark:hover:bg-white/10 transition-colors relative z-10 cursor-pointer text-neutral-800 dark:text-white"
+          className="xl:hidden p-2 rounded-full hover:bg-neutral-200/50 dark:hover:bg-white/10 transition-colors relative z-10 cursor-pointer text-neutral-800 dark:text-white"
           aria-label="Toggle Navigation Drawer"
         >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
 
         {/* Mobile Menu Drawer */}
@@ -201,7 +201,7 @@ export function Navbar() {
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="absolute top-full inset-x-0 mt-3 p-5 rounded-3xl bg-white/95 dark:bg-[#0A0C12]/95 border border-black/10 dark:border-white/15 backdrop-blur-2xl shadow-2xl flex flex-col gap-2 xl:hidden overflow-hidden z-50"
+              className="absolute top-full inset-x-0 mt-3 p-4 rounded-3xl bg-white/95 dark:bg-[#07080B]/95 border border-black/10 dark:border-white/15 backdrop-blur-2xl shadow-2xl flex flex-col gap-1.5 xl:hidden overflow-hidden z-50"
             >
               {navItems.map((item) => {
                 const normalizedHref = item.href.startsWith('#')
@@ -216,10 +216,10 @@ export function Navbar() {
                       setMobileMenuOpen(false);
                       handleNavClick(e, item.href);
                     }}
-                    className="px-4 py-3 rounded-2xl hover:bg-neutral-100 dark:hover:bg-white/10 text-sm font-bold text-neutral-900 dark:text-white flex items-center justify-between transition-colors"
+                    className="px-4 py-2.5 rounded-2xl hover:bg-neutral-100 dark:hover:bg-white/10 text-xs font-bold text-neutral-900 dark:text-white flex items-center justify-between transition-colors"
                   >
                     <span>{item.label}</span>
-                    {item.badge && <span className="text-[10px] font-mono font-bold text-blue-500 bg-blue-500/10 px-2.5 py-0.5 rounded-full">{item.badge}</span>}
+                    {item.badge && <span className="text-[9px] font-mono font-bold text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded-full">{item.badge}</span>}
                   </Link>
                 );
               })}
