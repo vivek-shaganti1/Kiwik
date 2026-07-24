@@ -799,14 +799,48 @@ export default function AdminPage() {
               {/* 3. PROMPT BAR EDITOR */}
               {activePage === "home" && homeSection === "prompt-bar" && (
                 <GlassCard className="p-6 space-y-5 text-left">
-                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                    <Terminal className="w-4 h-4 text-accent-blue" /> Hero Prompt Bar Typewriter Suggestions
-                  </h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                      <Terminal className="w-4 h-4 text-accent-blue" /> Hero Prompt Bar Typewriter Suggestions ({(cms.hero.rotatingWords || []).length})
+                    </h3>
+                    <button
+                      onClick={() => {
+                        const newWord = prompt("Enter new prompt suggestion:", "Design an autonomous workflow...");
+                        if (newWord) {
+                          const updated = [...(cms.hero.rotatingWords || []), newWord];
+                          updateHero({ rotatingWords: updated });
+                          showToast(`Added prompt suggestion!`);
+                        }
+                      }}
+                      className="px-4 py-2 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add Prompt
+                    </button>
+                  </div>
                   <div className="space-y-3">
-                    {["Design a product launch campaign...", "Build an autonomous AI agent workflow...", "Generate a 3D glassmorphic dashboard..."].map((prompt, idx) => (
+                    {(cms.hero.rotatingWords || []).map((promptText, idx) => (
                       <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-bg-secondary border border-glass-border">
-                        <input type="text" defaultValue={prompt} className="flex-1 bg-transparent text-xs font-mono font-medium focus:outline-none" />
-                        <button className="text-xs font-bold text-accent-blue">Save</button>
+                        <input
+                          type="text"
+                          value={promptText}
+                          onChange={(e) => {
+                            const updated = [...(cms.hero.rotatingWords || [])];
+                            updated[idx] = e.target.value;
+                            updateHero({ rotatingWords: updated });
+                            showToast("Updated prompt suggestion!");
+                          }}
+                          className="flex-1 bg-transparent text-xs font-mono font-medium text-text-primary focus:outline-none"
+                        />
+                        <button
+                          onClick={() => {
+                            const updated = (cms.hero.rotatingWords || []).filter((_, i) => i !== idx);
+                            updateHero({ rotatingWords: updated });
+                            showToast("Deleted prompt suggestion!");
+                          }}
+                          className="p-1 text-rose-500 hover:bg-rose-500/10 rounded cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -877,7 +911,7 @@ export default function AdminPage() {
                               useSiteCMSStore.getState().updateArchitectureNode(node.id, { subtitle: e.target.value });
                               showToast("Updated subtitle!");
                             }}
-                            className="w-full px-2 py-1 rounded bg-bg-secondary text-xs"
+                            className="w-full px-2 py-1 rounded bg-bg-secondary text-xs text-text-primary"
                           />
                         </div>
                       </GlassCard>
@@ -890,23 +924,66 @@ export default function AdminPage() {
               {activePage === "home" && homeSection === "why-criska" && (
                 <div className="space-y-6 text-left">
                   <GlassCard className="p-6 space-y-4">
-                    <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-emerald-400" /> Why Criska Pills Manager ({(cms.whyCriskaPills || []).length})
-                    </h3>
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-emerald-400" /> Why Criska Pills Manager ({(cms.whyCriskaPills || []).length})
+                      </h3>
+                      <button
+                        onClick={() => {
+                          const text = prompt("Pill Text:", "High Speed Edge");
+                          if (text) {
+                            const updated = [...(cms.whyCriskaPills || []), { id: `w-${Date.now()}`, text, iconName: "Cpu", visible: true, order: (cms.whyCriskaPills || []).length + 1 }];
+                            useSiteCMSStore.setState({ cms: { ...cms, whyCriskaPills: updated } });
+                            showToast(`Added Why Criska pill [${text}]!`);
+                          }
+                        }}
+                        className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold flex items-center gap-1.5 shadow cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" /> Add Pill
+                      </button>
+                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       {(cms.whyCriskaPills || []).map((pill) => (
-                        <div key={pill.id} className="p-3 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-2">
-                          <label className="text-[10px] font-bold text-text-muted block">Pill Text</label>
-                          <input
-                            type="text"
-                            value={pill.text}
-                            onChange={(e) => {
-                              const updated = (cms.whyCriskaPills || []).map((p) => (p.id === pill.id ? { ...p, text: e.target.value } : p));
-                              useSiteCMSStore.setState({ cms: { ...cms, whyCriskaPills: updated } });
-                              showToast("Updated pill text!");
-                            }}
-                            className="w-full px-3 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-bold"
-                          />
+                        <div key={pill.id} className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-3">
+                          <div>
+                            <label className="text-[10px] font-bold text-text-muted block mb-1">Pill Label</label>
+                            <input
+                              type="text"
+                              value={pill.text}
+                              onChange={(e) => {
+                                const updated = (cms.whyCriskaPills || []).map((p) => (p.id === pill.id ? { ...p, text: e.target.value } : p));
+                                useSiteCMSStore.setState({ cms: { ...cms, whyCriskaPills: updated } });
+                                showToast("Updated pill label!");
+                              }}
+                              className="w-full px-3 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-bold text-text-primary"
+                            />
+                          </div>
+
+                          <div className="flex items-center justify-between pt-2 border-t border-divider">
+                            <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-text-secondary">
+                              <input
+                                type="checkbox"
+                                checked={pill.visible !== false}
+                                onChange={(e) => {
+                                  const updated = (cms.whyCriskaPills || []).map((p) => (p.id === pill.id ? { ...p, visible: e.target.checked } : p));
+                                  useSiteCMSStore.setState({ cms: { ...cms, whyCriskaPills: updated } });
+                                  showToast("Toggled pill visibility!");
+                                }}
+                                className="rounded text-accent-blue"
+                              />
+                              Visible on Home
+                            </label>
+                            <button
+                              onClick={() => {
+                                const updated = (cms.whyCriskaPills || []).filter((p) => p.id !== pill.id);
+                                useSiteCMSStore.setState({ cms: { ...cms, whyCriskaPills: updated } });
+                                showToast(`Deleted pill [${pill.text}]`);
+                              }}
+                              className="p-1.5 text-rose-500 hover:bg-rose-500/10 rounded cursor-pointer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -930,11 +1007,11 @@ export default function AdminPage() {
                           useSiteCMSStore.setState({ cms: { ...cms, dashboardShowcase: { ...cms.dashboardShowcase, sectionTitle: e.target.value } } });
                           showToast("Updated section title!");
                         }}
-                        className="w-full px-3 py-2 rounded-xl bg-bg-secondary text-xs font-semibold"
+                        className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-bold text-text-primary"
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-bold text-text-secondary block mb-1">Search Placeholder</label>
+                      <label className="text-xs font-bold text-text-secondary block mb-1">Search Input Placeholder</label>
                       <input
                         type="text"
                         value={cms.dashboardShowcase?.searchPlaceholder || "Search projects, docs..."}
@@ -942,7 +1019,7 @@ export default function AdminPage() {
                           useSiteCMSStore.setState({ cms: { ...cms, dashboardShowcase: { ...cms.dashboardShowcase, searchPlaceholder: e.target.value } } });
                           showToast("Updated search placeholder!");
                         }}
-                        className="w-full px-3 py-2 rounded-xl bg-bg-secondary text-xs font-medium"
+                        className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium text-text-primary"
                       />
                     </div>
                   </div>
@@ -953,15 +1030,67 @@ export default function AdminPage() {
               {activePage === "home" && homeSection === "featured-products" && (
                 <GlassCard className="p-6 space-y-5 text-left">
                   <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                    <Folder className="w-4 h-4 text-indigo-400" /> Featured Products Coverflow Carousel Config
+                    <Folder className="w-4 h-4 text-indigo-400" /> Featured Products Section Config
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {projects.slice(0, 6).map((proj) => (
-                      <div key={proj.id} className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-2">
-                        <div className="text-xs font-bold text-text-primary">{proj.name}</div>
-                        <div className="text-[10px] font-mono text-text-muted">{proj.tagline || proj.description}</div>
-                      </div>
-                    ))}
+                  <div className="space-y-4 pb-4 border-b border-divider">
+                    <div>
+                      <label className="text-xs font-bold text-text-secondary block mb-1">Section Title</label>
+                      <input
+                        type="text"
+                        value={cms.featuredSection?.title || "The Enterprise Operating System"}
+                        onChange={(e) => {
+                          useSiteCMSStore.getState().updateFeaturedSection({ title: e.target.value });
+                          showToast("Updated featured section title!");
+                        }}
+                        className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-bold text-text-primary"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-text-secondary block mb-1">Section Subtitle / Description</label>
+                      <textarea
+                        rows={2}
+                        value={cms.featuredSection?.subtitle || "One featured platform at a time..."}
+                        onChange={(e) => {
+                          useSiteCMSStore.getState().updateFeaturedSection({ subtitle: e.target.value });
+                          showToast("Updated featured section subtitle!");
+                        }}
+                        className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium text-text-primary"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted block">Projects Catalog ({projects.length})</span>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {projects.map((proj) => (
+                        <div key={proj.id} className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-3">
+                          <div>
+                            <label className="text-[10px] font-bold text-text-muted block">Project Name</label>
+                            <input
+                              type="text"
+                              value={proj.name}
+                              onChange={(e) => {
+                                useProjectsStore.getState().updateProject(proj.id, { name: e.target.value });
+                                showToast("Updated project name!");
+                              }}
+                              className="w-full px-3 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-bold text-text-primary"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-bold text-text-muted block">Tagline / Description</label>
+                            <input
+                              type="text"
+                              value={proj.tagline || proj.description}
+                              onChange={(e) => {
+                                useProjectsStore.getState().updateProject(proj.id, { tagline: e.target.value, description: e.target.value });
+                                showToast("Updated tagline!");
+                              }}
+                              className="w-full px-3 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium text-text-primary"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </GlassCard>
               )}
@@ -982,7 +1111,7 @@ export default function AdminPage() {
                           useSiteCMSStore.getState().updateEarthShowcase({ headline: e.target.value });
                           showToast("Updated Earth headline!");
                         }}
-                        className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+                        className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary"
                       />
                     </div>
                     <div>
@@ -994,7 +1123,7 @@ export default function AdminPage() {
                           useSiteCMSStore.getState().updateEarthShowcase({ description: e.target.value });
                           showToast("Updated Earth description!");
                         }}
-                        className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium"
+                        className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium text-text-primary"
                       />
                     </div>
                     <div>
@@ -1006,8 +1135,44 @@ export default function AdminPage() {
                           useSiteCMSStore.getState().updateEarthShowcase({ earthImageUrl: e.target.value });
                           showToast("Updated Earth background image!");
                         }}
-                        className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
+                        className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono text-text-primary"
                       />
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 pt-4 border-t border-divider">
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted block">Telemetry Metric Cards ({(cms.earthShowcase?.stats || []).length})</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                      {(cms.earthShowcase?.stats || []).map((st) => (
+                        <div key={st.id} className="p-4 rounded-xl bg-bg-secondary border border-glass-border space-y-2">
+                          <div>
+                            <label className="text-[10px] font-bold text-text-muted block">Metric Value (e.g. 99.9%)</label>
+                            <input
+                              type="text"
+                              value={st.value}
+                              onChange={(e) => {
+                                const updated = (cms.earthShowcase?.stats || []).map((s) => (s.id === st.id ? { ...s, value: e.target.value } : s));
+                                useSiteCMSStore.getState().updateEarthShowcase({ stats: updated });
+                                showToast("Updated metric value!");
+                              }}
+                              className="w-full px-2 py-1 rounded bg-bg-primary text-xs font-mono font-bold text-text-primary"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-bold text-text-muted block">Metric Label</label>
+                            <input
+                              type="text"
+                              value={st.label}
+                              onChange={(e) => {
+                                const updated = (cms.earthShowcase?.stats || []).map((s) => (s.id === st.id ? { ...s, label: e.target.value } : s));
+                                useSiteCMSStore.getState().updateEarthShowcase({ stats: updated });
+                                showToast("Updated metric label!");
+                              }}
+                              className="w-full px-2 py-1 rounded bg-bg-primary text-xs font-bold text-text-primary"
+                            />
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </GlassCard>
@@ -1016,30 +1181,109 @@ export default function AdminPage() {
               {/* 9. DEVICE SHOWCASE EDITOR */}
               {activePage === "home" && homeSection === "device-showcase" && (
                 <GlassCard className="p-6 space-y-5 text-left">
-                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                    <Smartphone className="w-4 h-4 text-emerald-400" /> Phone Mockup Cards ({(cms.deviceShowcase?.cards || []).length})
-                  </h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                      <Smartphone className="w-4 h-4 text-emerald-400" /> Phone Mockup Cards ({(cms.deviceShowcase?.cards || []).length})
+                    </h3>
+                    <button
+                      onClick={() => {
+                        const name = prompt("Card Owner Name:", "Alex Mercer");
+                        const tag = prompt("Tag / Role:", "Architect");
+                        if (name) {
+                          useSiteCMSStore.getState().addDeviceCard({
+                            id: `card-${Date.now()}`,
+                            name,
+                            role: tag || "Founder",
+                            quote: "Building zero latency edge infrastructure.",
+                            tag: tag || "Founder",
+                            avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+                            frameOverlayUrl: "https://framerusercontent.com/images/H2xOBKfRU2M06U4j9LF5WN8z6pA.png?scale-down-to=2048",
+                            accentColor: "#3B82F6"
+                          });
+                          showToast(`Added Phone Card [${name}]!`);
+                        }
+                      }}
+                      className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add Phone Card
+                    </button>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-text-secondary block mb-1">Top Badge Text</label>
+                    <input
+                      type="text"
+                      value={cms.deviceShowcase?.topBadgeText || "No Credit Card Required"}
+                      onChange={(e) => {
+                        useSiteCMSStore.setState({ cms: { ...cms, deviceShowcase: { ...cms.deviceShowcase, topBadgeText: e.target.value } } });
+                        showToast("Updated top badge text!");
+                      }}
+                      className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-bold text-text-primary"
+                    />
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {(cms.deviceShowcase?.cards || []).map((card) => (
                       <div key={card.id} className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-3">
-                        <input
-                          type="text"
-                          value={card.name}
-                          onChange={(e) => {
-                            useSiteCMSStore.getState().updateDeviceCard(card.id, { name: e.target.value });
-                            showToast("Updated card name!");
-                          }}
-                          className="font-bold text-xs text-text-primary bg-transparent focus:outline-none w-full"
-                        />
-                        <textarea
-                          rows={2}
-                          value={card.quote}
-                          onChange={(e) => {
-                            useSiteCMSStore.getState().updateDeviceCard(card.id, { quote: e.target.value });
-                            showToast("Updated quote!");
-                          }}
-                          className="w-full px-2 py-1 rounded bg-bg-primary text-[11px]"
-                        />
+                        <div className="flex items-center justify-between">
+                          <input
+                            type="text"
+                            value={card.name}
+                            onChange={(e) => {
+                              useSiteCMSStore.getState().updateDeviceCard(card.id, { name: e.target.value });
+                              showToast("Updated card name!");
+                            }}
+                            className="font-bold text-xs text-text-primary bg-transparent focus:outline-none w-full"
+                          />
+                          <button
+                            onClick={() => {
+                              useSiteCMSStore.getState().deleteDeviceCard(card.id);
+                              showToast(`Deleted card [${card.name}]`);
+                            }}
+                            className="p-1 text-rose-500 hover:bg-rose-500/10 rounded cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        <div>
+                          <label className="text-[10px] font-bold text-text-muted block">Tag / Role</label>
+                          <input
+                            type="text"
+                            value={card.tag || card.role || ""}
+                            onChange={(e) => {
+                              useSiteCMSStore.getState().updateDeviceCard(card.id, { tag: e.target.value, role: e.target.value });
+                              showToast("Updated card tag!");
+                            }}
+                            className="w-full px-2 py-1 rounded bg-bg-primary text-xs font-semibold text-text-primary"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-[10px] font-bold text-text-muted block">Quote / Description</label>
+                          <textarea
+                            rows={2}
+                            value={card.quote}
+                            onChange={(e) => {
+                              useSiteCMSStore.getState().updateDeviceCard(card.id, { quote: e.target.value });
+                              showToast("Updated quote!");
+                            }}
+                            className="w-full px-2 py-1 rounded bg-bg-primary text-[11px] text-text-primary"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-[10px] font-bold text-text-muted block">Frame Overlay Image URL</label>
+                          <input
+                            type="text"
+                            value={card.frameOverlayUrl || "https://framerusercontent.com/images/H2xOBKfRU2M06U4j9LF5WN8z6pA.png?scale-down-to=2048"}
+                            onChange={(e) => {
+                              useSiteCMSStore.getState().updateDeviceCard(card.id, { frameOverlayUrl: e.target.value });
+                              showToast("Updated frame overlay URL!");
+                            }}
+                            className="w-full px-2 py-1 rounded bg-bg-primary text-[10px] font-mono text-accent-blue"
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -1049,14 +1293,64 @@ export default function AdminPage() {
               {/* 10. CAPABILITIES EDITOR */}
               {activePage === "home" && homeSection === "capabilities" && (
                 <GlassCard className="p-6 space-y-5 text-left">
-                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                    <Cpu className="w-4 h-4 text-purple-400" /> Capabilities Grid Manager
-                  </h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                      <Cpu className="w-4 h-4 text-purple-400" /> Capabilities Grid Manager ({(cms.capabilities?.items || []).length})
+                    </h3>
+                    <button
+                      onClick={() => {
+                        const title = prompt("Capability Title:", "New Feature");
+                        const desc = prompt("Capability Description:", "Enterprise grade feature.");
+                        if (title) {
+                          const updated = [...(cms.capabilities?.items || []), { id: `cap-${Date.now()}`, title, desc: desc || "", iconName: "Cpu" }];
+                          useSiteCMSStore.getState().updateCapabilities({ items: updated });
+                          showToast(`Added capability [${title}]!`);
+                        }
+                      }}
+                      className="px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add Capability
+                    </button>
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {cms.capabilities.items.map((cap) => (
-                      <div key={cap.id} className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-2">
-                        <div className="text-xs font-bold text-text-primary">{cap.title}</div>
-                        <div className="text-[11px] text-text-secondary">{cap.desc}</div>
+                    {(cms.capabilities?.items || []).map((cap) => (
+                      <div key={cap.id} className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-3">
+                        <div className="flex items-center justify-between">
+                          <input
+                            type="text"
+                            value={cap.title}
+                            onChange={(e) => {
+                              const updated = (cms.capabilities?.items || []).map((c) => (c.id === cap.id ? { ...c, title: e.target.value } : c));
+                              useSiteCMSStore.getState().updateCapabilities({ items: updated });
+                              showToast("Updated title!");
+                            }}
+                            className="w-full font-bold text-xs text-text-primary bg-transparent focus:outline-none"
+                          />
+                          <button
+                            onClick={() => {
+                              const updated = (cms.capabilities?.items || []).filter((c) => c.id !== cap.id);
+                              useSiteCMSStore.getState().updateCapabilities({ items: updated });
+                              showToast(`Deleted capability [${cap.title}]`);
+                            }}
+                            className="p-1 text-rose-500 hover:bg-rose-500/10 rounded cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-text-muted block">Description Copy</label>
+                          <textarea
+                            rows={2}
+                            value={cap.desc}
+                            onChange={(e) => {
+                              const updated = (cms.capabilities?.items || []).map((c) => (c.id === cap.id ? { ...c, desc: e.target.value } : c));
+                              useSiteCMSStore.getState().updateCapabilities({ items: updated });
+                              showToast("Updated description!");
+                            }}
+                            className="w-full px-2.5 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-xs text-text-primary"
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -1066,14 +1360,68 @@ export default function AdminPage() {
               {/* 11. HOW WE WORK EDITOR */}
               {activePage === "home" && homeSection === "how-we-work" && (
                 <GlassCard className="p-6 space-y-5 text-left">
-                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                    <Workflow className="w-4 h-4 text-accent-blue" /> Workflow Timeline Builder
-                  </h3>
-                  <div className="space-y-3">
-                    {cms.howWeWork.steps.map((step) => (
-                      <div key={step.id} className="p-4 rounded-xl bg-bg-secondary border border-glass-border space-y-1">
-                        <div className="text-xs font-bold text-text-primary">Step {step.step}: {step.title}</div>
-                        <div className="text-[11px] text-text-secondary">{step.desc}</div>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                      <Workflow className="w-4 h-4 text-accent-blue" /> Workflow Timeline Steps Builder ({(cms.howWeWork?.steps || []).length})
+                    </h3>
+                    <button
+                      onClick={() => {
+                        const title = prompt("Step Title:", "Automated Testing");
+                        const desc = prompt("Step Description:", "Continuous integration testing.");
+                        if (title) {
+                          const updated = [...(cms.howWeWork?.steps || []), { id: `step-${Date.now()}`, step: String((cms.howWeWork?.steps || []).length + 1), title, desc: desc || "", duration: "Instant", iconName: "Cpu" }];
+                          useSiteCMSStore.getState().updateHowWeWork({ steps: updated });
+                          showToast(`Added workflow step [${title}]!`);
+                        }
+                      }}
+                      className="px-4 py-2 rounded-xl bg-accent-blue text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add Step
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {(cms.howWeWork?.steps || []).map((step) => (
+                      <div key={step.id} className="p-4 rounded-xl bg-bg-secondary border border-glass-border space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 flex-1">
+                            <span className="text-xs font-mono font-bold text-accent-blue">Step #{step.step}</span>
+                            <input
+                              type="text"
+                              value={step.title}
+                              onChange={(e) => {
+                                const updated = (cms.howWeWork?.steps || []).map((s) => (s.id === step.id ? { ...s, title: e.target.value } : s));
+                                useSiteCMSStore.getState().updateHowWeWork({ steps: updated });
+                                showToast("Updated step title!");
+                              }}
+                              className="font-bold text-xs text-text-primary bg-transparent focus:outline-none flex-1"
+                            />
+                          </div>
+                          <button
+                            onClick={() => {
+                              const updated = (cms.howWeWork?.steps || []).filter((s) => s.id !== step.id);
+                              useSiteCMSStore.getState().updateHowWeWork({ steps: updated });
+                              showToast(`Deleted step [${step.title}]`);
+                            }}
+                            className="p-1 text-rose-500 hover:bg-rose-500/10 rounded cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        <div>
+                          <label className="text-[10px] font-bold text-text-muted block">Step Description</label>
+                          <textarea
+                            rows={2}
+                            value={step.desc}
+                            onChange={(e) => {
+                              const updated = (cms.howWeWork?.steps || []).map((s) => (s.id === step.id ? { ...s, desc: e.target.value } : s));
+                              useSiteCMSStore.getState().updateHowWeWork({ steps: updated });
+                              showToast("Updated step description!");
+                            }}
+                            className="w-full px-2.5 py-1.5 rounded-xl bg-bg-primary text-xs text-text-primary"
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -1083,14 +1431,64 @@ export default function AdminPage() {
               {/* 12. TRUST SECTION EDITOR */}
               {activePage === "home" && homeSection === "trust" && (
                 <GlassCard className="p-6 space-y-5 text-left">
-                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400" /> Trust Section Badges & Metrics
-                  </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    {cms.trust.items.map((item) => (
-                      <div key={item.id} className="p-3 rounded-xl bg-bg-secondary border border-glass-border text-center space-y-1">
-                        <div className="text-lg font-bold font-mono text-text-primary">{item.title}</div>
-                        <div className="text-[10px] font-bold text-text-muted">{item.desc}</div>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-emerald-400" /> Trust Section Badges & Metrics ({(cms.trust?.items || []).length})
+                    </h3>
+                    <button
+                      onClick={() => {
+                        const title = prompt("Metric Title / Value:", "100%");
+                        const desc = prompt("Description:", "Production Uptime Guaranteed");
+                        if (title) {
+                          const updated = [...(cms.trust?.items || []), { id: `t-${Date.now()}`, title, desc: desc || "", icon: "Shield" }];
+                          useSiteCMSStore.getState().updateTrust({ items: updated });
+                          showToast(`Added trust metric [${title}]!`);
+                        }
+                      }}
+                      className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add Metric
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    {(cms.trust?.items || []).map((item) => (
+                      <div key={item.id} className="p-4 rounded-xl bg-bg-secondary border border-glass-border space-y-3">
+                        <div className="flex items-center justify-between">
+                          <input
+                            type="text"
+                            value={item.title}
+                            onChange={(e) => {
+                              const updated = (cms.trust?.items || []).map((t) => (t.id === item.id ? { ...t, title: e.target.value } : t));
+                              useSiteCMSStore.getState().updateTrust({ items: updated });
+                              showToast("Updated metric title!");
+                            }}
+                            className="font-bold text-sm font-mono text-text-primary bg-transparent focus:outline-none w-full"
+                          />
+                          <button
+                            onClick={() => {
+                              const updated = (cms.trust?.items || []).filter((t) => t.id !== item.id);
+                              useSiteCMSStore.getState().updateTrust({ items: updated });
+                              showToast(`Deleted trust item [${item.title}]`);
+                            }}
+                            className="p-1 text-rose-500 hover:bg-rose-500/10 rounded cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-text-muted block">Subtitle / Description</label>
+                          <input
+                            type="text"
+                            value={item.desc}
+                            onChange={(e) => {
+                              const updated = (cms.trust?.items || []).map((t) => (t.id === item.id ? { ...t, desc: e.target.value } : t));
+                              useSiteCMSStore.getState().updateTrust({ items: updated });
+                              showToast("Updated metric description!");
+                            }}
+                            className="w-full px-2 py-1 rounded bg-bg-primary text-xs text-text-primary"
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -1103,14 +1501,30 @@ export default function AdminPage() {
                   <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
                     <Mail className="w-4 h-4 text-indigo-400" /> Newsletter Subscription Config
                   </h3>
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <div>
-                      <label className="text-xs font-bold text-text-secondary block mb-1">Headline</label>
-                      <input type="text" defaultValue="Subscribe to Kiwik Releases" className="w-full px-3 py-2 rounded-xl bg-bg-secondary text-xs font-bold" />
+                      <label className="text-xs font-bold text-text-secondary block mb-1">Newsletter Headline</label>
+                      <input
+                        type="text"
+                        value={cms.footer?.newsletterHeadline || "Stay in the Loop"}
+                        onChange={(e) => {
+                          useSiteCMSStore.getState().updateFooter({ newsletterHeadline: e.target.value });
+                          showToast("Updated newsletter headline!");
+                        }}
+                        className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-bold text-text-primary"
+                      />
                     </div>
                     <div>
-                      <label className="text-xs font-bold text-text-secondary block mb-1">CTA Button Text</label>
-                      <input type="text" defaultValue="Subscribe Now" className="w-full px-3 py-2 rounded-xl bg-bg-secondary text-xs font-bold" />
+                      <label className="text-xs font-bold text-text-secondary block mb-1">Newsletter Description Copy</label>
+                      <textarea
+                        rows={2}
+                        value={cms.footer?.newsletterDescription || "Get product updates, launch notes, and insights directly in your inbox."}
+                        onChange={(e) => {
+                          useSiteCMSStore.getState().updateFooter({ newsletterDescription: e.target.value });
+                          showToast("Updated newsletter description!");
+                        }}
+                        className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium text-text-primary"
+                      />
                     </div>
                   </div>
                 </GlassCard>
@@ -1123,12 +1537,38 @@ export default function AdminPage() {
                     <Layers className="w-4 h-4 text-accent-blue" /> Footer Layout & Column Links
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    {cms.footer.columns.map((col) => (
-                      <div key={col.id} className="space-y-2">
-                        <div className="text-xs font-bold text-text-primary border-b border-divider pb-1">{col.title}</div>
-                        {col.links.map((lnk) => (
-                          <div key={lnk.id} className="text-[11px] text-text-secondary font-mono">{lnk.label} → {lnk.href}</div>
-                        ))}
+                    {(cms.footer?.columns || []).map((col) => (
+                      <div key={col.id} className="p-4 rounded-xl bg-bg-secondary border border-glass-border space-y-3">
+                        <input
+                          type="text"
+                          value={col.title}
+                          onChange={(e) => {
+                            const updated = (cms.footer?.columns || []).map((c) => (c.id === col.id ? { ...c, title: e.target.value } : c));
+                            useSiteCMSStore.getState().updateFooter({ columns: updated });
+                            showToast("Updated column title!");
+                          }}
+                          className="text-xs font-bold text-text-primary bg-transparent border-b border-divider pb-1 w-full focus:outline-none"
+                        />
+                        <div className="space-y-2">
+                          {col.links.map((lnk) => (
+                            <div key={lnk.id} className="space-y-1">
+                              <input
+                                type="text"
+                                value={lnk.label}
+                                onChange={(e) => {
+                                  const updatedCols = (cms.footer?.columns || []).map((c) => {
+                                    if (c.id !== col.id) return c;
+                                    const updatedLinks = c.links.map((l) => (l.id === lnk.id ? { ...l, label: e.target.value } : l));
+                                    return { ...c, links: updatedLinks };
+                                  });
+                                  useSiteCMSStore.getState().updateFooter({ columns: updatedCols });
+                                  showToast("Updated link label!");
+                                }}
+                                className="w-full px-2 py-1 rounded bg-bg-primary text-[11px] font-semibold text-text-primary"
+                              />
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     ))}
                   </div>
