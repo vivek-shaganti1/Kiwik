@@ -246,8 +246,62 @@ export default function AdminPage() {
           </span>
         </div>
 
-        {/* Global Action Tools */}
+        {/* Device Switcher & Mode Tools */}
         <div className="flex items-center gap-3">
+          {/* Viewport Frame Toggle */}
+          <button
+            onClick={() => {
+              if (mainTab === ("live-preview" as any)) {
+                setMainTab("pages");
+              } else {
+                setMainTab("live-preview" as any);
+              }
+            }}
+            className={cn(
+              "px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border",
+              mainTab === ("live-preview" as any)
+                ? "bg-accent-blue text-white border-transparent shadow-md"
+                : "bg-bg-secondary border-glass-border text-text-primary hover:bg-bg-primary"
+            )}
+          >
+            <Monitor className="w-4 h-4" />
+            <span>{mainTab === ("live-preview" as any) ? "Back to Studio" : "Live Device Frame"}</span>
+          </button>
+
+          {/* Device Switcher Segment */}
+          <div className="flex items-center p-1 rounded-xl bg-bg-secondary border border-glass-border">
+            <button
+              onClick={() => setPreviewDevice("desktop")}
+              className={cn(
+                "px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer",
+                previewDevice === "desktop" ? "bg-accent-blue text-white shadow-sm" : "text-text-secondary hover:text-text-primary"
+              )}
+              title="Desktop / Laptop View (1280px)"
+            >
+              <Laptop className="w-3.5 h-3.5" /> Laptop
+            </button>
+            <button
+              onClick={() => setPreviewDevice("tablet")}
+              className={cn(
+                "px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer",
+                previewDevice === "tablet" ? "bg-accent-blue text-white shadow-sm" : "text-text-secondary hover:text-text-primary"
+              )}
+              title="Tablet View (768px)"
+            >
+              <Tablet className="w-3.5 h-3.5" /> Tablet
+            </button>
+            <button
+              onClick={() => setPreviewDevice("mobile")}
+              className={cn(
+                "px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer",
+                previewDevice === "mobile" ? "bg-accent-blue text-white shadow-sm" : "text-text-secondary hover:text-text-primary"
+              )}
+              title="Mobile Smartphone View (375px)"
+            >
+              <Smartphone className="w-3.5 h-3.5" /> Mobile
+            </button>
+          </div>
+
           <button
             onClick={() => setPreviewMode(previewMode === "dark" ? "light" : "dark")}
             className="p-2 rounded-xl bg-bg-secondary border border-glass-border text-text-primary text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
@@ -435,6 +489,59 @@ export default function AdminPage() {
         {/* RIGHT MAIN CANVAS */}
         <main className="flex-1 p-6 overflow-y-auto space-y-6">
           
+          {/* LIVE DEVICE PREVIEW TAB */}
+          {mainTab === ("live-preview" as any) && (
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="flex items-center justify-between w-full p-4 rounded-2xl bg-glass-bg border border-glass-border">
+                <div className="flex items-center gap-3">
+                  <Monitor className="w-5 h-5 text-accent-blue" />
+                  <div className="text-left">
+                    <h3 className="text-sm font-serif font-bold text-text-primary">Live Responsive Device Canvas</h3>
+                    <p className="text-[11px] text-text-secondary">Simulating Kiwik Public Site in real-time viewports.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono font-bold text-accent-blue">
+                    Viewport: {previewDevice === "desktop" ? "Laptop / Desktop (1280px)" : previewDevice === "tablet" ? "iPad / Tablet (768px)" : "iPhone / Mobile (375px)"}
+                  </span>
+                </div>
+              </div>
+
+              {/* DEVICE FRAME CONTAINER */}
+              <div className="w-full flex justify-center py-4 overflow-x-auto">
+                <div
+                  className={cn(
+                    "transition-all duration-300 rounded-2xl bg-black border-4 border-neutral-800 shadow-2xl overflow-hidden relative flex flex-col",
+                    previewDevice === "desktop" && "w-full max-w-[1280px] h-[780px]",
+                    previewDevice === "tablet" && "w-[768px] h-[850px] rounded-[32px] border-[12px] border-neutral-800",
+                    previewDevice === "mobile" && "w-[375px] h-[720px] rounded-[40px] border-[14px] border-neutral-800"
+                  )}
+                >
+                  {/* macOS / Mobile Device Header Bar */}
+                  <div className="h-8 bg-neutral-900 border-b border-neutral-800 px-4 flex items-center justify-between shrink-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+                    </div>
+                    <div className="px-3 py-0.5 rounded-full bg-black/60 text-[10px] font-mono text-zinc-400 border border-white/10">
+                      https://kiwik-xi.vercel.app/
+                    </div>
+                    <div className="w-8" />
+                  </div>
+
+                  {/* REAL-TIME PUBLIC SITE IFRAME */}
+                  <iframe
+                    src="/"
+                    className="w-full flex-1 border-0 bg-bg-primary"
+                    title="Kiwik Live Responsive Site Preview"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* DASHBOARD TAB */}
           {mainTab === "dashboard" && (
             <div className="space-y-6 text-left">
