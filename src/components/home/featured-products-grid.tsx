@@ -27,10 +27,10 @@ export function FeaturedProductsGrid() {
         <span className="text-xs font-mono font-bold uppercase tracking-[0.2em] text-neutral-500 dark:text-[#A1A1AA]">
           FEATURED PRODUCTS
         </span>
-        <h2 className="text-4xl sm:text-5xl md:text-6xl font-serif font-medium text-neutral-900 dark:text-white tracking-tight leading-[1.05]">
+        <h2 className="text-4xl sm:text-5xl md:text-6xl font-serif font-medium text-neutral-900 dark:text-white tracking-wide leading-snug py-1">
           {title}
         </h2>
-        <p className="text-xs sm:text-sm text-neutral-600 dark:text-[#A1A1AA] font-sans font-medium max-w-xl mx-auto leading-relaxed">
+        <p className="text-sm sm:text-base text-neutral-600 dark:text-[#A1A1AA] font-sans font-medium max-w-2xl mx-auto leading-relaxed tracking-wide">
           {subtitle}
         </p>
       </motion.div>

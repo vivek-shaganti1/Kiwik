@@ -70,7 +70,7 @@
   --border-radius-xl: 32px;
 
   /* Typography */
-  --font-sans: "Playfair Display", Georgia, Cambria, serif;
+  --font-sans: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", monospace;
   --font-serif: "Playfair Display", Georgia, Cambria, serif;
 }
@@ -165,7 +165,19 @@ body {
   color: var(--text-primary);
   overflow-x: hidden;
   min-height: 100vh;
+  letter-spacing: 0.025em;
+  line-height: 1.7;
   transition: background-color 0.4s ease, color 0.3s ease;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+}
+
+p {
+  line-height: 1.75;
+  letter-spacing: 0.02em;
 }
 
 ::selection {

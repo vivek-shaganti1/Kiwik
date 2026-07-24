@@ -75,7 +75,7 @@ export function EcosystemPipeline() {
         <span className="text-xs font-mono font-bold text-accent-blue uppercase tracking-widest">
           THE CRISKA ECOSYSTEM
         </span>
-        <h2 className="text-3xl sm:text-4xl font-serif font-bold text-text-primary tracking-tight">
+        <h2 className="text-3xl sm:text-4xl font-serif font-bold text-text-primary tracking-wide leading-snug">
           Unified Operating Architecture
         </h2>
       </div>
