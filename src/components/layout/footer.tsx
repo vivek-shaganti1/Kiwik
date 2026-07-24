@@ -79,21 +79,21 @@ export function Footer() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      className="w-full mt-20 pt-16 pb-8 px-4 sm:px-6 md:px-8 border-t border-slate-300/40 dark:border-white/10 bg-[#f2f5f9]/90 dark:bg-[#06070a]/95 text-slate-600 dark:text-slate-300 relative z-20 backdrop-blur-md transition-colors"
+      className="w-full mt-20 pt-16 pb-8 px-4 sm:px-6 md:px-8 border-t border-neutral-200/80 dark:border-white/10 bg-white dark:bg-[#08090C] text-neutral-700 dark:text-neutral-300 relative z-20 transition-colors"
     >
       <div className="max-w-[1400px] mx-auto">
         
         {/* Newsletter Banner */}
-        <div className="p-6 md:p-8 rounded-2xl bg-neutral-200/50 dark:bg-white/5 border border-slate-300/40 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 mb-16 shadow-inner relative overflow-hidden backdrop-blur-2xl">
+        <div className="p-6 md:p-8 rounded-2xl bg-slate-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 mb-16 shadow-sm relative overflow-hidden">
           <div className="flex items-center gap-4 text-left mr-auto">
-            <div className="p-3.5 rounded-2xl bg-white/5 border border-slate-300/40 dark:border-white/10 text-accent-blue shrink-0">
-              <Mail className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
+            <div className="p-3.5 rounded-2xl bg-white dark:bg-white/5 border border-neutral-200/80 dark:border-white/10 text-indigo-600 dark:text-indigo-400 shrink-0 shadow-xs">
+              <Mail className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-base font-bold text-slate-800 dark:text-white tracking-tight">
+              <h4 className="text-base font-bold text-neutral-900 dark:text-white tracking-wide">
                 {footerCMS.newsletterHeadline || "Stay in the Loop"}
               </h4>
-              <p className="text-slate-500 dark:text-slate-400 text-xs mt-1 max-w-md font-semibold">
+              <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1 max-w-md font-medium leading-relaxed">
                 {footerCMS.newsletterDescription || "Get product updates, launch notes, and insights directly in your inbox."}
               </p>
             </div>
@@ -101,19 +101,19 @@ export function Footer() {
 
           <form onSubmit={handleSubscribe} className="flex items-center gap-3 w-full md:w-auto relative min-w-full sm:min-w-[360px] md:min-w-[400px]">
             <div className="relative flex-1">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 dark:text-neutral-500" />
               <input
                 type="email"
                 required
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-full bg-white/80 dark:bg-white/5 border border-slate-300/60 dark:border-white/10 focus:outline-none focus:border-indigo-500 text-xs font-semibold text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-sm"
+                className="w-full pl-10 pr-4 py-2.5 rounded-full bg-white dark:bg-black/60 border border-neutral-300 dark:border-white/15 focus:outline-none focus:border-indigo-500 text-xs font-semibold text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 shadow-xs"
               />
             </div>
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold transition-all shadow-md shadow-indigo-500/10 shrink-0 cursor-pointer"
+              className="px-6 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all shadow-md shadow-indigo-500/20 shrink-0 cursor-pointer"
             >
               {subscribed ? "Subscribed!" : "Subscribe"}
             </button>
@@ -121,14 +121,14 @@ export function Footer() {
         </div>
 
         {/* Main Sitemap Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 lg:grid-cols-12 gap-8 lg:gap-6 pb-14 border-b border-slate-300/40 dark:border-white/10 overflow-hidden">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 lg:grid-cols-12 gap-8 lg:gap-6 pb-14 border-b border-neutral-200/80 dark:border-white/10 overflow-hidden">
           
           {/* Brand block */}
           <div className="sm:col-span-2 md:col-span-6 lg:col-span-3 space-y-4 text-left pr-0 lg:pr-4">
             <div className="flex items-center gap-2">
-              <span className="text-lg font-serif font-bold text-slate-800 dark:text-white tracking-tight">Kiwik</span>
+              <span className="text-xl font-serif font-bold text-neutral-900 dark:text-white tracking-wide">Kiwik</span>
             </div>
-            <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed max-w-sm font-semibold">
+            <p className="text-neutral-600 dark:text-neutral-400 text-xs leading-relaxed max-w-sm font-medium">
               The operating system for digital products. Build, ship, document, and scale your ideas with engineering excellence.
             </p>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-mono font-bold tracking-tight">
@@ -138,19 +138,19 @@ export function Footer() {
 
             {/* Social Icons row */}
             <div className="flex items-center gap-2.5 pt-2 flex-wrap">
-              <Link href="https://github.com/shagantivivekgoud" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+              <Link href="https://github.com/shagantivivekgoud" target="_blank" className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-neutral-200 dark:border-white/10 flex items-center justify-center text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors">
                 <GithubIcon className="w-4 h-4" />
               </Link>
-              <Link href="https://x.com/kiwik" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+              <Link href="https://x.com/kiwik" target="_blank" className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-neutral-200 dark:border-white/10 flex items-center justify-center text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors">
                 <XIcon className="w-4 h-4" />
               </Link>
-              <Link href="https://discord.gg/kiwik" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+              <Link href="https://discord.gg/kiwik" target="_blank" className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-neutral-200 dark:border-white/10 flex items-center justify-center text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors">
                 <DiscordIcon className="w-4 h-4" />
               </Link>
-              <Link href="https://linkedin.com" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+              <Link href="https://linkedin.com" target="_blank" className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-neutral-200 dark:border-white/10 flex items-center justify-center text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors">
                 <LinkedInIcon className="w-4 h-4" />
               </Link>
-              <Link href="https://youtube.com" target="_blank" className="w-8 h-8 rounded-full bg-white/5 hover:bg-neutral-200/50 dark:hover:bg-white/10 border border-slate-300/40 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+              <Link href="https://youtube.com" target="_blank" className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-neutral-200 dark:border-white/10 flex items-center justify-center text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors">
                 <YoutubeIcon className="w-4 h-4" />
               </Link>
             </div>
@@ -158,69 +158,69 @@ export function Footer() {
 
           {/* Product links list */}
           <div className="col-span-1 sm:col-span-1 md:col-span-3 lg:col-span-2 text-left space-y-3">
-            <h5 className="text-[11px] font-mono tracking-widest text-slate-900 dark:text-white uppercase font-bold">Product</h5>
-            <ul className="space-y-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-              <li><Link href="/projects" className="hover:text-slate-900 dark:hover:text-white transition-colors">Projects</Link></li>
-              <li><Link href="#macos-dashboard-widget" className="hover:text-slate-900 dark:hover:text-white transition-colors">Documentation</Link></li>
-              <li><Link href="#capabilities-section" className="hover:text-slate-900 dark:hover:text-white transition-colors">Capabilities</Link></li>
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Integrations</span></li>
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Changelog</span></li>
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Roadmap</span></li>
+            <h5 className="text-xs font-mono tracking-wider text-neutral-900 dark:text-white uppercase font-bold">Product</h5>
+            <ul className="space-y-2 text-xs font-medium text-neutral-600 dark:text-neutral-400">
+              <li><Link href="/projects" className="hover:text-neutral-900 dark:hover:text-white transition-colors">Projects</Link></li>
+              <li><Link href="#macos-dashboard-widget" className="hover:text-neutral-900 dark:hover:text-white transition-colors">Documentation</Link></li>
+              <li><Link href="#capabilities-section" className="hover:text-neutral-900 dark:hover:text-white transition-colors">Capabilities</Link></li>
+              <li><span className="opacity-50 cursor-not-allowed text-neutral-400 dark:text-neutral-500">Integrations</span></li>
+              <li><span className="opacity-50 cursor-not-allowed text-neutral-400 dark:text-neutral-500">Changelog</span></li>
+              <li><span className="opacity-50 cursor-not-allowed text-neutral-400 dark:text-neutral-500">Roadmap</span></li>
             </ul>
           </div>
 
           {/* Resources links list */}
           <div className="col-span-1 sm:col-span-1 md:col-span-3 lg:col-span-2 text-left space-y-3">
-            <h5 className="text-[11px] font-mono tracking-widest text-slate-900 dark:text-white uppercase font-bold">Resources</h5>
-            <ul className="space-y-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Guides</span></li>
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">API Reference</span></li>
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Blog</span></li>
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Showcase</span></li>
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Templates</span></li>
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Help Center</span></li>
+            <h5 className="text-xs font-mono tracking-wider text-neutral-900 dark:text-white uppercase font-bold">Resources</h5>
+            <ul className="space-y-2 text-xs font-medium text-neutral-600 dark:text-neutral-400">
+              <li><span className="opacity-50 cursor-not-allowed text-neutral-400 dark:text-neutral-500">Guides</span></li>
+              <li><span className="opacity-50 cursor-not-allowed text-neutral-400 dark:text-neutral-500">API Reference</span></li>
+              <li><span className="opacity-50 cursor-not-allowed text-neutral-400 dark:text-neutral-500">Blog</span></li>
+              <li><span className="opacity-50 cursor-not-allowed text-neutral-400 dark:text-neutral-500">Showcase</span></li>
+              <li><span className="opacity-50 cursor-not-allowed text-neutral-400 dark:text-neutral-500">Templates</span></li>
+              <li><span className="opacity-50 cursor-not-allowed text-neutral-400 dark:text-neutral-500">Help Center</span></li>
             </ul>
           </div>
 
           {/* Company links list */}
           <div className="col-span-1 sm:col-span-1 md:col-span-3 lg:col-span-2 text-left space-y-3">
-            <h5 className="text-[11px] font-mono tracking-widest text-slate-900 dark:text-white uppercase font-bold">Company</h5>
-            <ul className="space-y-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">About Kiwik</span></li>
-              <li><Link href="#timeline-section" className="hover:text-slate-900 dark:hover:text-white transition-colors">How We Work</Link></li>
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Careers</span></li>
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Partners</span></li>
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Contact Us</span></li>
-              <li><span className="opacity-45 cursor-not-allowed text-slate-400">Press Kit</span></li>
+            <h5 className="text-xs font-mono tracking-wider text-neutral-900 dark:text-white uppercase font-bold">Company</h5>
+            <ul className="space-y-2 text-xs font-medium text-neutral-600 dark:text-neutral-400">
+              <li><span className="opacity-50 cursor-not-allowed text-neutral-400 dark:text-neutral-500">About Kiwik</span></li>
+              <li><Link href="#timeline-section" className="hover:text-neutral-900 dark:hover:text-white transition-colors">How We Work</Link></li>
+              <li><span className="opacity-50 cursor-not-allowed text-neutral-400 dark:text-neutral-500">Careers</span></li>
+              <li><span className="opacity-50 cursor-not-allowed text-neutral-400 dark:text-neutral-500">Partners</span></li>
+              <li><span className="opacity-50 cursor-not-allowed text-neutral-400 dark:text-neutral-500">Contact Us</span></li>
+              <li><span className="opacity-50 cursor-not-allowed text-neutral-400 dark:text-neutral-500">Press Kit</span></li>
             </ul>
           </div>
 
           {/* Get in Touch Card */}
-          <div className="col-span-1 sm:col-span-2 md:col-span-6 lg:col-span-3 p-5 rounded-2xl bg-neutral-200/40 dark:bg-white/5 border border-slate-300/50 dark:border-white/10 flex flex-col gap-4 text-left backdrop-blur-xl w-full max-w-full">
-            <h5 className="text-[11px] font-mono tracking-widest text-slate-900 dark:text-white uppercase font-bold">Get in Touch</h5>
+          <div className="col-span-1 sm:col-span-2 md:col-span-6 lg:col-span-3 p-5 rounded-2xl bg-slate-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-white/10 flex flex-col gap-4 text-left shadow-sm w-full max-w-full">
+            <h5 className="text-xs font-mono tracking-wider text-neutral-900 dark:text-white uppercase font-bold">Get in Touch</h5>
             
             <div className="space-y-3.5">
               <div className="flex gap-2.5 items-start">
-                <Mail className="w-4 h-4 text-indigo-500 dark:text-indigo-400 mt-0.5 shrink-0" />
+                <Mail className="w-4 h-4 text-indigo-600 dark:text-indigo-400 mt-0.5 shrink-0" />
                 <div>
-                  <a href="mailto:hello@kiwik.dev" className="text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors break-all">hello@kiwik.dev</a>
-                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-semibold">We usually reply within 24 hours</p>
+                  <a href="mailto:hello@kiwik.dev" className="text-xs font-bold text-neutral-900 dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors break-all">hello@kiwik.dev</a>
+                  <p className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5 font-medium">We usually reply within 24 hours</p>
                 </div>
               </div>
 
-              <div className="flex gap-2.5 items-start border-t border-slate-300/40 dark:border-white/10 pt-3">
-                <MapPin className="w-4 h-4 text-indigo-500 dark:text-indigo-400 mt-0.5 shrink-0" />
+              <div className="flex gap-2.5 items-start border-t border-neutral-200/80 dark:border-white/10 pt-3">
+                <MapPin className="w-4 h-4 text-indigo-600 dark:text-indigo-400 mt-0.5 shrink-0" />
                 <div>
-                  <span className="text-xs font-bold text-slate-700 dark:text-slate-200">Kiwik HQ</span>
-                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-semibold">Internet, Everywhere</p>
+                  <span className="text-xs font-bold text-neutral-900 dark:text-slate-100">Kiwik HQ</span>
+                  <p className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5 font-medium">Internet, Everywhere</p>
                 </div>
               </div>
 
-              <div className="flex gap-2.5 items-start border-t border-slate-300/40 dark:border-white/10 pt-3">
-                <MessageSquare className="w-4 h-4 text-indigo-500 dark:text-indigo-400 mt-0.5 shrink-0" />
+              <div className="flex gap-2.5 items-start border-t border-neutral-200/80 dark:border-white/10 pt-3">
+                <MessageSquare className="w-4 h-4 text-indigo-600 dark:text-indigo-400 mt-0.5 shrink-0" />
                 <div>
-                  <span className="text-xs font-bold text-slate-700 dark:text-slate-200">Live Support</span>
-                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-semibold">Available Mon - Fri, 9AM - 6PM UTC</p>
+                  <span className="text-xs font-bold text-neutral-900 dark:text-slate-100">Live Support</span>
+                  <p className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5 font-medium">Available Mon - Fri, 9AM - 6PM UTC</p>
                 </div>
               </div>
             </div>
@@ -233,8 +233,8 @@ export function Footer() {
           
           {/* Copyright block */}
           <div className="text-left space-y-1 select-none">
-            <div className="text-xs font-bold text-slate-800 dark:text-white">© {new Date().getFullYear()} Kiwik. All rights reserved.</div>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold leading-relaxed">
+            <div className="text-xs font-bold text-neutral-900 dark:text-white">© {new Date().getFullYear()} Kiwik. All rights reserved.</div>
+            <p className="text-[10px] text-neutral-500 dark:text-neutral-400 font-medium leading-relaxed">
               Kiwik.1 is a registered trademark of Kiwik Inc. <br />
               Built with ❤️ by the Kiwik Engineering Team.
             </p>
@@ -245,11 +245,11 @@ export function Footer() {
             
             {/* Status metric */}
             <div className="text-left space-y-1">
-              <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-neutral-600 dark:text-neutral-400">
                 <Activity className="w-3.5 h-3.5 text-emerald-500" />
                 <span>System Status</span>
               </div>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold">All services running smoothly</p>
+              <p className="text-[10px] text-neutral-500 dark:text-neutral-400 font-medium">All services running smoothly</p>
               <Link href="#macos-dashboard-widget" className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline inline-flex items-center gap-0.5">
                 <span>View status page</span>
                 <ArrowRight className="w-2.5 h-2.5" />
@@ -258,11 +258,11 @@ export function Footer() {
 
             {/* Performance metric */}
             <div className="text-left space-y-1">
-              <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-neutral-700 dark:text-neutral-300">
                 <Cpu className="w-3.5 h-3.5 text-amber-500" />
                 <span>Performance</span>
               </div>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold">99.9% uptime this month</p>
+              <p className="text-[10px] text-neutral-500 dark:text-neutral-400 font-medium">99.9% uptime this month</p>
               <Link href="#macos-dashboard-widget" className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline inline-flex items-center gap-0.5">
                 <span>View metrics</span>
                 <ArrowRight className="w-2.5 h-2.5" />
@@ -271,11 +271,11 @@ export function Footer() {
 
             {/* Security metric */}
             <div className="text-left space-y-1">
-              <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-neutral-700 dark:text-neutral-300">
                 <ShieldCheck className="w-3.5 h-3.5 text-indigo-500" />
                 <span>Security</span>
               </div>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold">SOC 2 Type II Compliant</p>
+              <p className="text-[10px] text-neutral-500 dark:text-neutral-400 font-medium">SOC 2 Type II Compliant</p>
               <Link href="#macos-dashboard-widget" className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline inline-flex items-center gap-0.5">
                 <span>View security</span>
                 <ArrowRight className="w-2.5 h-2.5" />
@@ -284,11 +284,11 @@ export function Footer() {
 
             {/* Made for developers */}
             <div className="text-left space-y-1">
-              <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-neutral-700 dark:text-neutral-300">
                 <Terminal className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
                 <span>Made for developers</span>
               </div>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold leading-relaxed">
+              <p className="text-[10px] text-neutral-500 dark:text-neutral-400 font-medium leading-relaxed">
                 Designed with precision. <br />
                 Engineered for scale.
               </p>
