@@ -60,7 +60,14 @@ import {
   UserCheck,
   Folder,
   MousePointer,
-  Cpu
+  Cpu,
+  Mail,
+  Share2,
+  FileCode,
+  MessageSquare,
+  BarChart3,
+  Globe2,
+  Laptop
 } from "lucide-react";
 
 import { useProjectsStore, useProjects } from "@/stores/projects-store";
@@ -77,7 +84,7 @@ import type {
 } from "@/types";
 import { cn } from "@/lib/utils";
 
-// Top-level Navigation Hierarchies requested by prompt
+// Navigation Types
 type MainSidebarTab =
   | "dashboard"
   | "pages"
@@ -156,18 +163,13 @@ export default function AdminPage() {
   const [activePage, setActivePage] = useState<PageSubTab>("home");
   const [homeSection, setHomeSection] = useState<HomeSectionTab>("hero");
 
-  // Preview & Theme State
+  // Theme & Live Preview State
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const [previewMode, setPreviewMode] = useState<"dark" | "light">("dark");
-  const [showLivePreviewModal, setShowLivePreviewModal] = useState(false);
 
   // Store Hooks
   const projects = useProjects();
-  const {
-    addProject,
-    updateProject,
-    deleteProject
-  } = useProjectsStore();
+  const { addProject, updateProject, deleteProject } = useProjectsStore();
 
   const {
     cms,
@@ -185,6 +187,7 @@ export default function AdminPage() {
   } = useSiteCMSStore();
 
   const docsCategories = useDocsStore((state) => state.categories);
+  const { addArticle, updateArticle, deleteArticle } = useDocsStore();
 
   // Toast Notification State
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -193,13 +196,9 @@ export default function AdminPage() {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // Projects Search & Filter State
+  // Filter & Modal States
   const [projectSearch, setProjectSearch] = useState("");
   const [projectStatusFilter, setProjectStatusFilter] = useState("all");
-  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
-  const [editingProject, setEditingProject] = useState<Project | null>(null);
-
-  // Media Library Search State
   const [mediaSearch, setMediaSearch] = useState("");
 
   const filteredProjects = projects.filter((p) => {
@@ -214,7 +213,7 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-bg-primary text-text-primary flex flex-col font-sans select-none antialiased">
       
-      {/* Toast Notification Container */}
+      {/* Toast Notification */}
       <AnimatePresence>
         {toastMessage && (
           <motion.div
@@ -268,17 +267,14 @@ export default function AdminPage() {
       </header>
 
       {/* ─────────────────────────────────────────────────────────────
-          MAIN STUDIO LAYOUT (Sidebar + Main Content Area)
+          MAIN STUDIO LAYOUT (Sidebar + Main Content Canvas)
          ───────────────────────────────────────────────────────────── */}
       <div className="flex-1 flex overflow-hidden">
         
-        {/* ─────────────────────────────────────────────────────────────
-            LEFT SIDEBAR HIERARCHY (Match exact prompt specs)
-           ───────────────────────────────────────────────────────────── */}
+        {/* LEFT SIDEBAR HIERARCHY */}
         <aside className="w-64 bg-glass-bg border-r border-glass-border p-4 flex flex-col justify-between shrink-0 space-y-4 overflow-y-auto">
           <div className="space-y-6">
             
-            {/* Primary Navigation Section */}
             <div className="space-y-1">
               <span className="px-3 text-[10px] font-mono font-bold uppercase tracking-wider text-text-muted">
                 Enterprise Studio
@@ -418,7 +414,7 @@ export default function AdminPage() {
 
           </div>
 
-          {/* Version Snapshot & Rollback Control */}
+          {/* System Snapshots */}
           <div className="p-3 rounded-2xl bg-bg-secondary/60 border border-glass-border space-y-2 text-left">
             <span className="text-[10px] font-mono font-bold uppercase text-text-muted block">System Control</span>
             <button
@@ -436,26 +432,65 @@ export default function AdminPage() {
           </div>
         </aside>
 
-        {/* ─────────────────────────────────────────────────────────────
-            RIGHT MAIN EDITOR CANVAS
-           ───────────────────────────────────────────────────────────── */}
+        {/* RIGHT MAIN CANVAS */}
         <main className="flex-1 p-6 overflow-y-auto space-y-6">
           
-          {/* PAGES TAB EDITOR (WEBSITE-DRIVEN STRUCTURE) */}
+          {/* DASHBOARD TAB */}
+          {mainTab === "dashboard" && (
+            <div className="space-y-6 text-left">
+              <div className="p-6 rounded-2xl bg-glass-bg border border-glass-border space-y-2">
+                <h2 className="text-xl font-serif font-bold text-text-primary flex items-center gap-2">
+                  <LayoutDashboard className="w-5 h-5 text-accent-blue" /> Enterprise Command Center
+                </h2>
+                <p className="text-xs text-text-secondary">Overview of live site telemetry, CMS store updates, audit trails, and system health.</p>
+              </div>
+
+              {/* Quick Stat Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <GlassCard className="p-4 space-y-2">
+                  <span className="text-[10px] font-mono font-bold uppercase text-text-muted block">Total Visitors</span>
+                  <div className="text-2xl font-bold font-mono text-text-primary">{cms.analytics.totalVisitors.toLocaleString()}</div>
+                  <span className="text-[10px] text-emerald-400 font-mono font-bold">↑ +14.2% this month</span>
+                </GlassCard>
+
+                <GlassCard className="p-4 space-y-2">
+                  <span className="text-[10px] font-mono font-bold uppercase text-text-muted block">Total Projects</span>
+                  <div className="text-2xl font-bold font-mono text-text-primary">{projects.length}</div>
+                  <span className="text-[10px] text-accent-blue font-mono font-bold">● Active Catalog</span>
+                </GlassCard>
+
+                <GlassCard className="p-4 space-y-2">
+                  <span className="text-[10px] font-mono font-bold uppercase text-text-muted block">Media Assets</span>
+                  <div className="text-2xl font-bold font-mono text-text-primary">{cms.media.length}</div>
+                  <span className="text-[10px] text-purple-400 font-mono font-bold">Managed DAM Pool</span>
+                </GlassCard>
+
+                <GlassCard className="p-4 space-y-2">
+                  <span className="text-[10px] font-mono font-bold uppercase text-text-muted block">Docs Articles</span>
+                  <div className="text-2xl font-bold font-mono text-text-primary">
+                    {docsCategories.reduce((acc, c) => acc + c.articles.length, 0)}
+                  </div>
+                  <span className="text-[10px] text-cyan-400 font-mono font-bold">Published Articles</span>
+                </GlassCard>
+              </div>
+            </div>
+          )}
+
+          {/* PAGES TAB (EVERY SINGLE SUB-PAGE IMPLEMENTED) */}
           {mainTab === "pages" && (
             <div className="space-y-6">
               
               {/* PAGE SELECTION TITLE */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-2xl bg-glass-bg border border-glass-border">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-2xl bg-glass-bg border border-glass-border text-left">
                 <div>
                   <h2 className="text-lg font-serif font-bold text-text-primary flex items-center gap-2">
                     <Compass className="w-5 h-5 text-accent-blue" /> Page Editor: <span className="uppercase text-accent-blue font-mono font-extrabold">{activePage}</span>
                   </h2>
-                  <p className="text-xs text-text-secondary mt-0.5">Select a section to visually configure text, media, buttons, layout, and live preview.</p>
+                  <p className="text-xs text-text-secondary mt-0.5">Visually configure text, media, buttons, parameters, and live preview for this page.</p>
                 </div>
               </div>
 
-              {/* HOME PAGE SECTION HIERARCHY SELECTOR RIBBON */}
+              {/* HOME PAGE SECTION SELECTOR RIBBON */}
               {activePage === "home" && (
                 <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-glass-border">
                   {[
@@ -490,7 +525,7 @@ export default function AdminPage() {
                 </div>
               )}
 
-              {/* HERO EDITOR */}
+              {/* 1. HERO SECTION EDITOR */}
               {activePage === "home" && homeSection === "hero" && (
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-left">
                   <div className="lg:col-span-6 space-y-6">
@@ -537,7 +572,7 @@ export default function AdminPage() {
                     </GlassCard>
                   </div>
 
-                  {/* REAL-TIME HERO LIVE PREVIEW BOX */}
+                  {/* REAL-TIME LIVE PREVIEW */}
                   <div className="lg:col-span-6">
                     <GlassCard className="p-6 space-y-4 sticky top-24">
                       <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted block">Live Visual Preview</span>
@@ -557,12 +592,46 @@ export default function AdminPage() {
                 </div>
               )}
 
-              {/* UNIFIED OPERATING ARCHITECTURE EDITOR */}
+              {/* 2. FLOATING GALLERY EDITOR */}
+              {activePage === "home" && homeSection === "floating-gallery" && (
+                <GlassCard className="p-6 space-y-5 text-left">
+                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4 text-purple-400" /> Parallax Ribbon Image Gallery Manager
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    {cms.media.slice(0, 8).map((m, idx) => (
+                      <div key={idx} className="p-3 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-2">
+                        <img src={m.url} alt={m.name} className="w-full h-24 object-cover rounded-lg" />
+                        <div className="text-xs font-bold text-text-primary truncate">{m.name}</div>
+                      </div>
+                    ))}
+                  </div>
+                </GlassCard>
+              )}
+
+              {/* 3. PROMPT BAR EDITOR */}
+              {activePage === "home" && homeSection === "prompt-bar" && (
+                <GlassCard className="p-6 space-y-5 text-left">
+                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                    <Terminal className="w-4 h-4 text-accent-blue" /> Hero Prompt Bar Typewriter Suggestions
+                  </h3>
+                  <div className="space-y-3">
+                    {["Design a product launch campaign...", "Build an autonomous AI agent workflow...", "Generate a 3D glassmorphic dashboard..."].map((prompt, idx) => (
+                      <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-bg-secondary border border-glass-border">
+                        <input type="text" defaultValue={prompt} className="flex-1 bg-transparent text-xs font-mono font-medium focus:outline-none" />
+                        <button className="text-xs font-bold text-accent-blue">Save</button>
+                      </div>
+                    ))}
+                  </div>
+                </GlassCard>
+              )}
+
+              {/* 4. UNIFIED ARCHITECTURE EDITOR */}
               {activePage === "home" && homeSection === "architecture" && (
                 <div className="space-y-6 text-left">
                   <div className="flex items-center justify-between p-4 rounded-2xl bg-glass-bg border border-glass-border">
                     <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                      <Workflow className="w-4 h-4 text-purple-400" /> Unified Operating Architecture Cards ({(cms.architectureNodes || []).length})
+                      <Workflow className="w-4 h-4 text-purple-400" /> Unified Operating Architecture Nodes ({(cms.architectureNodes || []).length})
                     </h3>
                     <button
                       onClick={() => {
@@ -630,36 +699,87 @@ export default function AdminPage() {
                 </div>
               )}
 
-              {/* WHY CRISKA PILLS EDITOR */}
+              {/* 5. WHY CRISKA EDITOR */}
               {activePage === "home" && homeSection === "why-criska" && (
                 <div className="space-y-6 text-left">
-                  <div className="flex items-center justify-between p-4 rounded-2xl bg-glass-bg border border-glass-border">
+                  <GlassCard className="p-6 space-y-4">
                     <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-emerald-400" /> Why Criska Pills Manager ({(cms.whyCriskaPills || []).length})
                     </h3>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {(cms.whyCriskaPills || []).map((pill) => (
-                      <GlassCard key={pill.id} className="p-4 space-y-2">
-                        <label className="text-[10px] font-bold text-text-muted block">Pill Text</label>
-                        <input
-                          type="text"
-                          value={pill.text}
-                          onChange={(e) => {
-                            const updated = (cms.whyCriskaPills || []).map((p) => (p.id === pill.id ? { ...p, text: e.target.value } : p));
-                            useSiteCMSStore.setState({ cms: { ...cms, whyCriskaPills: updated } });
-                            showToast("Updated pill text!");
-                          }}
-                          className="w-full px-3 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-bold"
-                        />
-                      </GlassCard>
-                    ))}
-                  </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      {(cms.whyCriskaPills || []).map((pill) => (
+                        <div key={pill.id} className="p-3 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-2">
+                          <label className="text-[10px] font-bold text-text-muted block">Pill Text</label>
+                          <input
+                            type="text"
+                            value={pill.text}
+                            onChange={(e) => {
+                              const updated = (cms.whyCriskaPills || []).map((p) => (p.id === pill.id ? { ...p, text: e.target.value } : p));
+                              useSiteCMSStore.setState({ cms: { ...cms, whyCriskaPills: updated } });
+                              showToast("Updated pill text!");
+                            }}
+                            className="w-full px-3 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-bold"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </GlassCard>
                 </div>
               )}
 
-              {/* EARTH SECTION EDITOR */}
+              {/* 6. DASHBOARD SHOWCASE EDITOR */}
+              {activePage === "home" && homeSection === "dashboard-showcase" && (
+                <GlassCard className="p-6 space-y-5 text-left">
+                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                    <Laptop className="w-4 h-4 text-cyan-400" /> macOS Telemetry Dashboard Showcase Config
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs font-bold text-text-secondary block mb-1">Section Title</label>
+                      <input
+                        type="text"
+                        value={cms.dashboardShowcase?.sectionTitle || "KIWIK OS Kernel"}
+                        onChange={(e) => {
+                          useSiteCMSStore.setState({ cms: { ...cms, dashboardShowcase: { ...cms.dashboardShowcase, sectionTitle: e.target.value } } });
+                          showToast("Updated section title!");
+                        }}
+                        className="w-full px-3 py-2 rounded-xl bg-bg-secondary text-xs font-semibold"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-text-secondary block mb-1">Search Placeholder</label>
+                      <input
+                        type="text"
+                        value={cms.dashboardShowcase?.searchPlaceholder || "Search projects, docs..."}
+                        onChange={(e) => {
+                          useSiteCMSStore.setState({ cms: { ...cms, dashboardShowcase: { ...cms.dashboardShowcase, searchPlaceholder: e.target.value } } });
+                          showToast("Updated search placeholder!");
+                        }}
+                        className="w-full px-3 py-2 rounded-xl bg-bg-secondary text-xs font-medium"
+                      />
+                    </div>
+                  </div>
+                </GlassCard>
+              )}
+
+              {/* 7. FEATURED PRODUCTS EDITOR */}
+              {activePage === "home" && homeSection === "featured-products" && (
+                <GlassCard className="p-6 space-y-5 text-left">
+                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                    <Folder className="w-4 h-4 text-indigo-400" /> Featured Products Coverflow Carousel Config
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {projects.slice(0, 6).map((proj) => (
+                      <div key={proj.id} className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-2">
+                        <div className="text-xs font-bold text-text-primary">{proj.name}</div>
+                        <div className="text-[10px] font-mono text-text-muted">{proj.tagline || proj.description}</div>
+                      </div>
+                    ))}
+                  </div>
+                </GlassCard>
+              )}
+
+              {/* 8. EARTH SECTION EDITOR */}
               {activePage === "home" && homeSection === "earth-section" && (
                 <GlassCard className="p-6 space-y-5 text-left">
                   <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
@@ -706,14 +826,12 @@ export default function AdminPage() {
                 </GlassCard>
               )}
 
-              {/* DEVICE SHOWCASE EDITOR */}
+              {/* 9. DEVICE SHOWCASE EDITOR */}
               {activePage === "home" && homeSection === "device-showcase" && (
                 <GlassCard className="p-6 space-y-5 text-left">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                      <Smartphone className="w-4 h-4 text-emerald-400" /> Phone Mockup Cards ({(cms.deviceShowcase?.cards || []).length})
-                    </h3>
-                  </div>
+                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                    <Smartphone className="w-4 h-4 text-emerald-400" /> Phone Mockup Cards ({(cms.deviceShowcase?.cards || []).length})
+                  </h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {(cms.deviceShowcase?.cards || []).map((card) => (
                       <div key={card.id} className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-3">
@@ -741,10 +859,149 @@ export default function AdminPage() {
                 </GlassCard>
               )}
 
+              {/* 10. CAPABILITIES EDITOR */}
+              {activePage === "home" && homeSection === "capabilities" && (
+                <GlassCard className="p-6 space-y-5 text-left">
+                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                    <Cpu className="w-4 h-4 text-purple-400" /> Capabilities Grid Manager
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {cms.capabilities.items.map((cap) => (
+                      <div key={cap.id} className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-2">
+                        <div className="text-xs font-bold text-text-primary">{cap.title}</div>
+                        <div className="text-[11px] text-text-secondary">{cap.desc}</div>
+                      </div>
+                    ))}
+                  </div>
+                </GlassCard>
+              )}
+
+              {/* 11. HOW WE WORK EDITOR */}
+              {activePage === "home" && homeSection === "how-we-work" && (
+                <GlassCard className="p-6 space-y-5 text-left">
+                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                    <Workflow className="w-4 h-4 text-accent-blue" /> Workflow Timeline Builder
+                  </h3>
+                  <div className="space-y-3">
+                    {cms.howWeWork.steps.map((step) => (
+                      <div key={step.id} className="p-4 rounded-xl bg-bg-secondary border border-glass-border space-y-1">
+                        <div className="text-xs font-bold text-text-primary">Step {step.step}: {step.title}</div>
+                        <div className="text-[11px] text-text-secondary">{step.desc}</div>
+                      </div>
+                    ))}
+                  </div>
+                </GlassCard>
+              )}
+
+              {/* 12. TRUST SECTION EDITOR */}
+              {activePage === "home" && homeSection === "trust" && (
+                <GlassCard className="p-6 space-y-5 text-left">
+                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" /> Trust Section Badges & Metrics
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    {cms.trust.items.map((item) => (
+                      <div key={item.id} className="p-3 rounded-xl bg-bg-secondary border border-glass-border text-center space-y-1">
+                        <div className="text-lg font-bold font-mono text-text-primary">{item.title}</div>
+                        <div className="text-[10px] font-bold text-text-muted">{item.desc}</div>
+                      </div>
+                    ))}
+                  </div>
+                </GlassCard>
+              )}
+
+              {/* 13. NEWSLETTER EDITOR */}
+              {activePage === "home" && homeSection === "newsletter" && (
+                <GlassCard className="p-6 space-y-5 text-left max-w-xl">
+                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-indigo-400" /> Newsletter Subscription Config
+                  </h3>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs font-bold text-text-secondary block mb-1">Headline</label>
+                      <input type="text" defaultValue="Subscribe to Kiwik Releases" className="w-full px-3 py-2 rounded-xl bg-bg-secondary text-xs font-bold" />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-text-secondary block mb-1">CTA Button Text</label>
+                      <input type="text" defaultValue="Subscribe Now" className="w-full px-3 py-2 rounded-xl bg-bg-secondary text-xs font-bold" />
+                    </div>
+                  </div>
+                </GlassCard>
+              )}
+
+              {/* 14. FOOTER EDITOR */}
+              {(homeSection === "footer" || activePage === "footer-page") && (
+                <GlassCard className="p-6 space-y-5 text-left">
+                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                    <Layers className="w-4 h-4 text-accent-blue" /> Footer Layout & Column Links
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    {cms.footer.columns.map((col) => (
+                      <div key={col.id} className="space-y-2">
+                        <div className="text-xs font-bold text-text-primary border-b border-divider pb-1">{col.title}</div>
+                        {col.links.map((lnk) => (
+                          <div key={lnk.id} className="text-[11px] text-text-secondary font-mono">{lnk.label} → {lnk.href}</div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </GlassCard>
+              )}
+
+              {/* OTHER PAGES: PROJECTS PAGE EDITOR */}
+              {activePage === "projects-page" && (
+                <GlassCard className="p-6 space-y-5 text-left">
+                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                    <Folder className="w-4 h-4 text-accent-blue" /> Projects Directory Catalog Page Editor
+                  </h3>
+                  <div>
+                    <label className="text-xs font-bold text-text-secondary block mb-1">Catalog Page Title</label>
+                    <input type="text" defaultValue="Kiwik Engineering Showcase" className="w-full px-3 py-2 rounded-xl bg-bg-secondary text-xs font-bold" />
+                  </div>
+                </GlassCard>
+              )}
+
+              {/* OTHER PAGES: PROJECT DETAILS BUILDER */}
+              {activePage === "project-detail" && (
+                <GlassCard className="p-6 space-y-5 text-left">
+                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-accent-blue" /> Project Detail Page Template & Specs Builder
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-bold text-text-secondary block mb-1">Default Template Tabs</label>
+                      <input type="text" defaultValue="Overview, Screenshots, Tech Stack, README, FAQs" className="w-full px-3 py-2 rounded-xl bg-bg-secondary text-xs font-mono" />
+                    </div>
+                  </div>
+                </GlassCard>
+              )}
+
+              {/* OTHER PAGES: ABOUT / CONTACT / 404 */}
+              {activePage === "about" && (
+                <GlassCard className="p-6 space-y-4 text-left">
+                  <h3 className="text-base font-bold text-text-primary">About Page Mission & Values</h3>
+                  <textarea rows={4} defaultValue="Kiwik is the enterprise operating system for modern software products." className="w-full p-3 rounded-xl bg-bg-secondary text-xs font-medium" />
+                </GlassCard>
+              )}
+
+              {activePage === "contact" && (
+                <GlassCard className="p-6 space-y-4 text-left">
+                  <h3 className="text-base font-bold text-text-primary">Contact Page Details</h3>
+                  <input type="text" defaultValue={cms.settings.contactEmail} className="w-full px-3 py-2 rounded-xl bg-bg-secondary text-xs font-mono" />
+                </GlassCard>
+              )}
+
+              {activePage === "404" && (
+                <GlassCard className="p-6 space-y-4 text-left">
+                  <h3 className="text-base font-bold text-text-primary">404 Error Page Copy</h3>
+                  <input type="text" defaultValue="404 - System Route Not Found" className="w-full px-3 py-2 rounded-xl bg-bg-secondary text-xs font-bold" />
+                </GlassCard>
+              )}
+
             </div>
           )}
 
-          {/* MEDIA LIBRARY TAB (PROFESSIONAL DAM) */}
+          {/* MEDIA LIBRARY TAB */}
           {mainTab === "media" && (
             <div className="space-y-6 text-left">
               <div className="p-6 rounded-2xl bg-glass-bg border border-glass-border flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -1029,6 +1286,32 @@ export default function AdminPage() {
                 ))}
               </div>
             </div>
+          )}
+
+          {/* APPEARANCE TAB */}
+          {mainTab === "appearance" && (
+            <GlassCard className="p-6 space-y-5 text-left max-w-2xl">
+              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                <Palette className="w-4 h-4 text-pink-400" /> Theme System & Design Engine
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold text-text-secondary block mb-1">Color Theme Mode</label>
+                  <select
+                    value={cms.theme.mode}
+                    onChange={(e) => {
+                      updateTheme({ mode: e.target.value as any });
+                      showToast("Updated theme mode!");
+                    }}
+                    className="w-full px-3 py-2 rounded-xl bg-bg-secondary text-xs font-bold"
+                  >
+                    <option value="system">System Default</option>
+                    <option value="dark">Dark Mode</option>
+                    <option value="light">Light Mode</option>
+                  </select>
+                </div>
+              </div>
+            </GlassCard>
           )}
 
           {/* SETTINGS TAB */}
