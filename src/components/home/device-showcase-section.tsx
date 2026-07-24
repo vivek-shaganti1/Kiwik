@@ -53,14 +53,7 @@ export function DeviceShowcaseSection() {
       id="device-showcase-section"
       className="py-28 sm:py-36 md:py-40 lg:py-44 px-0 sm:px-4 max-w-[1700px] mx-auto relative z-20 select-none overflow-hidden bg-[#FAFAF8] dark:bg-[#08090C]"
     >
-      {/* ─────────────────────────────────────────────────────────────
-          TOP BADGE: CMS Driven
-         ───────────────────────────────────────────────────────────── */}
-      <div className="flex justify-center mb-12 sm:mb-16">
-        <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 text-xs font-bold tracking-wide font-sans shadow-md hover:scale-[1.03] transition-all">
-          <img src="/logo.png" alt="Kiwik Logo" className="h-4.5 w-auto object-contain dark:brightness-0 dark:invert" />
-        </div>
-      </div>
+      {/* Mockups Grid Section */}
 
       {/* ─────────────────────────────────────────────────────────────
           5 REALISTIC IPHONE 16 PRO HARDWARE MOCKUPS (Infinite Horizon)
