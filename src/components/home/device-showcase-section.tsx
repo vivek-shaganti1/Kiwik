@@ -75,27 +75,16 @@ export function DeviceShowcaseSection() {
             scale: hoveredIndex === 0 ? 0.86 : 0.82,
           }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="relative flex-shrink-0 w-[250px] sm:w-[280px] md:w-[300px] h-[520px] sm:h-[590px] md:h-[630px] rounded-[50px] bg-gradient-to-b from-[#35363F] via-[#1A1B22] to-[#0D0E12] p-[10px] sm:p-[12px] shadow-[25px_35px_80px_rgba(0,0,0,0.18)] dark:shadow-[0_40px_100px_rgba(0,0,0,0.8)] border border-white/20 flex flex-col justify-between overflow-hidden cursor-pointer group z-10"
+          className="relative flex-shrink-0 w-[250px] sm:w-[280px] md:w-[300px] h-[520px] sm:h-[590px] md:h-[630px] shadow-[25px_35px_80px_rgba(0,0,0,0.18)] dark:shadow-[0_40px_100px_rgba(0,0,0,0.8)] overflow-hidden cursor-pointer group z-10 rounded-[48px] sm:rounded-[54px]"
         >
-          {/* Metallic Side Button Slits */}
-          <div className="absolute -left-[3px] top-28 w-[3px] h-10 bg-neutral-600 rounded-l-md" />
-          <div className="absolute -left-[3px] top-42 w-[3px] h-10 bg-neutral-600 rounded-l-md" />
-          <div className="absolute -right-[3px] top-32 w-[3px] h-14 bg-neutral-600 rounded-r-md" />
-
           {/* Screen Container */}
-          <div className="relative w-full h-full rounded-[40px] bg-white text-neutral-900 p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner">
+          <div className="absolute inset-[6px] sm:inset-[8px] rounded-[36px] sm:rounded-[42px] bg-white text-neutral-900 p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner pt-7 sm:pt-8">
             
             {/* Specular Light Reflection Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/20 opacity-30 pointer-events-none z-30" />
-
-            {/* Dynamic Island Notch */}
-            <div className="relative z-40 w-16 h-4 mx-auto rounded-full bg-black flex items-center justify-center gap-1.5 mb-2 shadow-sm">
-              <div className="w-2 h-2 rounded-full bg-[#101116]" />
-              <div className="w-1.5 h-1.5 rounded-full bg-blue-500/80" />
-            </div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/20 opacity-30 pointer-events-none z-20" />
 
             {/* Header Content */}
-            <div className="relative z-20 space-y-3 text-left">
+            <div className="relative z-15 space-y-3 text-left">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-neutral-200 overflow-hidden flex items-center justify-center font-bold text-xs font-serif text-neutral-700 shadow-sm">
                   JR
@@ -117,7 +106,7 @@ export function DeviceShowcaseSection() {
             </div>
 
             {/* Projects List */}
-            <div className="relative z-20 pt-3 border-t border-neutral-100 space-y-2 text-left">
+            <div className="relative z-15 pt-3 border-t border-neutral-100 space-y-2 text-left">
               <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Projects</span>
               
               <div className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-100 space-y-0.5">
@@ -132,6 +121,13 @@ export function DeviceShowcaseSection() {
             </div>
 
           </div>
+
+          {/* Premium Device Bezel Frame Overlay */}
+          <img 
+            src="https://framerusercontent.com/images/H2xOBKfRU2M06U4j9LF5WN8z6pA.png?scale-down-to=2048" 
+            alt="Device Frame" 
+            className="absolute inset-0 w-full h-full object-fill pointer-events-none z-30"
+          />
         </motion.div>
 
         {/* ── PHONE 2: JET HAWKEN (Mid Left - Product Designer) ── */}
@@ -144,30 +140,19 @@ export function DeviceShowcaseSection() {
             scale: hoveredIndex === 1 ? 0.94 : 0.89,
           }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="relative flex-shrink-0 w-[255px] sm:w-[285px] md:w-[310px] h-[535px] sm:h-[610px] md:h-[650px] rounded-[52px] bg-gradient-to-b from-[#35363F] via-[#1A1B22] to-[#0D0E12] p-[10px] sm:p-[12px] shadow-[30px_40px_90px_rgba(0,0,0,0.22)] dark:shadow-[0_45px_110px_rgba(0,0,0,0.85)] border border-white/25 flex flex-col justify-between overflow-hidden cursor-pointer group z-20"
+          className="relative flex-shrink-0 w-[255px] sm:w-[285px] md:w-[310px] h-[535px] sm:h-[610px] md:h-[650px] shadow-[30px_40px_90px_rgba(0,0,0,0.22)] dark:shadow-[0_45px_110px_rgba(0,0,0,0.85)] overflow-hidden cursor-pointer group z-20 rounded-[50px] sm:rounded-[56px]"
         >
-          {/* Metallic Side Button Slits */}
-          <div className="absolute -left-[3px] top-28 w-[3px] h-10 bg-neutral-600 rounded-l-md" />
-          <div className="absolute -left-[3px] top-42 w-[3px] h-10 bg-neutral-600 rounded-l-md" />
-          <div className="absolute -right-[3px] top-32 w-[3px] h-14 bg-neutral-600 rounded-r-md" />
-
           {/* Screen Container */}
-          <div className="relative w-full h-full rounded-[42px] bg-[#EBF2FE] text-neutral-900 p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner">
+          <div className="absolute inset-[6px] sm:inset-[8px] rounded-[38px] sm:rounded-[44px] bg-[#EBF2FE] text-neutral-900 p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner pt-7 sm:pt-8">
             
             {/* Specular Light Reflection Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/30 opacity-40 pointer-events-none z-30" />
-
-            {/* Dynamic Island Notch */}
-            <div className="relative z-40 w-16 h-4 mx-auto rounded-full bg-black flex items-center justify-center gap-1.5 mb-2 shadow-sm">
-              <div className="w-2 h-2 rounded-full bg-[#101116]" />
-              <div className="w-1.5 h-1.5 rounded-full bg-blue-500/80" />
-            </div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/30 opacity-40 pointer-events-none z-20" />
 
             {/* Top Blue Wave Shader */}
             <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-blue-300/40 via-blue-200/20 to-transparent pointer-events-none" />
 
             {/* Header Content */}
-            <div className="relative z-20 space-y-2.5 text-left">
+            <div className="relative z-15 space-y-2.5 text-left">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shadow-md">
                   JH
@@ -189,7 +174,7 @@ export function DeviceShowcaseSection() {
             </div>
 
             {/* Testimonials Block */}
-            <div className="relative z-20 pt-2 border-t border-blue-200/60 space-y-2 text-left">
+            <div className="relative z-15 pt-2 border-t border-blue-200/60 space-y-2 text-left">
               <div className="flex items-center gap-1 text-[10px] font-bold text-neutral-600">
                 <span className="font-serif italic text-base">“</span> Testimonials
               </div>
@@ -216,6 +201,13 @@ export function DeviceShowcaseSection() {
             </div>
 
           </div>
+
+          {/* Premium Device Bezel Frame Overlay */}
+          <img 
+            src="https://framerusercontent.com/images/H2xOBKfRU2M06U4j9LF5WN8z6pA.png?scale-down-to=2048" 
+            alt="Device Frame" 
+            className="absolute inset-0 w-full h-full object-fill pointer-events-none z-30"
+          />
         </motion.div>
 
         {/* ── PHONE 3: LESLIE PUTNAM (Center Hero - Titanium iPhone 16 Pro Frame) ── */}
@@ -227,30 +219,19 @@ export function DeviceShowcaseSection() {
             scale: hoveredIndex === 2 ? 1.05 : 1.0,
           }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="relative flex-shrink-0 w-[275px] sm:w-[310px] md:w-[335px] h-[570px] sm:h-[650px] md:h-[690px] rounded-[56px] bg-gradient-to-b from-[#444652] via-[#242530] to-[#12131A] p-[12px] sm:p-[14px] shadow-[35px_50px_110px_rgba(0,0,0,0.32)] dark:shadow-[0_50px_140px_rgba(0,0,0,0.95)] border-2 border-white/30 flex flex-col justify-between overflow-hidden cursor-pointer z-40 group"
+          className="relative flex-shrink-0 w-[275px] sm:w-[310px] md:w-[335px] h-[570px] sm:h-[650px] md:h-[690px] shadow-[35px_50px_110px_rgba(0,0,0,0.32)] dark:shadow-[0_50px_140px_rgba(0,0,0,0.95)] overflow-hidden cursor-pointer z-40 group rounded-[52px] sm:rounded-[58px]"
         >
-          {/* Titanium Metallic Highlights */}
-          <div className="absolute -left-[3px] top-32 w-[3px] h-12 bg-neutral-500 rounded-l-md" />
-          <div className="absolute -left-[3px] top-48 w-[3px] h-12 bg-neutral-500 rounded-l-md" />
-          <div className="absolute -right-[3px] top-36 w-[3px] h-16 bg-neutral-500 rounded-r-md" />
-
           {/* Screen Container */}
-          <div className="relative w-full h-full rounded-[44px] bg-[#0C0D12] text-white p-4 sm:p-6 flex flex-col justify-between overflow-hidden shadow-inner">
+          <div className="absolute inset-[6px] sm:inset-[8px] rounded-[40px] sm:rounded-[46px] bg-[#0C0D12] text-white p-4 sm:p-6 flex flex-col justify-between overflow-hidden shadow-inner pt-8 sm:pt-9">
             
             {/* Glass Specular Reflection Highlight Diagonal */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/25 opacity-50 pointer-events-none z-30" />
-
-            {/* Dynamic Island Notch */}
-            <div className="relative z-40 w-20 h-5 mx-auto rounded-full bg-black flex items-center justify-center gap-2 mb-2 shadow-md">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#101116]" />
-              <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-            </div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/25 opacity-50 pointer-events-none z-20" />
 
             {/* Glowing Blue Mesh Shader Top */}
             <div className="absolute top-0 left-0 right-0 h-56 bg-gradient-to-br from-blue-600/40 via-indigo-600/30 to-transparent blur-xl pointer-events-none" />
 
             {/* Header Content */}
-            <div className="relative z-20 space-y-3 text-left">
+            <div className="relative z-15 space-y-3 text-left">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 text-white font-bold text-xs flex items-center justify-center shadow-lg border border-white/20">
                   LP
@@ -272,8 +253,8 @@ export function DeviceShowcaseSection() {
             </div>
 
             {/* Resume Timeline Block */}
-            <div className="relative z-20 pt-3 border-t border-white/10 space-y-2 text-left">
-              <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-white/70">
+            <div className="relative z-15 pt-3 border-t border-white/10 space-y-2 text-left">
+              <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-white/77">
                 <Briefcase className="w-3 h-3 text-blue-400" />
                 <span>Resume</span>
               </div>
@@ -298,6 +279,13 @@ export function DeviceShowcaseSection() {
             </div>
 
           </div>
+
+          {/* Premium Device Bezel Frame Overlay */}
+          <img 
+            src="https://framerusercontent.com/images/H2xOBKfRU2M06U4j9LF5WN8z6pA.png?scale-down-to=2048" 
+            alt="Device Frame" 
+            className="absolute inset-0 w-full h-full object-fill pointer-events-none z-30"
+          />
         </motion.div>
 
         {/* ── PHONE 4: TAYLOR BROWN (Mid Right - Botanist) ── */}
@@ -310,30 +298,19 @@ export function DeviceShowcaseSection() {
             scale: hoveredIndex === 3 ? 0.94 : 0.89,
           }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="relative flex-shrink-0 w-[255px] sm:w-[285px] md:w-[310px] h-[535px] sm:h-[610px] md:h-[650px] rounded-[52px] bg-gradient-to-b from-[#35363F] via-[#1A1B22] to-[#0D0E12] p-[10px] sm:p-[12px] shadow-[30px_40px_90px_rgba(0,0,0,0.22)] dark:shadow-[0_45px_110px_rgba(0,0,0,0.85)] border border-white/25 flex flex-col justify-between overflow-hidden cursor-pointer group z-20"
+          className="relative flex-shrink-0 w-[255px] sm:w-[285px] md:w-[310px] h-[535px] sm:h-[610px] md:h-[650px] shadow-[30px_40px_90px_rgba(0,0,0,0.22)] dark:shadow-[0_45px_110px_rgba(0,0,0,0.85)] overflow-hidden cursor-pointer group z-20 rounded-[50px] sm:rounded-[56px]"
         >
-          {/* Metallic Side Button Slits */}
-          <div className="absolute -left-[3px] top-28 w-[3px] h-10 bg-neutral-600 rounded-l-md" />
-          <div className="absolute -left-[3px] top-42 w-[3px] h-10 bg-neutral-600 rounded-l-md" />
-          <div className="absolute -right-[3px] top-32 w-[3px] h-14 bg-neutral-600 rounded-r-md" />
-
           {/* Screen Container */}
-          <div className="relative w-full h-full rounded-[42px] bg-[#0E1F18] text-white p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner">
+          <div className="absolute inset-[6px] sm:inset-[8px] rounded-[38px] sm:rounded-[44px] bg-[#0E1F18] text-white p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner pt-7 sm:pt-8">
             
             {/* Specular Light Reflection Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/30 opacity-40 pointer-events-none z-30" />
-
-            {/* Dynamic Island Notch */}
-            <div className="relative z-40 w-16 h-4 mx-auto rounded-full bg-black flex items-center justify-center gap-1.5 mb-2 shadow-sm">
-              <div className="w-2 h-2 rounded-full bg-[#101116]" />
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            </div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/30 opacity-40 pointer-events-none z-20" />
 
             {/* Botanical Dark Green Background Texture */}
             <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-emerald-700/40 via-teal-900/30 to-transparent pointer-events-none" />
 
             {/* Header Content */}
-            <div className="relative z-20 space-y-2.5 text-left">
+            <div className="relative z-15 space-y-2.5 text-left">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-emerald-700 text-white font-bold text-xs flex items-center justify-center shadow-md border border-emerald-400/30">
                   TB
@@ -355,7 +332,7 @@ export function DeviceShowcaseSection() {
             </div>
 
             {/* Social Icons & FAQ Block */}
-            <div className="relative z-20 pt-2 border-t border-emerald-800/60 space-y-2 text-left">
+            <div className="relative z-15 pt-2 border-t border-emerald-800/60 space-y-2 text-left">
               <div className="flex items-center justify-between px-1">
                 {[Globe, MessageSquare, Share2, Send, Lock].map((Icon, idx) => (
                   <div key={idx} className="w-6 h-6 rounded-full bg-white/10 border border-emerald-500/20 flex items-center justify-center text-emerald-300">
@@ -378,6 +355,13 @@ export function DeviceShowcaseSection() {
             </div>
 
           </div>
+
+          {/* Premium Device Bezel Frame Overlay */}
+          <img 
+            src="https://framerusercontent.com/images/H2xOBKfRU2M06U4j9LF5WN8z6pA.png?scale-down-to=2048" 
+            alt="Device Frame" 
+            className="absolute inset-0 w-full h-full object-fill pointer-events-none z-30"
+          />
         </motion.div>
 
         {/* ── PHONE 5: JASON MARKUS (Far Right - Cropped Viewport) ── */}
@@ -390,30 +374,19 @@ export function DeviceShowcaseSection() {
             scale: hoveredIndex === 4 ? 0.86 : 0.82,
           }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="relative flex-shrink-0 w-[250px] sm:w-[280px] md:w-[300px] h-[520px] sm:h-[590px] md:h-[630px] rounded-[50px] bg-gradient-to-b from-[#35363F] via-[#1A1B22] to-[#0D0E12] p-[10px] sm:p-[12px] shadow-[25px_35px_80px_rgba(0,0,0,0.18)] dark:shadow-[0_40px_100px_rgba(0,0,0,0.8)] border border-white/20 flex flex-col justify-between overflow-hidden cursor-pointer group z-10"
+          className="relative flex-shrink-0 w-[250px] sm:w-[280px] md:w-[300px] h-[520px] sm:h-[590px] md:h-[630px] shadow-[25px_35px_80px_rgba(0,0,0,0.18)] dark:shadow-[0_40px_100px_rgba(0,0,0,0.8)] overflow-hidden cursor-pointer group z-10 rounded-[48px] sm:rounded-[54px]"
         >
-          {/* Metallic Side Button Slits */}
-          <div className="absolute -left-[3px] top-28 w-[3px] h-10 bg-neutral-600 rounded-l-md" />
-          <div className="absolute -left-[3px] top-42 w-[3px] h-10 bg-neutral-600 rounded-l-md" />
-          <div className="absolute -right-[3px] top-32 w-[3px] h-14 bg-neutral-600 rounded-r-md" />
-
           {/* Screen Container */}
-          <div className="relative w-full h-full rounded-[40px] bg-[#0D150B] text-white p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner">
+          <div className="absolute inset-[6px] sm:inset-[8px] rounded-[36px] sm:rounded-[42px] bg-[#0D150B] text-white p-4 sm:p-5 flex flex-col justify-between overflow-hidden shadow-inner pt-7 sm:pt-8">
             
             {/* Specular Light Reflection Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/20 opacity-30 pointer-events-none z-30" />
-
-            {/* Dynamic Island Notch */}
-            <div className="relative z-40 w-16 h-4 mx-auto rounded-full bg-black flex items-center justify-center gap-1.5 mb-2 shadow-sm">
-              <div className="w-2 h-2 rounded-full bg-[#101116]" />
-              <div className="w-1.5 h-1.5 rounded-full bg-lime-500" />
-            </div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/20 opacity-30 pointer-events-none z-20" />
 
             {/* Lime Gradient Background Top */}
             <div className="absolute top-0 left-0 right-0 h-44 bg-gradient-to-b from-lime-600/40 via-emerald-800/20 to-transparent pointer-events-none" />
 
             {/* Header Content */}
-            <div className="relative z-20 space-y-2.5 text-left">
+            <div className="relative z-15 space-y-2.5 text-left">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-lime-600 text-black font-bold text-xs flex items-center justify-center shadow-md">
                   JM
@@ -435,7 +408,7 @@ export function DeviceShowcaseSection() {
             </div>
 
             {/* Contact Form Block */}
-            <div className="relative z-20 pt-2 border-t border-lime-900/60 space-y-1.5 text-left">
+            <div className="relative z-15 pt-2 border-t border-lime-900/60 space-y-1.5 text-left">
               <span className="text-[10px] font-bold text-lime-300">Contact Jason Markus</span>
 
               <div className="space-y-1 text-[9px] font-mono">
@@ -446,6 +419,13 @@ export function DeviceShowcaseSection() {
             </div>
 
           </div>
+
+          {/* Premium Device Bezel Frame Overlay */}
+          <img 
+            src="https://framerusercontent.com/images/H2xOBKfRU2M06U4j9LF5WN8z6pA.png?scale-down-to=2048" 
+            alt="Device Frame" 
+            className="absolute inset-0 w-full h-full object-fill pointer-events-none z-30"
+          />
         </motion.div>
 
       </motion.div>
