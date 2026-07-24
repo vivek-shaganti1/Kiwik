@@ -4,13 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const SAMPLE_PROMPTS = [
-  "Design a product launch campaign for a new sneaker drop...",
-  "Build an autonomous AI agent workflow for customer onboarding...",
-  "Generate a 3D glassmorphic dashboard design system...",
-  "Architect a zero-latency serverless cloud infrastructure..."
-];
+import { useSiteCMSStore } from "@/stores/site-cms-store";
 
 export function PromptCTA() {
   const [promptIndex, setPromptIndex] = useState(0);
@@ -18,10 +12,18 @@ export function PromptCTA() {
   const [isTyping, setIsTyping] = useState(true);
   const [userPrompt, setUserPrompt] = useState("");
 
+  const rotatingWords = useSiteCMSStore((state) => state.cms.hero.rotatingWords);
+  const samplePrompts = rotatingWords && rotatingWords.length > 0 ? rotatingWords : [
+    "Design a product launch campaign for a new sneaker drop...",
+    "Build an autonomous AI agent workflow for customer onboarding...",
+    "Generate a 3D glassmorphic dashboard design system...",
+    "Architect a zero-latency serverless cloud infrastructure..."
+  ];
+
   useEffect(() => {
     if (userPrompt) return; // Pause auto typewriter if user is typing custom text
 
-    const currentFullPrompt = SAMPLE_PROMPTS[promptIndex];
+    const currentFullPrompt = samplePrompts[promptIndex % samplePrompts.length];
     let charIdx = 0;
 
     const typingInterval = setInterval(() => {
@@ -31,13 +33,13 @@ export function PromptCTA() {
       } else {
         clearInterval(typingInterval);
         setTimeout(() => {
-          setPromptIndex((prev) => (prev + 1) % SAMPLE_PROMPTS.length);
+          setPromptIndex((prev) => (prev + 1) % samplePrompts.length);
         }, 3000);
       }
     }, 45);
 
     return () => clearInterval(typingInterval);
-  }, [promptIndex, userPrompt]);
+  }, [promptIndex, userPrompt, samplePrompts]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

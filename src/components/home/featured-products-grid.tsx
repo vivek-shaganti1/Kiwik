@@ -3,8 +3,14 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { AppleCoverflowCarousel } from "./apple-coverflow-carousel";
+import { useSiteCMSStore } from "@/stores/site-cms-store";
 
 export function FeaturedProductsGrid() {
+  const featuredSection = useSiteCMSStore((state) => state.cms.featuredSection);
+
+  const title = featuredSection?.title || "The Enterprise Operating System";
+  const subtitle = featuredSection?.subtitle || "One featured platform at a time. Every project is showcased as a cinematic Apple-class software launch.";
+
   return (
     <section id="featured-products-section" className="py-20 md:py-28 px-4 sm:px-6 md:px-8 max-w-[1500px] mx-auto relative z-20 select-none">
       
@@ -22,10 +28,10 @@ export function FeaturedProductsGrid() {
           FEATURED PRODUCTS
         </span>
         <h2 className="text-4xl sm:text-5xl md:text-6xl font-serif font-medium text-neutral-900 dark:text-white tracking-tight leading-[1.05]">
-          The Enterprise Operating System
+          {title}
         </h2>
         <p className="text-xs sm:text-sm text-neutral-600 dark:text-[#A1A1AA] font-sans font-medium max-w-xl mx-auto leading-relaxed">
-          One featured platform at a time. Every project is showcased as a cinematic Apple-class software launch.
+          {subtitle}
         </p>
       </motion.div>
 

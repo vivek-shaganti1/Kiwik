@@ -2,36 +2,32 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Cpu, Shield, Box, Cloud, Zap } from "lucide-react";
+import { Cpu, Shield, Box, Cloud, Zap, Sparkles, Layers } from "lucide-react";
+import { useSiteCMSStore } from "@/stores/site-cms-store";
 
 export function FeaturePillars() {
-  const pillars = [
-    {
-      id: "ai-intelligence",
-      title: "AI-Powered Intelligence",
-      icon: <Cpu className="w-4 h-4 text-purple-400" />
-    },
-    {
-      id: "security-first",
-      title: "Security First",
-      icon: <Shield className="w-4 h-4 text-emerald-400" />
-    },
-    {
-      id: "enterprise-ready",
-      title: "Enterprise Ready",
-      icon: <Box className="w-4 h-4 text-amber-400" />
-    },
-    {
-      id: "cloud-native",
-      title: "Cloud Native",
-      icon: <Cloud className="w-4 h-4 text-accent-blue" />
-    },
-    {
-      id: "scalable-design",
-      title: "Scalable by Design",
-      icon: <Zap className="w-4 h-4 text-cyan-400" />
+  const whyCriskaPills = useSiteCMSStore((state) => state.cms.whyCriskaPills);
+
+  const getIcon = (iconName?: string) => {
+    switch (iconName) {
+      case "Shield": return <Shield className="w-4 h-4 text-emerald-400" />;
+      case "Layers": return <Layers className="w-4 h-4 text-amber-400" />;
+      case "Cloud": return <Cloud className="w-4 h-4 text-accent-blue" />;
+      case "Zap": return <Zap className="w-4 h-4 text-cyan-400" />;
+      case "Sparkles": return <Sparkles className="w-4 h-4 text-pink-400" />;
+      default: return <Cpu className="w-4 h-4 text-purple-400" />;
     }
-  ];
+  };
+
+  const pillars = (whyCriskaPills && whyCriskaPills.length > 0)
+    ? whyCriskaPills.filter(p => p.visible !== false)
+    : [
+        { id: "w-1", text: "AI-Powered Intelligence", iconName: "Cpu" },
+        { id: "w-2", text: "Security First", iconName: "Shield" },
+        { id: "w-3", text: "Enterprise Ready", iconName: "Layers" },
+        { id: "w-4", text: "Cloud Native", iconName: "Cloud" },
+        { id: "w-5", text: "Scalable by Design", iconName: "Sparkles" }
+      ];
 
   return (
     <section className="py-12 px-4 sm:px-6 md:px-8 max-w-[1400px] mx-auto relative z-20">
@@ -53,9 +49,9 @@ export function FeaturePillars() {
             className="px-5 py-3 rounded-full bg-glass-bg border border-glass-border hover:border-accent-blue/40 backdrop-blur-xl flex items-center gap-3 text-xs font-bold text-text-primary shadow-lg transition-all cursor-pointer group"
           >
             <div className="p-1.5 rounded-full bg-bg-secondary border border-glass-border group-hover:scale-110 transition-transform">
-              {p.icon}
+              {getIcon(p.iconName)}
             </div>
-            <span>{p.title}</span>
+            <span>{p.text || (p as any).title}</span>
           </motion.div>
         ))}
       </div>
