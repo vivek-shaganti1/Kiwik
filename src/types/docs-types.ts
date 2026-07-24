@@ -71,6 +71,8 @@ export interface DocArticle {
   categoryId: string;
   title: string;
   subtitle: string;
+  iconName?: string;
+  badge?: string;
   readingTimeMinutes: number;
   lastUpdated: string;
   author: string;

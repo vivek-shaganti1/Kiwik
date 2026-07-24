@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
-import { docCategories, docArticles } from "@/data/docs-data";
+import { useDocsStore } from "@/stores/docs-store";
 import { DocsHeader } from "@/components/docs/DocsHeader";
 import { DocsSidebar } from "@/components/docs/DocsSidebar";
 import { DocsRightSidebar } from "@/components/docs/DocsRightSidebar";
@@ -19,6 +19,8 @@ function DocsMainContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
+  const { categories, articles } = useDocsStore();
+  
   // Default to 'introduction' if no slug query param is supplied
   const initialSlug = searchParams.get("slug") || "introduction";
   const [activeSlug, setActiveSlug] = useState(initialSlug);
@@ -30,10 +32,10 @@ function DocsMainContent() {
   // Sync activeSlug from searchParams if query string changes
   useEffect(() => {
     const slugFromParam = searchParams.get("slug");
-    if (slugFromParam && docArticles[slugFromParam]) {
+    if (slugFromParam && articles[slugFromParam]) {
       setActiveSlug(slugFromParam);
     }
-  }, [searchParams]);
+  }, [searchParams, articles]);
 
   // Load saved bookmarks from localStorage
   useEffect(() => {
@@ -88,7 +90,7 @@ function DocsMainContent() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [router]);
 
-  const currentArticle = docArticles[activeSlug] || docArticles["introduction"];
+  const currentArticle = articles[activeSlug] || articles["introduction"] || Object.values(articles)[0];
 
   const handleSelectArticle = (slug: string) => {
     setActiveSlug(slug);
@@ -139,7 +141,7 @@ function DocsMainContent() {
         
         {/* Left Navigation Sidebar */}
         <DocsSidebar
-          categories={docCategories}
+          categories={categories}
           activeSlug={activeSlug}
           onSelectArticle={handleSelectArticle}
           bookmarksCount={bookmarks.length}

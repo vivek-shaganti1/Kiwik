@@ -98,76 +98,73 @@ export default function HomePage() {
       <FeaturedProductsGrid />
 
       {/* EARTH INFRASTRUCTURE SHOWCASE SECTION */}
-      <section className="relative w-full overflow-hidden bg-[#050608] text-white py-28 sm:py-36 md:py-40 lg:py-44 px-6 md:px-12 border-t border-b border-white/[0.06] select-none">
-        {/* Immersive Curved Earth Background */}
-        <div 
-          className="absolute inset-0 bg-cover bg-left md:bg-center opacity-65 md:opacity-80 mix-blend-screen pointer-events-none z-0 scale-[1.05]"
-          style={{ 
-            backgroundImage: "url('https://cdn.prod.website-files.com/68513e75563291f5d48ada9b/696df7aeb646a7a2198327de_36fa0c4d18a844367e1911df246f6613_earth.webp')",
-            backgroundRepeat: "no-repeat"
-          }}
-        />
-        {/* Soft Radial Ambient Lighting to Blend Edge */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#050608]/90 via-transparent to-[#050608] pointer-events-none z-10" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050608] via-transparent to-[#050608] pointer-events-none z-10" />
+      {(() => {
+        const earthShowcase = cms.earthShowcase || {
+          headline: "Access the largest enterprise telemetry network.",
+          description: "Kiwik connects the edge telemetry, managed node clusters, and database replication pipelines on every cloud stack you operate.",
+          earthImageUrl: "https://cdn.prod.website-files.com/68513e75563291f5d48ada9b/696df7aeb646a7a2198327de_36fa0c4d18a844367e1911df246f6613_earth.webp",
+          stats: [
+            { id: "st-1", value: "99.9%", label: "System Uptime", description: "Automated multi-region deployments." },
+            { id: "st-2", value: "14ms", label: "Edge Latency", description: "Average edge request roundtrip latency." },
+            { id: "st-3", value: "24/7", label: "Monitoring", description: "Operational intelligence and telemetry monitoring." },
+            { id: "st-4", value: "3M+", label: "Daily Events", description: "Daily edge events processed and synced." }
+          ]
+        };
 
-        <div className="max-w-[1400px] mx-auto relative z-20 text-center md:text-left flex flex-col justify-between h-full min-h-[460px] md:min-h-[500px]">
-          {/* Centered Premium Typography Content */}
-          <div className="max-w-3xl mx-auto text-center space-y-6 mt-6">
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold text-white tracking-tight leading-tight">
-              Access the largest enterprise telemetry network.
-            </h2>
-            <p className="text-sm sm:text-base text-neutral-400 font-sans max-w-2xl mx-auto leading-relaxed">
-              Kiwik connects the edge telemetry, managed node clusters, and database replication pipelines on every cloud stack you operate.
-            </p>
-            <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
-              <Link 
-                href="/docs" 
-                className="px-6 py-2.5 rounded-full bg-white text-black font-sans font-bold text-xs hover:bg-neutral-200 transition-colors shadow-lg"
-              >
-                Book a demo
-              </Link>
-              <Link 
-                href="/projects" 
-                className="px-6 py-2.5 rounded-full bg-white/10 border border-white/20 text-white font-sans font-semibold text-xs hover:bg-white/20 transition-colors"
-              >
-                Telemetry integration
-              </Link>
-            </div>
-          </div>
+        return (
+          <section className="relative w-full overflow-hidden bg-[#050608] text-white py-28 sm:py-36 md:py-40 lg:py-44 px-6 md:px-12 border-t border-b border-white/[0.06] select-none">
+            {/* Immersive Curved Earth Background */}
+            <div 
+              className="absolute inset-0 bg-cover bg-left md:bg-center opacity-65 md:opacity-80 mix-blend-screen pointer-events-none z-0 scale-[1.05]"
+              style={{ 
+                backgroundImage: `url('${earthShowcase.earthImageUrl || "https://cdn.prod.website-files.com/68513e75563291f5d48ada9b/696df7aeb646a7a2198327de_36fa0c4d18a844367e1911df246f6613_earth.webp"}')`,
+                backgroundRepeat: "no-repeat"
+              }}
+            />
+            {/* Soft Radial Ambient Lighting to Blend Edge */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#050608]/90 via-transparent to-[#050608] pointer-events-none z-10" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#050608] via-transparent to-[#050608] pointer-events-none z-10" />
 
-          {/* Row of Metrics (Reference Style) */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-16 mt-auto border-t border-white/10 max-w-5xl mx-auto w-full">
-            <div className="space-y-1.5 text-center md:text-left">
-              <h3 className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold text-white tracking-tight">99.9%</h3>
-              <p className="text-[11px] text-neutral-400 leading-normal max-w-[180px] mx-auto md:mx-0 font-medium">
-                System uptime with automated multi-region deployments.
-              </p>
-            </div>
+            <div className="max-w-[1400px] mx-auto relative z-20 text-center md:text-left flex flex-col justify-between h-full min-h-[460px] md:min-h-[500px]">
+              {/* Centered Premium Typography Content */}
+              <div className="max-w-3xl mx-auto text-center space-y-6 mt-6">
+                <h2 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold text-white tracking-tight leading-tight">
+                  {earthShowcase.headline || "Access the largest enterprise telemetry network."}
+                </h2>
+                <p className="text-sm sm:text-base text-neutral-400 font-sans max-w-2xl mx-auto leading-relaxed">
+                  {earthShowcase.description || "Kiwik connects the edge telemetry, managed node clusters, and database replication pipelines on every cloud stack you operate."}
+                </p>
+                <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
+                  <Link 
+                    href="/docs" 
+                    className="px-6 py-2.5 rounded-full bg-white text-black font-sans font-bold text-xs hover:bg-neutral-200 transition-colors shadow-lg"
+                  >
+                    Book a demo
+                  </Link>
+                  <Link 
+                    href="/projects" 
+                    className="px-6 py-2.5 rounded-full bg-white/10 border border-white/20 text-white font-sans font-semibold text-xs hover:bg-white/20 transition-colors"
+                  >
+                    Telemetry integration
+                  </Link>
+                </div>
+              </div>
 
-            <div className="space-y-1.5 text-center md:text-left">
-              <h3 className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold text-white tracking-tight">14ms</h3>
-              <p className="text-[11px] text-neutral-400 leading-normal max-w-[180px] mx-auto md:mx-0 font-medium">
-                Average edge request roundtrip latency.
-              </p>
+              {/* Row of Metrics (Reference Style) */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-16 mt-auto border-t border-white/10 max-w-5xl mx-auto w-full">
+                {(earthShowcase.stats || []).map((stat, i) => (
+                  <div key={stat.id || i} className="space-y-1.5 text-center md:text-left">
+                    <h3 className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold text-white tracking-tight">{stat.value}</h3>
+                    <p className="text-[11px] text-neutral-400 leading-normal max-w-[180px] mx-auto md:mx-0 font-medium">
+                      {stat.description || stat.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
-
-            <div className="space-y-1.5 text-center md:text-left">
-              <h3 className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold text-white tracking-tight">24/7</h3>
-              <p className="text-[11px] text-neutral-400 leading-normal max-w-[180px] mx-auto md:mx-0 font-medium">
-                Operational intelligence and telemetry monitoring.
-              </p>
-            </div>
-
-            <div className="space-y-1.5 text-center md:text-left">
-              <h3 className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold text-white tracking-tight">3M+</h3>
-              <p className="text-[11px] text-neutral-400 leading-normal max-w-[180px] mx-auto md:mx-0 font-medium">
-                Daily edge events processed and synced.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+          </section>
+        );
+      })()}
 
       {/* SECTION B: HOW WE WORK (5-Step Engineering Pipeline) */}
       <section id="how-we-work" className="py-16 md:py-24 px-4 sm:px-6 md:px-8 border-t border-divider/60 max-w-[1400px] mx-auto relative z-20">

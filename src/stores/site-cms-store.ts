@@ -248,6 +248,54 @@ const defaultCMSData: SiteCMSData = {
       applicationCategory: "DeveloperApplication"
     })
   },
+  deviceShowcase: {
+    topBadgeText: "No Credit Card Required",
+    cards: [
+      { id: "dev-1", name: "John Richardson", role: "Co-Founder", quote: "We scale high throughput products fast.", tag: "Founder", avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150", frameOverlayUrl: "https://framerusercontent.com/images/H2xOBKfRU2M06U4j9LF5WN8z6pA.png?scale-down-to=2048", accentColor: "#3b82f6" },
+      { id: "dev-2", name: "Sarah Lin", role: "Product Designer", quote: "Crafting modern UI and motion interaction.", tag: "Design", avatarUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150", frameOverlayUrl: "https://framerusercontent.com/images/H2xOBKfRU2M06U4j9LF5WN8z6pA.png?scale-down-to=2048", accentColor: "#a855f7" },
+      { id: "dev-3", name: "Alex Mercer", role: "Lead Systems Architect", quote: "High availability, 14ms latency, global edge.", tag: "Engineering", avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150", frameOverlayUrl: "https://framerusercontent.com/images/H2xOBKfRU2M06U4j9LF5WN8z6pA.png?scale-down-to=2048", accentColor: "#06b6d4" },
+      { id: "dev-4", name: "Elena Rostova", role: "Head of AI Research", quote: "Autonomous multi-agent orchestration engines.", tag: "AI & ML", avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150", frameOverlayUrl: "https://framerusercontent.com/images/H2xOBKfRU2M06U4j9LF5WN8z6pA.png?scale-down-to=2048", accentColor: "#ec4899" },
+      { id: "dev-5", name: "Jason Markus", role: "Viral Marketer", quote: "Helping founders grow apps through strategy.", tag: "Growth", avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150", frameOverlayUrl: "https://framerusercontent.com/images/H2xOBKfRU2M06U4j9LF5WN8z6pA.png?scale-down-to=2048", accentColor: "#65a30d" }
+    ]
+  },
+  earthShowcase: {
+    headline: "Access the largest enterprise telemetry network.",
+    description: "Kiwik connects the edge telemetry, managed node clusters, and database replication pipelines on every cloud stack you operate.",
+    earthImageUrl: "https://cdn.prod.website-files.com/68513e75563291f5d48ada9b/696df7aeb646a7a2198327de_36fa0c4d18a844367e1911df246f6613_earth.webp",
+    stats: [
+      { id: "st-1", value: "99.9%", label: "System Uptime", description: "Automated multi-region deployments." },
+      { id: "st-2", value: "14ms", label: "Edge Latency", description: "Average edge request roundtrip latency." },
+      { id: "st-3", value: "24/7", label: "Monitoring", description: "Operational intelligence and telemetry monitoring." },
+      { id: "st-4", value: "3M+", label: "Daily Events", description: "Daily edge events processed and synced." }
+    ]
+  },
+  aiKnowledge: {
+    articles: [
+      { id: "k-1", title: "Kiwik Architecture Overview", category: "Core Platform", content: "Kiwik is an enterprise digital product operating system built on Next.js 16, React 19, and Tailwind CSS. It features Zustand telemetry stores, real-time CMS synchronization, and multi-agent AI assistants.", tags: ["architecture", "nextjs", "zustand"], lastUpdated: "2026-07-24" },
+      { id: "k-2", title: "CriskaAI Intelligent Copilot", category: "AI Products", content: "CriskaAI provides multimodal reasoning, autonomous workflow triggers, and natural language database mutations across web and cloud backends.", tags: ["criskaai", "copilot", "llm"], lastUpdated: "2026-07-24" },
+      { id: "k-3", title: "CriskaPay Infrastructure", category: "Fintech", content: "CriskaPay handles PCI-compliant payments, multi-currency wallets, and subscription metering with sub-second settlement.", tags: ["payments", "fintech", "stripe"], lastUpdated: "2026-07-24" }
+    ]
+  },
+  analytics: {
+    totalVisitors: 1248900,
+    projectClicks: { "criskaai": 4120, "criskacloud": 2890, "criskapay": 3410, "flowengine": 1980 },
+    searches: [
+      { query: "criskaai", count: 480, timestamp: "2026-07-24" },
+      { query: "payments", count: 320, timestamp: "2026-07-24" },
+      { query: "documentation", count: 290, timestamp: "2026-07-24" }
+    ],
+    aiQueries: [
+      { prompt: "How do I deploy CriskaCloud?", count: 180, timestamp: "2026-07-24" },
+      { prompt: "What is Kiwik.1 OS?", count: 240, timestamp: "2026-07-24" }
+    ],
+    countryBreakdown: [
+      { country: "United States", flag: "🇺🇸", count: 420000 },
+      { country: "Germany", flag: "🇩🇪", count: 180000 },
+      { country: "United Kingdom", flag: "🇬🇧", count: 140000 },
+      { country: "Japan", flag: "🇯🇵", count: 95000 },
+      { country: "India", flag: "🇮🇳", count: 85000 }
+    ]
+  },
   auditLogs: [
     {
       id: "log-1",
@@ -290,6 +338,26 @@ interface SiteCMSStoreState {
 
   updateHowWeWork: (hww: Partial<HowWeWorkCMS>) => void;
   updateWorkflowStep: (id: string, step: Partial<WorkflowStep>) => void;
+
+  // Device Showcase & Earth Showcase Mutators
+  updateDeviceShowcase: (sec: Partial<import("@/types/site-cms-types").DeviceShowcaseCMS>) => void;
+  updateDeviceCard: (id: string, card: Partial<import("@/types/site-cms-types").DeviceShowcaseCard>) => void;
+  addDeviceCard: (card: import("@/types/site-cms-types").DeviceShowcaseCard) => void;
+  deleteDeviceCard: (id: string) => void;
+
+  updateEarthShowcase: (sec: Partial<import("@/types/site-cms-types").EarthShowcaseCMS>) => void;
+  updateEarthStat: (id: string, stat: Partial<import("@/types/site-cms-types").StatItem>) => void;
+
+  // AI Knowledge Mutators
+  addAiKnowledgeArticle: (article: import("@/types/site-cms-types").AIKnowledgeArticle) => void;
+  updateAiKnowledgeArticle: (id: string, updated: Partial<import("@/types/site-cms-types").AIKnowledgeArticle>) => void;
+  deleteAiKnowledgeArticle: (id: string) => void;
+
+  // Analytics Recording
+  recordVisitor: () => void;
+  recordProjectClick: (slug: string) => void;
+  recordSearch: (query: string) => void;
+  recordAiQuery: (prompt: string) => void;
 
   // Footer & Theme Mutators
   updateFooter: (footer: Partial<FooterCMS>) => void;
@@ -548,6 +616,210 @@ export const useSiteCMSStore = create<SiteCMSStoreState>()(
           cms: { ...state.cms, media: state.cms.media.filter((m) => m.id !== id) }
         }));
         get().addAuditLog("DELETE_MEDIA", "Media Library", `Deleted media asset [${id}]`);
+      },
+
+      updateDeviceShowcase: (sec) => {
+        set((state) => ({
+          cms: { ...state.cms, deviceShowcase: { ...(state.cms.deviceShowcase || defaultCMSData.deviceShowcase), ...sec } }
+        }));
+        get().addAuditLog("UPDATE_DEVICE_SHOWCASE", "Device Showcase", "Updated Device Showcase header/badge");
+      },
+
+      updateDeviceCard: (id, card) => {
+        set((state) => {
+          const current = state.cms.deviceShowcase || defaultCMSData.deviceShowcase;
+          return {
+            cms: {
+              ...state.cms,
+              deviceShowcase: {
+                ...current,
+                cards: current.cards.map((c) => (c.id === id ? { ...c, ...card } : c))
+              }
+            }
+          };
+        });
+        get().addAuditLog("UPDATE_DEVICE_CARD", "Device Showcase", `Updated phone card [${id}]`);
+      },
+
+      addDeviceCard: (card) => {
+        set((state) => {
+          const current = state.cms.deviceShowcase || defaultCMSData.deviceShowcase;
+          return {
+            cms: {
+              ...state.cms,
+              deviceShowcase: {
+                ...current,
+                cards: [...current.cards, card]
+              }
+            }
+          };
+        });
+        get().addAuditLog("ADD_DEVICE_CARD", "Device Showcase", `Added phone card [${card.name}]`);
+      },
+
+      deleteDeviceCard: (id) => {
+        set((state) => {
+          const current = state.cms.deviceShowcase || defaultCMSData.deviceShowcase;
+          return {
+            cms: {
+              ...state.cms,
+              deviceShowcase: {
+                ...current,
+                cards: current.cards.filter((c) => c.id !== id)
+              }
+            }
+          };
+        });
+        get().addAuditLog("DELETE_DEVICE_CARD", "Device Showcase", `Deleted phone card [${id}]`);
+      },
+
+      updateEarthShowcase: (sec) => {
+        set((state) => ({
+          cms: { ...state.cms, earthShowcase: { ...(state.cms.earthShowcase || defaultCMSData.earthShowcase), ...sec } }
+        }));
+        get().addAuditLog("UPDATE_EARTH_SHOWCASE", "Earth Showcase", "Updated Earth section headline/description");
+      },
+
+      updateEarthStat: (id, stat) => {
+        set((state) => {
+          const current = state.cms.earthShowcase || defaultCMSData.earthShowcase;
+          return {
+            cms: {
+              ...state.cms,
+              earthShowcase: {
+                ...current,
+                stats: current.stats.map((s) => (s.id === id ? { ...s, ...stat } : s))
+              }
+            }
+          };
+        });
+        get().addAuditLog("UPDATE_EARTH_STAT", "Earth Showcase", `Updated stat [${id}]`);
+      },
+
+      addAiKnowledgeArticle: (article) => {
+        set((state) => {
+          const current = state.cms.aiKnowledge || defaultCMSData.aiKnowledge;
+          return {
+            cms: {
+              ...state.cms,
+              aiKnowledge: {
+                ...current,
+                articles: [article, ...current.articles]
+              }
+            }
+          };
+        });
+        get().addAuditLog("ADD_AI_KNOWLEDGE", "AI Manager", `Added knowledge article [${article.title}]`);
+      },
+
+      updateAiKnowledgeArticle: (id, updated) => {
+        set((state) => {
+          const current = state.cms.aiKnowledge || defaultCMSData.aiKnowledge;
+          return {
+            cms: {
+              ...state.cms,
+              aiKnowledge: {
+                ...current,
+                articles: current.articles.map((a) => (a.id === id ? { ...a, ...updated } : a))
+              }
+            }
+          };
+        });
+        get().addAuditLog("UPDATE_AI_KNOWLEDGE", "AI Manager", `Updated knowledge article [${id}]`);
+      },
+
+      deleteAiKnowledgeArticle: (id) => {
+        set((state) => {
+          const current = state.cms.aiKnowledge || defaultCMSData.aiKnowledge;
+          return {
+            cms: {
+              ...state.cms,
+              aiKnowledge: {
+                ...current,
+                articles: current.articles.filter((a) => a.id !== id)
+              }
+            }
+          };
+        });
+        get().addAuditLog("DELETE_AI_KNOWLEDGE", "AI Manager", `Deleted knowledge article [${id}]`);
+      },
+
+      recordVisitor: () => {
+        set((state) => {
+          const analytics = state.cms.analytics || defaultCMSData.analytics;
+          return {
+            cms: {
+              ...state.cms,
+              analytics: {
+                ...analytics,
+                totalVisitors: analytics.totalVisitors + 1
+              }
+            }
+          };
+        });
+      },
+
+      recordProjectClick: (slug) => {
+        set((state) => {
+          const analytics = state.cms.analytics || defaultCMSData.analytics;
+          const currentClicks = analytics.projectClicks || {};
+          return {
+            cms: {
+              ...state.cms,
+              analytics: {
+                ...analytics,
+                projectClicks: {
+                  ...currentClicks,
+                  [slug]: (currentClicks[slug] || 0) + 1
+                }
+              }
+            }
+          };
+        });
+      },
+
+      recordSearch: (query) => {
+        if (!query.trim()) return;
+        set((state) => {
+          const analytics = state.cms.analytics || defaultCMSData.analytics;
+          const existingIndex = analytics.searches.findIndex((s) => s.query.toLowerCase() === query.toLowerCase());
+          let updatedSearches = [...analytics.searches];
+          if (existingIndex >= 0) {
+            updatedSearches[existingIndex] = {
+              ...updatedSearches[existingIndex],
+              count: updatedSearches[existingIndex].count + 1,
+              timestamp: new Date().toISOString().split("T")[0]
+            };
+          } else {
+            updatedSearches.unshift({ query, count: 1, timestamp: new Date().toISOString().split("T")[0] });
+          }
+          return {
+            cms: {
+              ...state.cms,
+              analytics: {
+                ...analytics,
+                searches: updatedSearches.slice(0, 20)
+              }
+            }
+          };
+        });
+      },
+
+      recordAiQuery: (prompt) => {
+        if (!prompt.trim()) return;
+        set((state) => {
+          const analytics = state.cms.analytics || defaultCMSData.analytics;
+          const updated = [{ prompt, count: 1, timestamp: new Date().toISOString().split("T")[0] }, ...analytics.aiQueries];
+          return {
+            cms: {
+              ...state.cms,
+              analytics: {
+                ...analytics,
+                aiQueries: updated.slice(0, 20)
+              }
+            }
+          };
+        });
       },
 
       createSnapshot: (name, note = "") => {

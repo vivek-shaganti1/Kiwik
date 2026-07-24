@@ -45,11 +45,13 @@ import {
   Database,
   Terminal,
   Activity,
-  Workflow
+  Workflow,
+  Globe
 } from "lucide-react";
 
 import { useProjectsStore, useProjects } from "@/stores/projects-store";
 import { useSiteCMSStore } from "@/stores/site-cms-store";
+import { useDocsStore } from "@/stores/docs-store";
 import { GlassCard } from "@/components/glass/glass-card";
 import type {
   Project,
@@ -67,7 +69,10 @@ type AdminTab =
   | "hero"
   | "sections"
   | "projects"
+  | "documentation"
   | "media"
+  | "ai"
+  | "analytics"
   | "navigation"
   | "theme"
   | "seo"
@@ -436,7 +441,10 @@ export default function AdminPage() {
           { id: "hero", label: "Hero CMS", icon: <Sparkles className="w-3.5 h-3.5" /> },
           { id: "sections", label: "Page Sections", icon: <Layers className="w-3.5 h-3.5" /> },
           { id: "projects", label: "Projects CMS", icon: <Database className="w-3.5 h-3.5" /> },
+          { id: "documentation", label: "Docs CMS", icon: <FileText className="w-3.5 h-3.5" /> },
           { id: "media", label: "Media Library", icon: <ImageIcon className="w-3.5 h-3.5" /> },
+          { id: "ai", label: "AI Knowledge", icon: <Terminal className="w-3.5 h-3.5" /> },
+          { id: "analytics", label: "Analytics Telemetry", icon: <Activity className="w-3.5 h-3.5" /> },
           { id: "navigation", label: "Nav & Footer", icon: <Compass className="w-3.5 h-3.5" /> },
           { id: "theme", label: "Theme & Styling", icon: <Palette className="w-3.5 h-3.5" /> },
           { id: "seo", label: "SEO Engine", icon: <Search className="w-3.5 h-3.5" /> },
@@ -1287,6 +1295,375 @@ export default function AdminPage() {
               ))}
             </div>
           </GlassCard>
+
+          {/* Earth Infrastructure Showcase Manager */}
+          <GlassCard className="p-6 space-y-5">
+            <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+              <Globe className="w-4 h-4 text-cyan-400" /> Earth Infrastructure Showcase Header & Stats
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-text-secondary block mb-1">Headline Text</label>
+                <input
+                  type="text"
+                  value={cms.earthShowcase?.headline || ""}
+                  onChange={(e) => {
+                    useSiteCMSStore.getState().updateEarthShowcase({ headline: e.target.value });
+                    showToast("Updated Earth Showcase headline!");
+                  }}
+                  className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-text-secondary block mb-1">Description Copy</label>
+                <textarea
+                  rows={2}
+                  value={cms.earthShowcase?.description || ""}
+                  onChange={(e) => {
+                    useSiteCMSStore.getState().updateEarthShowcase({ description: e.target.value });
+                    showToast("Updated Earth Showcase description!");
+                  }}
+                  className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-text-secondary block mb-1">Earth Background Image WebP URL</label>
+                <input
+                  type="text"
+                  value={cms.earthShowcase?.earthImageUrl || ""}
+                  onChange={(e) => {
+                    useSiteCMSStore.getState().updateEarthShowcase({ earthImageUrl: e.target.value });
+                    showToast("Updated Earth background image!");
+                  }}
+                  className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
+                />
+              </div>
+
+              {/* Stats Editor Grid */}
+              <div className="pt-2">
+                <span className="text-xs font-bold text-text-primary block mb-3">Live Telemetry Metrics Grid (4 Stats)</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                  {(cms.earthShowcase?.stats || []).map((stat) => (
+                    <div key={stat.id} className="p-3 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-2">
+                      <div>
+                        <label className="text-[10px] font-bold text-text-muted block mb-0.5">Value</label>
+                        <input
+                          type="text"
+                          value={stat.value}
+                          onChange={(e) => {
+                            useSiteCMSStore.getState().updateEarthStat(stat.id, { value: e.target.value });
+                            showToast("Updated stat value!");
+                          }}
+                          className="w-full px-2 py-1 rounded bg-bg-primary border border-glass-border text-xs font-mono font-bold text-text-primary"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-text-muted block mb-0.5">Description</label>
+                        <input
+                          type="text"
+                          value={stat.description}
+                          onChange={(e) => {
+                            useSiteCMSStore.getState().updateEarthStat(stat.id, { description: e.target.value });
+                            showToast("Updated stat description!");
+                          }}
+                          className="w-full px-2 py-1 rounded bg-bg-primary border border-glass-border text-[11px] text-text-secondary"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </GlassCard>
+
+          {/* Device Showcase Manager */}
+          <GlassCard className="p-6 space-y-5">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                <Smartphone className="w-4 h-4 text-emerald-400" /> Device Showcase Cards ({cms.deviceShowcase?.cards?.length || 0})
+              </h3>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-text-secondary">Badge Text:</span>
+                <input
+                  type="text"
+                  value={cms.deviceShowcase?.topBadgeText || ""}
+                  onChange={(e) => {
+                    useSiteCMSStore.getState().updateDeviceShowcase({ topBadgeText: e.target.value });
+                    showToast("Updated top badge text!");
+                  }}
+                  className="px-3 py-1 rounded-lg bg-bg-secondary border border-glass-border text-xs font-bold"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {(cms.deviceShowcase?.cards || []).map((card) => (
+                <div key={card.id} className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-3">
+                  <div className="flex items-center justify-between">
+                    <input
+                      type="text"
+                      value={card.name}
+                      onChange={(e) => {
+                        useSiteCMSStore.getState().updateDeviceCard(card.id, { name: e.target.value });
+                        showToast("Updated card name!");
+                      }}
+                      className="font-bold text-xs text-text-primary bg-transparent focus:outline-none"
+                    />
+                    <button
+                      onClick={() => {
+                        useSiteCMSStore.getState().deleteDeviceCard(card.id);
+                        showToast(`Deleted card ${card.name}`);
+                      }}
+                      className="p-1 text-rose-500 hover:bg-rose-500/10 rounded cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-text-muted block">Role / Tagline</label>
+                    <input
+                      type="text"
+                      value={card.role}
+                      onChange={(e) => {
+                        useSiteCMSStore.getState().updateDeviceCard(card.id, { role: e.target.value });
+                        showToast("Updated card role!");
+                      }}
+                      className="w-full px-2.5 py-1 rounded bg-bg-primary border border-glass-border text-xs font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-text-muted block">Quote / Bio</label>
+                    <textarea
+                      rows={2}
+                      value={card.quote}
+                      onChange={(e) => {
+                        useSiteCMSStore.getState().updateDeviceCard(card.id, { quote: e.target.value });
+                        showToast("Updated card quote!");
+                      }}
+                      className="w-full px-2.5 py-1 rounded bg-bg-primary border border-glass-border text-[11px] text-text-secondary"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </GlassCard>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TAB: DOCUMENTATION CMS MANAGER
+         ───────────────────────────────────────────────────────────── */}
+      {activeTab === "documentation" && (
+        <div className="space-y-6 text-left">
+          <div className="p-6 rounded-2xl bg-glass-bg border border-glass-border flex items-center justify-between">
+            <div>
+              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                <FileText className="w-4 h-4 text-indigo-400" /> Documentation Categories & Articles Manager
+              </h3>
+              <p className="text-xs text-text-secondary mt-0.5">Edit sidebar categories, article markdown content, API specs, and component playgrounds live.</p>
+            </div>
+            <button
+              onClick={() => {
+                const title = prompt("Enter Article Title:", "New Doc Article");
+                const slug = title ? title.toLowerCase().replace(/[^a-z0-9]+/g, "-") : "";
+                if (title && slug) {
+                  useDocsStore.getState().addArticle(
+                    {
+                      id: `doc-${Date.now()}`,
+                      slug,
+                      categoryId: "getting-started",
+                      title,
+                      subtitle: "Custom documentation article created via Admin CMS.",
+                      readingTimeMinutes: 3,
+                      lastUpdated: new Date().toISOString().split("T")[0],
+                      author: "Kiwik Team",
+                      tags: ["guide", "cms"],
+                      toc: [{ id: "sec-1", title: "Overview", level: 2 }],
+                      sections: [
+                        {
+                          id: "sec-1",
+                          heading: "Overview",
+                          bodyMarkdown: "Write your markdown documentation here. Admin edits update the `/docs` page in real-time."
+                        }
+                      ]
+                    },
+                    "getting-started"
+                  );
+                  showToast(`Added new doc article [${title}]!`);
+                }
+              }}
+              className="px-5 py-2.5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold text-xs shadow-md flex items-center gap-2 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" /> Add Doc Article
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {useDocsStore.getState().categories.map((cat) => (
+              <GlassCard key={cat.id} className="p-5 space-y-4 text-left">
+                <div className="flex items-center justify-between border-b border-divider pb-3">
+                  <div>
+                    <h4 className="text-sm font-bold text-text-primary">{cat.name}</h4>
+                    <span className="text-[10px] font-mono font-bold text-accent-blue">{cat.articles.length} Articles</span>
+                  </div>
+                  {cat.badge && (
+                    <span className="px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[9px] font-mono font-bold">
+                      {cat.badge}
+                    </span>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  {cat.articles.map((art) => (
+                    <div key={art.id} className="p-3 rounded-xl bg-bg-secondary/60 border border-glass-border flex items-center justify-between">
+                      <div>
+                        <div className="text-xs font-bold text-text-primary">{art.title}</div>
+                        <div className="text-[10px] font-mono text-text-muted">/docs?slug={art.slug}</div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          const newTitle = prompt("Edit Article Title:", art.title);
+                          if (newTitle && newTitle !== art.title) {
+                            useDocsStore.getState().updateArticle(art.slug, { title: newTitle });
+                            showToast("Updated article title!");
+                          }
+                        }}
+                        className="p-1 text-accent-blue hover:bg-accent-blue/10 rounded cursor-pointer"
+                      >
+                        <Edit className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TAB: AI KNOWLEDGE MANAGER
+         ───────────────────────────────────────────────────────────── */}
+      {activeTab === "ai" && (
+        <div className="space-y-6 text-left">
+          <div className="p-6 rounded-2xl bg-glass-bg border border-glass-border flex items-center justify-between">
+            <div>
+              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                <Terminal className="w-4 h-4 text-accent-blue" /> AI Assistant Knowledge Manager
+              </h3>
+              <p className="text-xs text-text-secondary mt-0.5">Upload, edit, and index knowledge snippets so the AI chatbot answers using authoritative CMS data.</p>
+            </div>
+            <button
+              onClick={() => {
+                const title = prompt("Enter Knowledge Article Title:", "New Knowledge Item");
+                const content = prompt("Enter Knowledge Content:", "Detailed explanation...");
+                if (title && content) {
+                  useSiteCMSStore.getState().addAiKnowledgeArticle({
+                    id: `k-${Date.now()}`,
+                    title,
+                    category: "General",
+                    content,
+                    tags: ["ai", "knowledge"],
+                    lastUpdated: new Date().toISOString().split("T")[0]
+                  });
+                  showToast(`Added AI Knowledge Article [${title}]!`);
+                }
+              }}
+              className="px-5 py-2.5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold text-xs shadow-md flex items-center gap-2 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" /> Add Knowledge Article
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {(cms.aiKnowledge?.articles || []).map((art) => (
+              <GlassCard key={art.id} className="p-5 space-y-3 text-left">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm font-bold text-text-primary">{art.title}</h4>
+                    <span className="text-[10px] font-mono text-accent-blue uppercase font-bold">{art.category}</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      useSiteCMSStore.getState().deleteAiKnowledgeArticle(art.id);
+                      showToast(`Deleted knowledge article [${art.title}]`);
+                    }}
+                    className="p-1.5 text-rose-500 hover:bg-rose-500/10 rounded cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <textarea
+                  rows={4}
+                  value={art.content}
+                  onChange={(e) => {
+                    useSiteCMSStore.getState().updateAiKnowledgeArticle(art.id, { content: e.target.value });
+                    showToast("Updated knowledge article content!");
+                  }}
+                  className="w-full p-3 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono leading-relaxed"
+                />
+              </GlassCard>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TAB: ANALYTICS TELEMETRY DASHBOARD
+         ───────────────────────────────────────────────────────────── */}
+      {activeTab === "analytics" && (
+        <div className="space-y-6 text-left">
+          <div className="p-6 rounded-2xl bg-glass-bg border border-glass-border space-y-2">
+            <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+              <Activity className="w-4 h-4 text-emerald-400" /> Real-time Analytics & Search Telemetry
+            </h3>
+            <p className="text-xs text-text-secondary">Tracks visitor activity, top command palette searches, project clicks, and AI prompt frequencies.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <GlassCard className="p-5 space-y-4">
+              <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted">Top Search Queries</h4>
+              <div className="space-y-2">
+                {(cms.analytics?.searches || []).map((s, i) => (
+                  <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-bg-secondary text-xs">
+                    <span className="font-mono font-bold text-text-primary">{s.query}</span>
+                    <span className="px-2 py-0.5 rounded-full bg-accent-blue/10 text-accent-blue font-mono font-bold text-[10px]">
+                      {s.count} searches
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </GlassCard>
+
+            <GlassCard className="p-5 space-y-4">
+              <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted">Project Clicks Leaderboard</h4>
+              <div className="space-y-2">
+                {Object.entries(cms.analytics?.projectClicks || {}).map(([slug, count], i) => (
+                  <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-bg-secondary text-xs">
+                    <span className="font-mono font-bold text-text-primary">/projects/{slug}</span>
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-mono font-bold text-[10px]">
+                      {count} clicks
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </GlassCard>
+
+            <GlassCard className="p-5 space-y-4">
+              <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted">Visitor Geographic Breakdown</h4>
+              <div className="space-y-2">
+                {(cms.analytics?.countryBreakdown || []).map((c, i) => (
+                  <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-bg-secondary text-xs">
+                    <div className="flex items-center gap-2">
+                      <span>{c.flag}</span>
+                      <span className="font-bold text-text-primary">{c.country}</span>
+                    </div>
+                    <span className="font-mono text-text-secondary text-[11px] font-semibold">{c.count.toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+            </GlassCard>
+          </div>
         </div>
       )}
 

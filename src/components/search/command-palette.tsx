@@ -7,10 +7,12 @@ import { Search, Command, ArrowUp, ArrowDown, CornerDownLeft, X, LayoutTemplate 
 import Fuse from "fuse.js";
 import { cn } from "@/lib/utils";
 import { useProjects } from "@/stores/projects-store";
+import { useSiteCMSStore } from "@/stores/site-cms-store";
 import { Project } from "@/types";
 
 export function CommandPalette() {
   const projects = useProjects();
+  const recordSearch = useSiteCMSStore((state) => state.recordSearch);
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
@@ -61,7 +63,10 @@ export function CommandPalette() {
 
   useEffect(() => {
     setActiveIndex(0);
-  }, [query]);
+    if (query.length > 2) {
+      recordSearch(query);
+    }
+  }, [query, recordSearch]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
@@ -79,6 +84,9 @@ export function CommandPalette() {
   const handleSelect = (project: Project) => {
     if (query && !recentSearches.includes(query)) {
       setRecentSearches((prev) => [query, ...prev].slice(0, 5));
+    }
+    if (query) {
+      recordSearch(query);
     }
     setIsOpen(false);
     router.push(`/projects/${project.slug}`);

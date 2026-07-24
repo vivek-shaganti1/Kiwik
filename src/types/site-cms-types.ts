@@ -164,6 +164,59 @@ export interface PageCMS {
   lastUpdated: string;
 }
 
+export interface DeviceShowcaseCard {
+  id: string;
+  name: string;
+  role: string;
+  quote: string;
+  tag: string;
+  avatarUrl: string;
+  frameOverlayUrl: string;
+  accentColor: string;
+  inputFields?: string[];
+  ctaText?: string;
+}
+
+export interface DeviceShowcaseCMS {
+  topBadgeText: string;
+  cards: DeviceShowcaseCard[];
+}
+
+export interface StatItem {
+  id: string;
+  value: string;
+  label: string;
+  description: string;
+}
+
+export interface EarthShowcaseCMS {
+  headline: string;
+  description: string;
+  earthImageUrl: string;
+  stats: StatItem[];
+}
+
+export interface AIKnowledgeArticle {
+  id: string;
+  title: string;
+  category: string;
+  content: string;
+  tags: string[];
+  lastUpdated: string;
+}
+
+export interface AIKnowledgeCMS {
+  articles: AIKnowledgeArticle[];
+}
+
+export interface AnalyticsData {
+  totalVisitors: number;
+  projectClicks: Record<string, number>;
+  searches: Array<{ query: string; count: number; timestamp: string }>;
+  aiQueries: Array<{ prompt: string; count: number; timestamp: string }>;
+  countryBreakdown: Array<{ country: string; flag: string; count: number }>;
+}
+
 export interface MediaItem {
   id: string;
   name: string;
@@ -174,6 +227,7 @@ export interface MediaItem {
   dimensions?: { width: number; height: number };
   folder: string;
   tags: string[];
+  usedIn?: string[];
   createdAt: string;
 }
 
@@ -245,6 +299,10 @@ export interface SiteCMSData {
   capabilities: CapabilitiesCMS;
   trust: TrustCMS;
   howWeWork: HowWeWorkCMS;
+  deviceShowcase: DeviceShowcaseCMS;
+  earthShowcase: EarthShowcaseCMS;
+  aiKnowledge: AIKnowledgeCMS;
+  analytics: AnalyticsData;
   pages: PageCMS[];
   media: MediaItem[];
   theme: ThemeCMS;

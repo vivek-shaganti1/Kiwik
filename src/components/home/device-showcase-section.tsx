@@ -16,11 +16,17 @@ import {
   Globe
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSiteCMSStore } from "@/stores/site-cms-store";
 
 export function DeviceShowcaseSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  const deviceShowcase = useSiteCMSStore((state) => state.cms.deviceShowcase) || {
+    topBadgeText: "No Credit Card Required",
+    cards: []
+  };
 
   // Scroll parallax translation
   const { scrollYProgress } = useScroll({
@@ -48,12 +54,12 @@ export function DeviceShowcaseSection() {
       className="py-28 sm:py-36 md:py-40 lg:py-44 px-0 sm:px-4 max-w-[1700px] mx-auto relative z-20 select-none overflow-hidden bg-[#FAFAF8] dark:bg-[#08090C]"
     >
       {/* ─────────────────────────────────────────────────────────────
-          TOP BADGE: "No Credit Card Required"
+          TOP BADGE: CMS Driven
          ───────────────────────────────────────────────────────────── */}
       <div className="flex justify-center mb-12 sm:mb-16">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-white/10 border border-neutral-200 dark:border-white/15 text-neutral-600 dark:text-neutral-300 text-xs font-sans font-medium shadow-sm">
           <CreditCard className="w-3.5 h-3.5 text-neutral-400" />
-          <span className="line-through decoration-neutral-400">No Credit Card Required</span>
+          <span className="line-through decoration-neutral-400">{deviceShowcase.topBadgeText || "No Credit Card Required"}</span>
         </div>
       </div>
 
