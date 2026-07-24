@@ -57,11 +57,8 @@ export function DeviceShowcaseSection() {
           TOP BADGE: CMS Driven
          ───────────────────────────────────────────────────────────── */}
       <div className="flex justify-center mb-12 sm:mb-16">
-        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border border-neutral-800 dark:border-neutral-200 text-xs font-bold tracking-wide font-sans shadow-md hover:scale-[1.03] transition-all">
-          <div className="w-5 h-5 rounded-md bg-gradient-to-tr from-orange-500 to-amber-400 flex items-center justify-center font-bold text-[10px] text-black shrink-0">
-            K
-          </div>
-          <span>Kiwik</span>
+        <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 text-xs font-bold tracking-wide font-sans shadow-md hover:scale-[1.03] transition-all">
+          <img src="/logo.png" alt="Kiwik Logo" className="h-4.5 w-auto object-contain dark:brightness-0 dark:invert" />
         </div>
       </div>
 
