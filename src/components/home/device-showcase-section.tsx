@@ -57,9 +57,11 @@ export function DeviceShowcaseSection() {
           TOP BADGE: CMS Driven
          ───────────────────────────────────────────────────────────── */}
       <div className="flex justify-center mb-12 sm:mb-16">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-white/10 border border-neutral-200 dark:border-white/15 text-neutral-600 dark:text-neutral-300 text-xs font-sans font-medium shadow-sm">
-          <CreditCard className="w-3.5 h-3.5 text-neutral-400" />
-          <span className="line-through decoration-neutral-400">{deviceShowcase.topBadgeText || "No Credit Card Required"}</span>
+        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border border-neutral-800 dark:border-neutral-200 text-xs font-bold tracking-wide font-sans shadow-md hover:scale-[1.03] transition-all">
+          <div className="w-5 h-5 rounded-md bg-gradient-to-tr from-orange-500 to-amber-400 flex items-center justify-center font-bold text-[10px] text-black shrink-0">
+            K
+          </div>
+          <span>Kiwik</span>
         </div>
       </div>
 
