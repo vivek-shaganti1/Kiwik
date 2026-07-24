@@ -46,7 +46,21 @@ import {
   Terminal,
   Activity,
   Workflow,
-  Globe
+  Globe,
+  ChevronRight,
+  ChevronDown,
+  Sliders,
+  Play,
+  RefreshCw,
+  FolderPlus,
+  Tag,
+  ShieldCheck,
+  HelpCircle,
+  Lock,
+  UserCheck,
+  Folder,
+  MousePointer,
+  Cpu
 } from "lucide-react";
 
 import { useProjectsStore, useProjects } from "@/stores/projects-store";
@@ -63,20 +77,45 @@ import type {
 } from "@/types";
 import { cn } from "@/lib/utils";
 
-type AdminTab =
+// Top-level Navigation Hierarchies requested by prompt
+type MainSidebarTab =
   | "dashboard"
-  | "visual-editor"
-  | "hero"
-  | "sections"
+  | "pages"
+  | "media"
   | "projects"
   | "documentation"
-  | "media"
   | "ai"
   | "analytics"
-  | "navigation"
-  | "theme"
-  | "seo"
-  | "audit-snapshots";
+  | "users"
+  | "appearance"
+  | "settings";
+
+type PageSubTab =
+  | "home"
+  | "projects-page"
+  | "project-detail"
+  | "docs-page"
+  | "doc-article"
+  | "about"
+  | "contact"
+  | "footer-page"
+  | "404";
+
+type HomeSectionTab =
+  | "hero"
+  | "floating-gallery"
+  | "prompt-bar"
+  | "architecture"
+  | "why-criska"
+  | "dashboard-showcase"
+  | "featured-products"
+  | "earth-section"
+  | "device-showcase"
+  | "capabilities"
+  | "how-we-work"
+  | "trust"
+  | "newsletter"
+  | "footer";
 
 // Blank Project Template
 const emptyProject: Project = {
@@ -112,37 +151,29 @@ const emptyProject: Project = {
 };
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<AdminTab>("projects");
+  // Navigation State
+  const [mainTab, setMainTab] = useState<MainSidebarTab>("pages");
+  const [activePage, setActivePage] = useState<PageSubTab>("home");
+  const [homeSection, setHomeSection] = useState<HomeSectionTab>("hero");
+
+  // Preview & Theme State
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
+  const [previewMode, setPreviewMode] = useState<"dark" | "light">("dark");
+  const [showLivePreviewModal, setShowLivePreviewModal] = useState(false);
+
+  // Store Hooks
   const projects = useProjects();
   const {
     addProject,
     updateProject,
-    deleteProject,
-    movePriority,
-    duplicateProject,
-    resetToDefaults,
+    deleteProject
   } = useProjectsStore();
 
-  const cms = useSiteCMSStore((state) => state.cms);
   const {
+    cms,
     updateSettings,
     updateHero,
-    updateHeroRotatingWords,
-    updateHeroMetric,
     updateNavigation,
-    addNavItem,
-    updateNavItem,
-    deleteNavItem,
-    updateFeaturedSection,
-    updateCapabilities,
-    addCapabilityItem,
-    updateCapabilityItem,
-    deleteCapabilityItem,
-    updateTrust,
-    addTrustItem,
-    updateTrustItem,
-    deleteTrustItem,
-    updateHowWeWork,
     updateFooter,
     updateTheme,
     updateSEO,
@@ -150,1948 +181,903 @@ export default function AdminPage() {
     deleteMediaItem,
     createSnapshot,
     rollbackSnapshot,
-    deleteSnapshot,
-    exportJSONBackup,
-    importJSONBackup,
+    addAuditLog
   } = useSiteCMSStore();
 
-  // Search & Filter States for Projects
-  const [projectSearch, setProjectSearch] = useState("");
-  const [projectStatusFilter, setProjectStatusFilter] = useState<string>("all");
-  const [projectCategoryFilter, setProjectCategoryFilter] = useState<string>("all");
+  const docsCategories = useDocsStore((state) => state.categories);
 
-  // Project Modal State
-  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
-  const [editingProject, setEditingProject] = useState<Project>(emptyProject);
-  const [modalSubTab, setModalSubTab] = useState<"basic" | "details" | "tech" | "features" | "readme">("basic");
-
-  // Form Inputs
-  const [newRotatingWord, setNewRotatingWord] = useState("");
-  const [newNavLabel, setNewNavLabel] = useState("");
-  const [newNavHref, setNewNavHref] = useState("");
-
-  const [newCapTitle, setNewCapTitle] = useState("");
-  const [newCapDesc, setNewCapDesc] = useState("");
-  const [newCapIcon, setNewCapIcon] = useState("Sparkles");
-
-  const [newTrustTitle, setNewTrustTitle] = useState("");
-  const [newTrustDesc, setNewTrustDesc] = useState("");
-
-  // Sub-items for project modal
-  const [newTechName, setNewTechName] = useState("");
-  const [newTechCat, setNewTechCat] = useState<TechCategory>("frontend");
-  const [newFeatureTitle, setNewFeatureTitle] = useState("");
-  const [newFeatureDesc, setNewFeatureDesc] = useState("");
-
-  const [previewDevice, setPreviewDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
-  const [previewMode, setPreviewMode] = useState<"dark" | "light">("dark");
-  const [jsonBackupInput, setJsonBackupInput] = useState("");
+  // Toast Notification State
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  // Live Visitor Stats Telemetry
-  const [visitorStats, setVisitorStats] = useState({ total: 1, active: 1 });
-
-  useEffect(() => {
-    const fetchVisitorStats = () => {
-      fetch("/api/visitors")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data && typeof data.total === "number") {
-            setVisitorStats({ total: data.total, active: data.active });
-          }
-        })
-        .catch((err) => console.error("Error fetching visitor telemetry:", err));
-    };
-
-    fetchVisitorStats();
-    const interval = setInterval(fetchVisitorStats, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // Filtered Projects
+  // Projects Search & Filter State
+  const [projectSearch, setProjectSearch] = useState("");
+  const [projectStatusFilter, setProjectStatusFilter] = useState("all");
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
+
+  // Media Library Search State
+  const [mediaSearch, setMediaSearch] = useState("");
+
   const filteredProjects = projects.filter((p) => {
     const matchesSearch =
       p.name.toLowerCase().includes(projectSearch.toLowerCase()) ||
-      p.slug.toLowerCase().includes(projectSearch.toLowerCase()) ||
-      p.description.toLowerCase().includes(projectSearch.toLowerCase());
-    const matchesStatus = projectStatusFilter === "all" || p.status === projectStatusFilter;
-    const matchesCategory = projectCategoryFilter === "all" || p.category === projectCategoryFilter;
-    return matchesSearch && matchesStatus && matchesCategory;
+      p.slug.toLowerCase().includes(projectSearch.toLowerCase());
+    const matchesStatus =
+      projectStatusFilter === "all" || p.status === projectStatusFilter;
+    return matchesSearch && matchesStatus;
   });
 
-  const handleOpenNewProjectModal = () => {
-    setEditingProject({
-      ...emptyProject,
-      id: `proj-${Date.now()}`,
-      slug: `project-${Date.now()}`,
-      name: "New Kiwik Project",
-      createdAt: new Date().toISOString().split("T")[0]
-    });
-    setModalSubTab("basic");
-    setIsProjectModalOpen(true);
-  };
-
-  const handleOpenEditProjectModal = (proj: Project) => {
-    setEditingProject({ ...proj });
-    setModalSubTab("basic");
-    setIsProjectModalOpen(true);
-  };
-
-  const handleSaveProject = () => {
-    if (!editingProject.name.trim() || !editingProject.slug.trim()) return;
-    
-    const exists = projects.some((p) => p.id === editingProject.id);
-    if (exists) {
-      updateProject(editingProject.id, editingProject);
-      showToast(`Updated project "${editingProject.name}"!`);
-    } else {
-      addProject(editingProject);
-      showToast(`Added project "${editingProject.name}"!`);
-    }
-    setIsProjectModalOpen(false);
-  };
-
-  const handleAddTechItem = () => {
-    if (!newTechName.trim()) return;
-    const item: TechItem = {
-      name: newTechName.trim(),
-      category: newTechCat
-    };
-    setEditingProject({
-      ...editingProject,
-      techStack: [...(editingProject.techStack || []), item]
-    });
-    setNewTechName("");
-  };
-
-  const handleRemoveTechItem = (idx: number) => {
-    setEditingProject({
-      ...editingProject,
-      techStack: (editingProject.techStack || []).filter((_, i) => i !== idx)
-    });
-  };
-
-  const handleAddFeatureItem = () => {
-    if (!newFeatureTitle.trim()) return;
-    const feat: Feature = {
-      title: newFeatureTitle.trim(),
-      description: newFeatureDesc.trim()
-    };
-    setEditingProject({
-      ...editingProject,
-      features: [...(editingProject.features || []), feat]
-    });
-    setNewFeatureTitle("");
-    setNewFeatureDesc("");
-  };
-
-  const handleRemoveFeatureItem = (title: string) => {
-    setEditingProject({
-      ...editingProject,
-      features: (editingProject.features || []).filter((f) => f.title !== title)
-    });
-  };
-
-  const handleAddRotatingWord = () => {
-    if (!newRotatingWord.trim()) return;
-    const updated = [...cms.hero.rotatingWords, newRotatingWord.trim()];
-    updateHeroRotatingWords(updated);
-    setNewRotatingWord("");
-    showToast("Added rotating phrase!");
-  };
-
-  const handleRemoveRotatingWord = (index: number) => {
-    const updated = cms.hero.rotatingWords.filter((_, i) => i !== index);
-    updateHeroRotatingWords(updated);
-    showToast("Removed phrase!");
-  };
-
-  const handleAddNavItem = () => {
-    if (!newNavLabel.trim() || !newNavHref.trim()) return;
-    addNavItem({
-      id: `nav-${Date.now()}`,
-      label: newNavLabel.trim(),
-      href: newNavHref.trim(),
-      order: cms.navigation.items.length + 1,
-      visible: true
-    });
-    setNewNavLabel("");
-    setNewNavHref("");
-    showToast("Added navigation item!");
-  };
-
-  const handleAddCapability = () => {
-    if (!newCapTitle.trim()) return;
-    addCapabilityItem({
-      id: `cap-${Date.now()}`,
-      title: newCapTitle.trim(),
-      desc: newCapDesc.trim() || "Capability description.",
-      iconName: newCapIcon
-    });
-    setNewCapTitle("");
-    setNewCapDesc("");
-    showToast("Added capability card!");
-  };
-
-  const handleAddTrust = () => {
-    if (!newTrustTitle.trim()) return;
-    addTrustItem({
-      id: `tr-${Date.now()}`,
-      title: newTrustTitle.trim(),
-      desc: newTrustDesc.trim() || "Trust item description."
-    });
-    setNewTrustTitle("");
-    setNewTrustDesc("");
-    showToast("Added trust assurance item!");
-  };
-
-  const handleExportBackup = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(exportJSONBackup());
-    const downloadAnchor = document.createElement("a");
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `kiwik_cms_backup_${Date.now()}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-    showToast("CMS Backup exported!");
-  };
-
-  const handleImportBackup = () => {
-    if (!jsonBackupInput.trim()) return;
-    const success = importJSONBackup(jsonBackupInput);
-    if (success) {
-      showToast("CMS Backup restored!");
-      setJsonBackupInput("");
-    } else {
-      alert("Invalid JSON Backup format.");
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-bg-primary text-text-primary pt-24 pb-16 px-4 sm:px-6 md:px-8 max-w-[1500px] mx-auto select-none">
+    <div className="min-h-screen bg-bg-primary text-text-primary flex flex-col font-sans select-none antialiased">
       
-      {/* Toast Notification */}
+      {/* Toast Notification Container */}
       <AnimatePresence>
         {toastMessage && (
           <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.9 }}
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.9 }}
-            className="fixed top-6 right-6 z-50 px-5 py-3 rounded-full bg-emerald-600 text-white font-semibold text-xs shadow-2xl flex items-center gap-2 border border-emerald-400/40"
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            className="fixed top-20 right-6 z-50 px-5 py-3 rounded-2xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold text-xs shadow-2xl flex items-center gap-2 border border-white/20"
           >
-            <CheckCircle2 className="w-4 h-4" />
-            {toastMessage}
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 dark:text-emerald-600" />
+            <span>{toastMessage}</span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 border-b border-divider pb-6 text-left">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-text-primary tracking-tight">
-              Kiwik.1 Enterprise Website CMS
-            </h1>
-          </div>
-          <p className="text-xs text-text-secondary mt-1 font-medium">
-            Full Interactive Edit Access. Priority ordering, duplicate, status filters, markdown READMEs, rotating phrases, navigation, theme, and projects live.
-          </p>
+      {/* ─────────────────────────────────────────────────────────────
+          TOP CONTROL BAR (Enterprise CMS Studio Header)
+         ───────────────────────────────────────────────────────────── */}
+      <header className="h-16 px-6 bg-glass-bg border-b border-glass-border backdrop-blur-xl flex items-center justify-between sticky top-0 z-40">
+        <div className="flex items-center gap-4">
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-accent-blue via-indigo-500 to-purple-600 p-[1px]">
+              <div className="w-full h-full bg-bg-primary rounded-[11px] flex items-center justify-center font-bold text-xs text-text-primary group-hover:scale-105 transition-transform">
+                K
+              </div>
+            </div>
+            <span className="font-serif font-bold text-base tracking-tight text-text-primary">Kiwik OS Studio</span>
+          </Link>
+          <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-mono font-bold flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Live Telemetry Synced
+          </span>
         </div>
 
-        <div className="flex items-center gap-3 flex-wrap">
+        {/* Global Action Tools */}
+        <div className="flex items-center gap-3">
           <button
-            onClick={() => {
-              createSnapshot(`Snapshot-${new Date().toLocaleTimeString()}`, "Manual snapshot backup");
-              showToast("Saved version snapshot!");
-            }}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-glass-bg border border-glass-border hover:bg-glass-bg-hover text-xs font-semibold shadow-sm transition-all cursor-pointer"
+            onClick={() => setPreviewMode(previewMode === "dark" ? "light" : "dark")}
+            className="p-2 rounded-xl bg-bg-secondary border border-glass-border text-text-primary text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
           >
-            <History className="w-3.5 h-3.5 text-accent-blue" />
-            Save Snapshot
+            {previewMode === "dark" ? <Moon className="w-4 h-4 text-indigo-400" /> : <Sun className="w-4 h-4 text-amber-500" />}
+            <span>{previewMode === "dark" ? "Dark Mode" : "Light Mode"}</span>
           </button>
-          <button
-            onClick={handleExportBackup}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-glass-bg border border-glass-border hover:bg-glass-bg-hover text-xs font-semibold shadow-sm transition-all cursor-pointer"
-          >
-            <Download className="w-3.5 h-3.5 text-indigo-400" />
-            Export JSON
-          </button>
+
           <Link
             href="/"
             target="_blank"
-            className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold text-xs shadow-md transition-all hover:scale-102"
+            className="px-4 py-2 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 text-xs font-bold shadow-md hover:scale-102 transition-all flex items-center gap-1.5"
           >
-            <Eye className="w-3.5 h-3.5" />
-            Live Website
+            <Eye className="w-4 h-4" /> View Public Site
           </Link>
         </div>
-      </div>
-
-      {/* Navigation Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar border-b border-divider/60">
-        {[
-          { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-3.5 h-3.5" /> },
-          { id: "visual-editor", label: "Visual Editor", icon: <Eye className="w-3.5 h-3.5" /> },
-          { id: "hero", label: "Hero CMS", icon: <Sparkles className="w-3.5 h-3.5" /> },
-          { id: "sections", label: "Page Sections", icon: <Layers className="w-3.5 h-3.5" /> },
-          { id: "projects", label: "Projects CMS", icon: <Database className="w-3.5 h-3.5" /> },
-          { id: "documentation", label: "Docs CMS", icon: <FileText className="w-3.5 h-3.5" /> },
-          { id: "media", label: "Media Library", icon: <ImageIcon className="w-3.5 h-3.5" /> },
-          { id: "ai", label: "AI Knowledge", icon: <Terminal className="w-3.5 h-3.5" /> },
-          { id: "analytics", label: "Analytics Telemetry", icon: <Activity className="w-3.5 h-3.5" /> },
-          { id: "navigation", label: "Nav & Footer", icon: <Compass className="w-3.5 h-3.5" /> },
-          { id: "theme", label: "Theme & Styling", icon: <Palette className="w-3.5 h-3.5" /> },
-          { id: "seo", label: "SEO Engine", icon: <Search className="w-3.5 h-3.5" /> },
-          { id: "audit-snapshots", label: "Audit & Versioning", icon: <History className="w-3.5 h-3.5" /> }
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id as AdminTab)}
-            className={cn(
-              "flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all whitespace-nowrap cursor-pointer",
-              activeTab === tab.id
-                ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-md font-bold"
-                : "bg-glass-bg border border-glass-border text-text-secondary hover:text-text-primary hover:bg-glass-bg-hover"
-            )}
-          >
-            {tab.icon}
-            <span>{tab.label}</span>
-          </button>
-        ))}
-      </div>
+      </header>
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB 1: DASHBOARD
+          MAIN STUDIO LAYOUT (Sidebar + Main Content Area)
          ───────────────────────────────────────────────────────────── */}
-      {activeTab === "dashboard" && (
-        <div className="space-y-8 text-left">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-            {[
-              { 
-                label: "Live Visitors", 
-                val: visitorStats.active, 
-                icon: <Users className="w-5 h-5 text-emerald-400" />,
-                isLive: true 
-              },
-              { 
-                label: "Total Site Visits", 
-                val: visitorStats.total, 
-                icon: <Eye className="w-5 h-5 text-cyan-400" /> 
-              },
-              { label: "Active Projects", val: projects.length, icon: <Layers className="w-5 h-5 text-accent-blue" /> },
-              { label: "Rotating Phrases", val: cms.hero.rotatingWords.length, icon: <Sparkles className="w-5 h-5 text-indigo-400" /> },
-              { label: "Nav Items", val: cms.navigation.items.length, icon: <Compass className="w-5 h-5 text-cyan-400" /> },
-              { label: "Audit Logs", val: cms.auditLogs.length, icon: <History className="w-5 h-5 text-amber-400" /> }
-            ].map((st, i) => (
-              <GlassCard key={i} className="p-5 flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-1.5 mb-1">
-                    {st.isLive && <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />}
-                    <p className="text-[10px] uppercase font-mono tracking-wider text-text-secondary font-bold">{st.label}</p>
-                  </div>
-                  <h3 className="text-2xl font-bold text-text-primary font-mono">{st.val}</h3>
+      <div className="flex-1 flex overflow-hidden">
+        
+        {/* ─────────────────────────────────────────────────────────────
+            LEFT SIDEBAR HIERARCHY (Match exact prompt specs)
+           ───────────────────────────────────────────────────────────── */}
+        <aside className="w-64 bg-glass-bg border-r border-glass-border p-4 flex flex-col justify-between shrink-0 space-y-4 overflow-y-auto">
+          <div className="space-y-6">
+            
+            {/* Primary Navigation Section */}
+            <div className="space-y-1">
+              <span className="px-3 text-[10px] font-mono font-bold uppercase tracking-wider text-text-muted">
+                Enterprise Studio
+              </span>
+
+              <button
+                onClick={() => setMainTab("dashboard")}
+                className={cn(
+                  "w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-3 transition-colors cursor-pointer text-left",
+                  mainTab === "dashboard" ? "bg-accent-blue text-white shadow-md" : "text-text-secondary hover:bg-bg-secondary hover:text-text-primary"
+                )}
+              >
+                <LayoutDashboard className="w-4 h-4" /> Dashboard
+              </button>
+
+              <button
+                onClick={() => setMainTab("pages")}
+                className={cn(
+                  "w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-between transition-colors cursor-pointer text-left",
+                  mainTab === "pages" ? "bg-accent-blue text-white shadow-md" : "text-text-secondary hover:bg-bg-secondary hover:text-text-primary"
+                )}
+              >
+                <div className="flex items-center gap-3">
+                  <Compass className="w-4 h-4" /> Pages
                 </div>
-                <div className="p-3 rounded-2xl bg-bg-secondary border border-glass-border">{st.icon}</div>
-              </GlassCard>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <GlassCard className="p-6 text-left space-y-4">
-              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-accent-blue" /> Current Hero Headline
-              </h3>
-              <div className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border font-serif text-lg text-text-primary">
-                "{cms.hero.headlinePrefix} <span className="italic text-accent-blue">{cms.hero.headlineHighlightWord}</span> [Rotating Phrases]"
-              </div>
-              <p className="text-xs text-text-secondary">{cms.hero.description}</p>
-              <button
-                onClick={() => setActiveTab("hero")}
-                className="px-4 py-2 rounded-full bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors cursor-pointer"
-              >
-                Edit Hero Content
+                <ChevronDown className="w-3.5 h-3.5 opacity-60" />
               </button>
-            </GlassCard>
 
-            <GlassCard className="p-6 text-left space-y-4">
-              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                <History className="w-4 h-4 text-indigo-400" /> Recent Audit Trail
-              </h3>
-              <div className="space-y-2 max-h-[160px] overflow-y-auto pr-2">
-                {cms.auditLogs.slice(0, 4).map((log) => (
-                  <div key={log.id} className="text-xs p-2.5 rounded-lg bg-bg-secondary border border-glass-border flex items-center justify-between">
-                    <div>
-                      <span className="font-bold text-accent-blue">{log.section}: </span>
-                      <span className="text-text-secondary">{log.details}</span>
-                    </div>
-                    <span className="text-[10px] font-mono text-text-muted shrink-0 ml-2">
-                      {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </GlassCard>
-          </div>
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          TAB 2: VISUAL EDITOR
-         ───────────────────────────────────────────────────────────── */}
-      {activeTab === "visual-editor" && (
-        <div className="space-y-6 text-left">
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-glass-bg border border-glass-border flex-wrap gap-4">
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-bold text-text-primary">Device Viewport:</span>
-              <button
-                onClick={() => setPreviewDevice("desktop")}
-                className={cn("p-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer", previewDevice === "desktop" ? "bg-accent-blue text-white" : "bg-bg-secondary text-text-secondary")}
-              >
-                <Monitor className="w-4 h-4" /> Desktop
-              </button>
-              <button
-                onClick={() => setPreviewDevice("tablet")}
-                className={cn("p-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer", previewDevice === "tablet" ? "bg-accent-blue text-white" : "bg-bg-secondary text-text-secondary")}
-              >
-                <Tablet className="w-4 h-4" /> Tablet
-              </button>
-              <button
-                onClick={() => setPreviewDevice("mobile")}
-                className={cn("p-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer", previewDevice === "mobile" ? "bg-accent-blue text-white" : "bg-bg-secondary text-text-secondary")}
-              >
-                <Smartphone className="w-4 h-4" /> Mobile
-              </button>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-bold text-text-primary">Theme Mode:</span>
-              <button
-                onClick={() => setPreviewMode(previewMode === "dark" ? "light" : "dark")}
-                className="p-2 rounded-lg bg-bg-secondary text-text-primary text-xs font-bold flex items-center gap-1.5 border border-glass-border cursor-pointer"
-              >
-                {previewMode === "dark" ? <Moon className="w-4 h-4 text-indigo-400" /> : <Sun className="w-4 h-4 text-amber-500" />}
-                {previewMode === "dark" ? "Dark Mode" : "Light Mode"}
-              </button>
-            </div>
-          </div>
-
-          <div className="flex justify-center w-full py-4 bg-black/40 rounded-3xl border border-glass-border overflow-hidden">
-            <div
-              className={cn(
-                "transition-all duration-500 rounded-2xl overflow-hidden border border-white/20 shadow-2xl bg-bg-primary",
-                previewDevice === "desktop" && "w-full max-w-[1300px] h-[720px]",
-                previewDevice === "tablet" && "w-[768px] h-[720px]",
-                previewDevice === "mobile" && "w-[375px] h-[680px]",
-                previewMode === "dark" ? "dark" : ""
-              )}
-            >
-              <iframe src="/" className="w-full h-full border-none" title="Live Website Preview" />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          TAB 5: PROJECTS CMS (RESTORED PRIORITY REORDERING, FILTERS, DUPLICATE & MULTI-TAB MODAL)
-         ───────────────────────────────────────────────────────────── */}
-      {activeTab === "projects" && (
-        <div className="space-y-6 text-left">
-          
-          {/* Header Controls & Filters */}
-          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-5 rounded-2xl bg-glass-bg border border-glass-border">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
-              <div className="relative flex-1">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
-                <input
-                  type="text"
-                  placeholder="Search projects by name, slug, or tech..."
-                  value={projectSearch}
-                  onChange={(e) => setProjectSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium text-text-primary focus:outline-none focus:border-accent-blue"
-                />
-              </div>
-
-              {/* Status Filter Pills */}
-              <div className="flex items-center gap-1 bg-bg-secondary p-1 rounded-xl border border-glass-border overflow-x-auto">
-                {["all", "completed", "in-progress", "planning"].map((st) => (
-                  <button
-                    key={st}
-                    onClick={() => setProjectStatusFilter(st)}
-                    className={cn(
-                      "px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap",
-                      projectStatusFilter === st
-                        ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow"
-                        : "text-text-secondary hover:text-text-primary"
-                    )}
-                  >
-                    {st}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <button
-              onClick={handleOpenNewProjectModal}
-              className="px-5 py-2.5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold text-xs shadow-md transition-all hover:scale-102 flex items-center justify-center gap-2 cursor-pointer shrink-0"
-            >
-              <Plus className="w-4 h-4" /> Add New Project
-            </button>
-          </div>
-
-          {/* Project List Grid with Priority Up/Down Controls */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProjects.map((proj, idx) => (
-              <GlassCard key={proj.id} className="p-5 space-y-4 flex flex-col justify-between group relative">
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-mono font-bold text-accent-blue bg-accent-blue/10 px-2 py-0.5 rounded-full">
-                        #{idx + 1} Priority
-                      </span>
-                      <span className="text-[10px] font-mono font-bold uppercase text-text-muted">
-                        {proj.category}
-                      </span>
-                    </div>
-
-                    {/* Priority Move Controls */}
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => movePriority(proj.id, "up")}
-                        disabled={idx === 0}
-                        className="p-1 rounded bg-bg-secondary hover:bg-glass-bg-hover text-text-secondary disabled:opacity-30 cursor-pointer"
-                        title="Move Priority Up"
-                      >
-                        <ArrowUp className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => movePriority(proj.id, "down")}
-                        disabled={idx === projects.length - 1}
-                        className="p-1 rounded bg-bg-secondary hover:bg-glass-bg-hover text-text-secondary disabled:opacity-30 cursor-pointer"
-                        title="Move Priority Down"
-                      >
-                        <ArrowDown className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <h4 className="text-base font-bold text-text-primary tracking-tight">{proj.name}</h4>
-                  <p className="text-xs text-text-secondary mt-1.5 line-clamp-2 leading-relaxed">{proj.tagline || proj.description}</p>
-                </div>
-
-                <div className="space-y-3 pt-4 border-t border-divider">
-                  <div className="flex items-center justify-between text-[10px] font-mono">
-                    <span className={cn(
-                      "font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border",
-                      proj.status === "completed" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                    )}>
-                      ● {proj.status}
-                    </span>
-                    <span className="text-text-muted">{proj.version}</span>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center justify-end gap-2">
-                    <button
-                      onClick={() => handleOpenEditProjectModal(proj)}
-                      className="p-2 rounded-lg bg-bg-secondary hover:bg-glass-bg-hover text-accent-blue transition-colors cursor-pointer"
-                      title="Edit Full Project Specs"
-                    >
-                      <Edit className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        duplicateProject(proj.id);
-                        showToast(`Duplicated ${proj.name}!`);
-                      }}
-                      className="p-2 rounded-lg bg-bg-secondary hover:bg-glass-bg-hover text-text-secondary transition-colors cursor-pointer"
-                      title="Duplicate Project"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        deleteProject(proj.id);
-                        showToast(`Deleted ${proj.name}`);
-                      }}
-                      className="p-2 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-colors cursor-pointer"
-                      title="Delete Project"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              </GlassCard>
-            ))}
-          </div>
-
-          {/* Full Multi-Tab Edit Project Modal */}
-          {isProjectModalOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md overflow-y-auto">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="w-full max-w-3xl rounded-2xl bg-glass-bg border border-glass-border p-6 shadow-2xl space-y-5 text-left max-h-[90vh] flex flex-col my-auto"
-              >
-                {/* Modal Header */}
-                <div className="flex items-center justify-between border-b border-divider pb-3 shrink-0">
-                  <div>
-                    <h3 className="text-lg font-bold text-text-primary">{editingProject.name || "Project Specs"}</h3>
-                    <p className="text-xs text-text-secondary font-mono">ID: {editingProject.id || "new"}</p>
-                  </div>
-                  <button onClick={() => setIsProjectModalOpen(false)} className="p-1 rounded-lg hover:bg-white/10 text-text-secondary hover:text-text-primary">
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-
-                {/* Sub-Tabs */}
-                <div className="flex items-center gap-2 border-b border-divider pb-2 shrink-0 overflow-x-auto">
+              {/* Collapsible Pages Tree */}
+              {mainTab === "pages" && (
+                <div className="pl-4 pr-1 py-1 space-y-1 border-l-2 border-accent-blue/30 ml-3 my-1">
                   {[
-                    { id: "basic", label: "Basic Info" },
-                    { id: "details", label: "Metadata & Stats" },
-                    { id: "tech", label: "Tech Stack" },
-                    { id: "features", label: "Features" },
-                    { id: "readme", label: "README Markdown" }
-                  ].map((tb) => (
+                    { id: "home", label: "HOME", icon: Sparkles },
+                    { id: "projects-page", label: "PROJECTS", icon: Folder },
+                    { id: "project-detail", label: "PROJECT DETAILS", icon: FileText },
+                    { id: "docs-page", label: "DOCUMENTATION", icon: BookOpenIcon },
+                    { id: "doc-article", label: "DOC ARTICLE", icon: Code },
+                    { id: "about", label: "ABOUT", icon: Users },
+                    { id: "contact", label: "CONTACT", icon: Terminal },
+                    { id: "footer-page", label: "FOOTER", icon: Layers },
+                    { id: "404", label: "404 PAGE", icon: AlertCircle }
+                  ].map((pg) => (
                     <button
-                      key={tb.id}
-                      onClick={() => setModalSubTab(tb.id as any)}
+                      key={pg.id}
+                      onClick={() => setActivePage(pg.id as PageSubTab)}
                       className={cn(
-                        "px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer",
-                        modalSubTab === tb.id ? "bg-accent-blue text-white" : "bg-bg-secondary text-text-secondary hover:text-text-primary"
+                        "w-full px-2.5 py-1.5 rounded-lg text-[11px] font-bold flex items-center gap-2 transition-colors cursor-pointer text-left",
+                        activePage === pg.id ? "bg-white/10 text-accent-blue font-extrabold" : "text-text-secondary hover:text-text-primary"
                       )}
                     >
-                      {tb.label}
+                      <pg.icon className="w-3 h-3" /> {pg.label}
                     </button>
                   ))}
                 </div>
+              )}
 
-                {/* Modal Body Scroll */}
-                <div className="flex-1 overflow-y-auto space-y-4 pr-1">
-                  
-                  {/* Basic Info Tab */}
-                  {modalSubTab === "basic" && (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-xs font-bold text-text-secondary block mb-1">Project Name</label>
-                          <input
-                            type="text"
-                            value={editingProject.name}
-                            onChange={(e) => setEditingProject({ ...editingProject, name: e.target.value })}
-                            className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-xs font-bold text-text-secondary block mb-1">Slug (URL Path)</label>
-                          <input
-                            type="text"
-                            value={editingProject.slug}
-                            onChange={(e) => setEditingProject({ ...editingProject, slug: e.target.value })}
-                            className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
-                          />
-                        </div>
-                      </div>
+              <button
+                onClick={() => setMainTab("media")}
+                className={cn(
+                  "w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-3 transition-colors cursor-pointer text-left",
+                  mainTab === "media" ? "bg-accent-blue text-white shadow-md" : "text-text-secondary hover:bg-bg-secondary hover:text-text-primary"
+                )}
+              >
+                <ImageIcon className="w-4 h-4" /> Media Library
+              </button>
 
+              <button
+                onClick={() => setMainTab("projects")}
+                className={cn(
+                  "w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-3 transition-colors cursor-pointer text-left",
+                  mainTab === "projects" ? "bg-accent-blue text-white shadow-md" : "text-text-secondary hover:bg-bg-secondary hover:text-text-primary"
+                )}
+              >
+                <Folder className="w-4 h-4" /> Projects
+              </button>
+
+              <button
+                onClick={() => setMainTab("documentation")}
+                className={cn(
+                  "w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-3 transition-colors cursor-pointer text-left",
+                  mainTab === "documentation" ? "bg-accent-blue text-white shadow-md" : "text-text-secondary hover:bg-bg-secondary hover:text-text-primary"
+                )}
+              >
+                <FileText className="w-4 h-4" /> Documentation
+              </button>
+
+              <button
+                onClick={() => setMainTab("ai")}
+                className={cn(
+                  "w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-3 transition-colors cursor-pointer text-left",
+                  mainTab === "ai" ? "bg-accent-blue text-white shadow-md" : "text-text-secondary hover:bg-bg-secondary hover:text-text-primary"
+                )}
+              >
+                <Terminal className="w-4 h-4" /> AI Assistant
+              </button>
+
+              <button
+                onClick={() => setMainTab("analytics")}
+                className={cn(
+                  "w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-3 transition-colors cursor-pointer text-left",
+                  mainTab === "analytics" ? "bg-accent-blue text-white shadow-md" : "text-text-secondary hover:bg-bg-secondary hover:text-text-primary"
+                )}
+              >
+                <Activity className="w-4 h-4" /> Analytics
+              </button>
+
+              <button
+                onClick={() => setMainTab("users")}
+                className={cn(
+                  "w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-3 transition-colors cursor-pointer text-left",
+                  mainTab === "users" ? "bg-accent-blue text-white shadow-md" : "text-text-secondary hover:bg-bg-secondary hover:text-text-primary"
+                )}
+              >
+                <Users className="w-4 h-4" /> Users & Roles
+              </button>
+
+              <button
+                onClick={() => setMainTab("appearance")}
+                className={cn(
+                  "w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-3 transition-colors cursor-pointer text-left",
+                  mainTab === "appearance" ? "bg-accent-blue text-white shadow-md" : "text-text-secondary hover:bg-bg-secondary hover:text-text-primary"
+                )}
+              >
+                <Palette className="w-4 h-4" /> Appearance
+              </button>
+
+              <button
+                onClick={() => setMainTab("settings")}
+                className={cn(
+                  "w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-3 transition-colors cursor-pointer text-left",
+                  mainTab === "settings" ? "bg-accent-blue text-white shadow-md" : "text-text-secondary hover:bg-bg-secondary hover:text-text-primary"
+                )}
+              >
+                <Settings className="w-4 h-4" /> Settings
+              </button>
+            </div>
+
+          </div>
+
+          {/* Version Snapshot & Rollback Control */}
+          <div className="p-3 rounded-2xl bg-bg-secondary/60 border border-glass-border space-y-2 text-left">
+            <span className="text-[10px] font-mono font-bold uppercase text-text-muted block">System Control</span>
+            <button
+              onClick={() => {
+                const name = prompt("Snapshot Name:", `Backup-${new Date().toLocaleTimeString()}`);
+                if (name) {
+                  createSnapshot(name, "Manual Admin Backup");
+                  showToast(`Created Snapshot [${name}]`);
+                }
+              }}
+              className="w-full py-1.5 rounded-lg bg-glass-bg border border-glass-border text-text-primary text-[11px] font-bold flex items-center justify-center gap-1.5 hover:bg-bg-secondary transition-colors cursor-pointer"
+            >
+              <History className="w-3.5 h-3.5 text-accent-blue" /> Create Snapshot
+            </button>
+          </div>
+        </aside>
+
+        {/* ─────────────────────────────────────────────────────────────
+            RIGHT MAIN EDITOR CANVAS
+           ───────────────────────────────────────────────────────────── */}
+        <main className="flex-1 p-6 overflow-y-auto space-y-6">
+          
+          {/* PAGES TAB EDITOR (WEBSITE-DRIVEN STRUCTURE) */}
+          {mainTab === "pages" && (
+            <div className="space-y-6">
+              
+              {/* PAGE SELECTION TITLE */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-2xl bg-glass-bg border border-glass-border">
+                <div>
+                  <h2 className="text-lg font-serif font-bold text-text-primary flex items-center gap-2">
+                    <Compass className="w-5 h-5 text-accent-blue" /> Page Editor: <span className="uppercase text-accent-blue font-mono font-extrabold">{activePage}</span>
+                  </h2>
+                  <p className="text-xs text-text-secondary mt-0.5">Select a section to visually configure text, media, buttons, layout, and live preview.</p>
+                </div>
+              </div>
+
+              {/* HOME PAGE SECTION HIERARCHY SELECTOR RIBBON */}
+              {activePage === "home" && (
+                <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-glass-border">
+                  {[
+                    { id: "hero", label: "Hero" },
+                    { id: "floating-gallery", label: "Floating Gallery" },
+                    { id: "prompt-bar", label: "Prompt Bar" },
+                    { id: "architecture", label: "Architecture" },
+                    { id: "why-criska", label: "Why Criska" },
+                    { id: "dashboard-showcase", label: "Dashboard Showcase" },
+                    { id: "featured-products", label: "Featured Products" },
+                    { id: "earth-section", label: "Earth Section" },
+                    { id: "device-showcase", label: "Device Showcase" },
+                    { id: "capabilities", label: "Capabilities" },
+                    { id: "how-we-work", label: "How We Work" },
+                    { id: "trust", label: "Trust Section" },
+                    { id: "newsletter", label: "Newsletter" },
+                    { id: "footer", label: "Footer" }
+                  ].map((sec) => (
+                    <button
+                      key={sec.id}
+                      onClick={() => setHomeSection(sec.id as HomeSectionTab)}
+                      className={cn(
+                        "px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer border",
+                        homeSection === sec.id
+                          ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 border-transparent shadow"
+                          : "bg-bg-secondary/60 text-text-secondary border-glass-border hover:text-text-primary"
+                      )}
+                    >
+                      {sec.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* HERO EDITOR */}
+              {activePage === "home" && homeSection === "hero" && (
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-left">
+                  <div className="lg:col-span-6 space-y-6">
+                    <GlassCard className="p-6 space-y-4">
+                      <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-accent-blue" /> Hero Headlines & Subtitle
+                      </h3>
                       <div>
-                        <label className="text-xs font-bold text-text-secondary block mb-1">Tagline</label>
+                        <label className="text-xs font-bold text-text-secondary block mb-1">Headline Prefix</label>
                         <input
                           type="text"
-                          value={editingProject.tagline}
-                          onChange={(e) => setEditingProject({ ...editingProject, tagline: e.target.value })}
-                          className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+                          value={cms.hero.headlinePrefix}
+                          onChange={(e) => {
+                            updateHero({ headlinePrefix: e.target.value });
+                            showToast("Updated headline prefix!");
+                          }}
+                          className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
                         />
                       </div>
-
-                      <div className="grid grid-cols-3 gap-4">
-                        <div>
-                          <label className="text-xs font-bold text-text-secondary block mb-1">Category</label>
-                          <select
-                            value={editingProject.category}
-                            onChange={(e) => setEditingProject({ ...editingProject, category: e.target.value as any })}
-                            className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary"
-                          >
-                            <option value="web">Web</option>
-                            <option value="ai">AI</option>
-                            <option value="devops">DevOps</option>
-                            <option value="saas">SaaS</option>
-                            <option value="research">Research</option>
-                            <option value="automation">Automation</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="text-xs font-bold text-text-secondary block mb-1">Status</label>
-                          <select
-                            value={editingProject.status}
-                            onChange={(e) => setEditingProject({ ...editingProject, status: e.target.value as any })}
-                            className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary"
-                          >
-                            <option value="completed font-bold">Completed (Live)</option>
-                            <option value="in-progress">In Progress (Beta)</option>
-                            <option value="planning">Planning</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="text-xs font-bold text-text-secondary block mb-1">Version</label>
-                          <input
-                            type="text"
-                            value={editingProject.version}
-                            onChange={(e) => setEditingProject({ ...editingProject, version: e.target.value })}
-                            className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
-                          />
-                        </div>
-                      </div>
-
                       <div>
-                        <label className="text-xs font-bold text-text-secondary block mb-1">Short Description</label>
+                        <label className="text-xs font-bold text-text-secondary block mb-1">Highlight Word / Phrase</label>
+                        <input
+                          type="text"
+                          value={cms.hero.headlineHighlightWord}
+                          onChange={(e) => {
+                            updateHero({ headlineHighlightWord: e.target.value });
+                            showToast("Updated highlight word!");
+                          }}
+                          className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-text-secondary block mb-1">Hero Description Copy</label>
                         <textarea
                           rows={3}
-                          value={editingProject.description}
-                          onChange={(e) => setEditingProject({ ...editingProject, description: e.target.value })}
-                          className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium"
+                          value={cms.hero.description}
+                          onChange={(e) => {
+                            updateHero({ description: e.target.value });
+                            showToast("Updated hero description!");
+                          }}
+                          className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium"
                         />
                       </div>
-                    </div>
-                  )}
+                    </GlassCard>
+                  </div>
 
-                  {/* Metadata Tab */}
-                  {modalSubTab === "details" && (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-xs font-bold text-text-secondary block mb-1">Live URL</label>
-                          <input
-                            type="text"
-                            value={editingProject.liveUrl || ""}
-                            onChange={(e) => setEditingProject({ ...editingProject, liveUrl: e.target.value })}
-                            className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-xs font-bold text-text-secondary block mb-1">GitHub Repo URL</label>
-                          <input
-                            type="text"
-                            value={editingProject.githubUrl || ""}
-                            onChange={(e) => setEditingProject({ ...editingProject, githubUrl: e.target.value })}
-                            className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="text-xs font-bold text-text-secondary block mb-1">Cover Image URL</label>
-                        <input
-                          type="text"
-                          placeholder="e.g. /images/kiwik-cover.jpg or https://images.unsplash.com/..."
-                          value={editingProject.coverImage || ""}
-                          onChange={(e) => setEditingProject({ ...editingProject, coverImage: e.target.value })}
-                          className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
-                        />
-
-                        {/* Live Image Preview */}
-                        <div className="mt-3 space-y-1">
-                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-text-muted">Live Cover Preview:</span>
-                          <div className="h-28 w-full rounded-xl overflow-hidden border border-glass-border relative bg-bg-secondary">
-                            <ProjectImage
-                              src={editingProject.coverImage || ""}
-                              alt={editingProject.name || "Preview"}
-                              category={editingProject.category}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Tech Stack Tab */}
-                  {modalSubTab === "tech" && (
-                    <div className="space-y-4">
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          placeholder="Tech Name (e.g. Next.js 15)"
-                          value={newTechName}
-                          onChange={(e) => setNewTechName(e.target.value)}
-                          className="flex-1 px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
-                        />
-                        <button
-                          onClick={handleAddTechItem}
-                          className="px-4 py-2 rounded-xl bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors"
-                        >
-                          Add Tech
-                        </button>
-                      </div>
-
-                      <div className="flex flex-wrap gap-2">
-                        {(editingProject.techStack || []).map((t, idx) => (
-                          <span key={idx} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-bg-secondary border border-glass-border text-xs font-semibold">
-                            {t.name}
-                            <button onClick={() => handleRemoveTechItem(idx)} className="text-rose-500 hover:text-rose-600">
-                              <X className="w-3 h-3" />
-                            </button>
+                  {/* REAL-TIME HERO LIVE PREVIEW BOX */}
+                  <div className="lg:col-span-6">
+                    <GlassCard className="p-6 space-y-4 sticky top-24">
+                      <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted block">Live Visual Preview</span>
+                      <div className="p-8 rounded-2xl bg-black text-center space-y-4 border border-white/20">
+                        <h1 className="text-2xl sm:text-3xl font-serif font-medium text-white tracking-tight leading-tight">
+                          {cms.hero.headlinePrefix} <br />
+                          <span className="italic font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-zinc-400">
+                            {cms.hero.headlineHighlightWord}
                           </span>
-                        ))}
+                        </h1>
+                        <p className="text-xs text-zinc-400 max-w-sm mx-auto leading-relaxed">
+                          {cms.hero.description}
+                        </p>
                       </div>
-                    </div>
-                  )}
+                    </GlassCard>
+                  </div>
+                </div>
+              )}
 
-                  {/* Features Tab */}
-                  {modalSubTab === "features" && (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-2">
+              {/* UNIFIED OPERATING ARCHITECTURE EDITOR */}
+              {activePage === "home" && homeSection === "architecture" && (
+                <div className="space-y-6 text-left">
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-glass-bg border border-glass-border">
+                    <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                      <Workflow className="w-4 h-4 text-purple-400" /> Unified Operating Architecture Cards ({(cms.architectureNodes || []).length})
+                    </h3>
+                    <button
+                      onClick={() => {
+                        const title = prompt("Node Title:", "New Node");
+                        if (title) {
+                          useSiteCMSStore.getState().addArchitectureNode({
+                            id: `node-${Date.now()}`,
+                            title,
+                            subtitle: "Active Service",
+                            iconName: "Cpu",
+                            color: "from-purple-500/20 to-purple-600/5",
+                            border: "border-purple-500/30 hover:border-purple-500/60",
+                            glow: "shadow-purple-500/10",
+                            badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/30",
+                            badgeText: "Active Node",
+                            order: (cms.architectureNodes || []).length + 1
+                          });
+                          showToast(`Added Architecture Node [${title}]`);
+                        }
+                      }}
+                      className="px-4 py-2 rounded-xl bg-accent-blue text-white text-xs font-bold flex items-center gap-1.5 shadow-md cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add Node
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    {(cms.architectureNodes || []).map((node) => (
+                      <GlassCard key={node.id} className="p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <input
+                            type="text"
+                            value={node.title}
+                            onChange={(e) => {
+                              useSiteCMSStore.getState().updateArchitectureNode(node.id, { title: e.target.value });
+                              showToast("Updated title!");
+                            }}
+                            className="font-bold text-xs text-text-primary bg-transparent focus:outline-none"
+                          />
+                          <button
+                            onClick={() => {
+                              useSiteCMSStore.getState().deleteArchitectureNode(node.id);
+                              showToast(`Deleted node [${node.title}]`);
+                            }}
+                            className="p-1 text-rose-500 hover:bg-rose-500/10 rounded cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-text-muted block">Subtitle</label>
+                          <input
+                            type="text"
+                            value={node.subtitle}
+                            onChange={(e) => {
+                              useSiteCMSStore.getState().updateArchitectureNode(node.id, { subtitle: e.target.value });
+                              showToast("Updated subtitle!");
+                            }}
+                            className="w-full px-2 py-1 rounded bg-bg-secondary text-xs"
+                          />
+                        </div>
+                      </GlassCard>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* WHY CRISKA PILLS EDITOR */}
+              {activePage === "home" && homeSection === "why-criska" && (
+                <div className="space-y-6 text-left">
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-glass-bg border border-glass-border">
+                    <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-emerald-400" /> Why Criska Pills Manager ({(cms.whyCriskaPills || []).length})
+                    </h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {(cms.whyCriskaPills || []).map((pill) => (
+                      <GlassCard key={pill.id} className="p-4 space-y-2">
+                        <label className="text-[10px] font-bold text-text-muted block">Pill Text</label>
                         <input
                           type="text"
-                          placeholder="Feature Title"
-                          value={newFeatureTitle}
-                          onChange={(e) => setNewFeatureTitle(e.target.value)}
-                          className="px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+                          value={pill.text}
+                          onChange={(e) => {
+                            const updated = (cms.whyCriskaPills || []).map((p) => (p.id === pill.id ? { ...p, text: e.target.value } : p));
+                            useSiteCMSStore.setState({ cms: { ...cms, whyCriskaPills: updated } });
+                            showToast("Updated pill text!");
+                          }}
+                          className="w-full px-3 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-bold"
                         />
-                        <input
-                          type="text"
-                          placeholder="Feature Description"
-                          value={newFeatureDesc}
-                          onChange={(e) => setNewFeatureDesc(e.target.value)}
-                          className="px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
-                        />
-                      </div>
-                      <button
-                        onClick={handleAddFeatureItem}
-                        className="w-full py-2 rounded-xl bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors"
-                      >
-                        + Add Feature
-                      </button>
+                      </GlassCard>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-                      <div className="space-y-2">
-                        {(editingProject.features || []).map((f, idx) => (
-                          <div key={idx} className="p-3 rounded-xl bg-bg-secondary border border-glass-border flex items-center justify-between">
-                            <div>
-                              <h4 className="text-xs font-bold text-text-primary">{f.title}</h4>
-                              <p className="text-[10px] text-text-secondary">{f.description}</p>
-                            </div>
-                            <button onClick={() => handleRemoveFeatureItem(f.title)} className="text-rose-500 p-1 cursor-pointer">
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* README Tab */}
-                  {modalSubTab === "readme" && (
-                    <div className="space-y-4">
-                      <label className="text-xs font-bold text-text-secondary block mb-1">Markdown Documentation / README</label>
-                      <textarea
-                        rows={10}
-                        value={editingProject.readme || ""}
-                        onChange={(e) => setEditingProject({ ...editingProject, readme: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono leading-relaxed"
-                        placeholder="# Project Documentation..."
+              {/* EARTH SECTION EDITOR */}
+              {activePage === "home" && homeSection === "earth-section" && (
+                <GlassCard className="p-6 space-y-5 text-left">
+                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                    <Globe className="w-4 h-4 text-cyan-400" /> Earth Telemetry Section Header & Metrics
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs font-bold text-text-secondary block mb-1">Headline Text</label>
+                      <input
+                        type="text"
+                        value={cms.earthShowcase?.headline || ""}
+                        onChange={(e) => {
+                          useSiteCMSStore.getState().updateEarthShowcase({ headline: e.target.value });
+                          showToast("Updated Earth headline!");
+                        }}
+                        className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
                       />
                     </div>
-                  )}
+                    <div>
+                      <label className="text-xs font-bold text-text-secondary block mb-1">Description Copy</label>
+                      <textarea
+                        rows={2}
+                        value={cms.earthShowcase?.description || ""}
+                        onChange={(e) => {
+                          useSiteCMSStore.getState().updateEarthShowcase({ description: e.target.value });
+                          showToast("Updated Earth description!");
+                        }}
+                        className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-text-secondary block mb-1">Earth Background WebP Image URL</label>
+                      <input
+                        type="text"
+                        value={cms.earthShowcase?.earthImageUrl || ""}
+                        onChange={(e) => {
+                          useSiteCMSStore.getState().updateEarthShowcase({ earthImageUrl: e.target.value });
+                          showToast("Updated Earth background image!");
+                        }}
+                        className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
+                      />
+                    </div>
+                  </div>
+                </GlassCard>
+              )}
 
-                </div>
+              {/* DEVICE SHOWCASE EDITOR */}
+              {activePage === "home" && homeSection === "device-showcase" && (
+                <GlassCard className="p-6 space-y-5 text-left">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                      <Smartphone className="w-4 h-4 text-emerald-400" /> Phone Mockup Cards ({(cms.deviceShowcase?.cards || []).length})
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {(cms.deviceShowcase?.cards || []).map((card) => (
+                      <div key={card.id} className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-3">
+                        <input
+                          type="text"
+                          value={card.name}
+                          onChange={(e) => {
+                            useSiteCMSStore.getState().updateDeviceCard(card.id, { name: e.target.value });
+                            showToast("Updated card name!");
+                          }}
+                          className="font-bold text-xs text-text-primary bg-transparent focus:outline-none w-full"
+                        />
+                        <textarea
+                          rows={2}
+                          value={card.quote}
+                          onChange={(e) => {
+                            useSiteCMSStore.getState().updateDeviceCard(card.id, { quote: e.target.value });
+                            showToast("Updated quote!");
+                          }}
+                          className="w-full px-2 py-1 rounded bg-bg-primary text-[11px]"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </GlassCard>
+              )}
 
-                {/* Modal Footer */}
-                <div className="flex justify-end gap-3 pt-3 border-t border-divider shrink-0">
-                  <button
-                    onClick={() => setIsProjectModalOpen(false)}
-                    className="px-5 py-2 rounded-full bg-glass-bg border border-glass-border text-xs font-semibold cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSaveProject}
-                    className="px-6 py-2 rounded-full bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors cursor-pointer"
-                  >
-                    Save Project Specs
-                  </button>
-                </div>
-              </motion.div>
             </div>
           )}
 
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          TAB 3: HERO CMS EDITOR
-         ───────────────────────────────────────────────────────────── */}
-      {activeTab === "hero" && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-left">
-          <div className="lg:col-span-7 space-y-6">
-            <GlassCard className="p-6 space-y-5">
-              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-accent-blue" /> Hero Headlines & Subheadings
-              </h3>
-
-              <div className="space-y-4">
+          {/* MEDIA LIBRARY TAB (PROFESSIONAL DAM) */}
+          {mainTab === "media" && (
+            <div className="space-y-6 text-left">
+              <div className="p-6 rounded-2xl bg-glass-bg border border-glass-border flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
-                  <label className="text-xs font-bold text-text-secondary block mb-1.5">Version Pill Badge Text</label>
-                  <input
-                    type="text"
-                    value={cms.hero.versionBadge}
-                    onChange={(e) => {
-                      updateHero({ versionBadge: e.target.value });
-                      showToast("Updated version badge!");
-                    }}
-                    className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary"
-                  />
+                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4 text-accent-blue" /> Digital Asset Management (DAM) Library ({cms.media.length})
+                  </h3>
+                  <p className="text-xs text-text-secondary mt-0.5">Upload, crop, replace, and check usage locations of website images, logos, and videos.</p>
                 </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold text-text-secondary block mb-1.5">Headline Prefix</label>
-                    <input
-                      type="text"
-                      value={cms.hero.headlinePrefix}
-                      onChange={(e) => {
-                        updateHero({ headlinePrefix: e.target.value });
-                        showToast("Updated headline prefix!");
-                      }}
-                      className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-text-secondary block mb-1.5">Highlight Connecting Word</label>
-                    <input
-                      type="text"
-                      value={cms.hero.headlineHighlightWord}
-                      onChange={(e) => {
-                        updateHero({ headlineHighlightWord: e.target.value });
-                        showToast("Updated highlight word!");
-                      }}
-                      className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold text-text-secondary block mb-1.5">Hero Description Copy</label>
-                  <textarea
-                    rows={3}
-                    value={cms.hero.description}
-                    onChange={(e) => {
-                      updateHero({ description: e.target.value });
-                      showToast("Updated hero description!");
-                    }}
-                    className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium text-text-primary"
-                  />
-                </div>
-              </div>
-            </GlassCard>
-
-            <GlassCard className="p-6 space-y-4">
-              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                <RotateCcw className="w-4 h-4 text-indigo-400" /> Animated Rotating Phrases ({cms.hero.rotatingWords.length})
-              </h3>
-
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Add new phrase (e.g. AI Agents.)"
-                  value={newRotatingWord}
-                  onChange={(e) => setNewRotatingWord(e.target.value)}
-                  className="flex-1 px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold text-text-primary"
-                />
                 <button
-                  onClick={handleAddRotatingWord}
-                  className="px-5 py-2 rounded-xl bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors flex items-center gap-1.5 cursor-pointer"
+                  onClick={() => {
+                    const name = prompt("Asset Name:", "New Banner Asset");
+                    const url = prompt("Asset Image URL:", "/logo.png");
+                    if (name && url) {
+                      addMediaItem({
+                        id: `med-${Date.now()}`,
+                        name,
+                        url,
+                        type: "image",
+                        sizeBytes: 18400,
+                        mimeType: "image/png",
+                        folder: "General",
+                        tags: ["asset"],
+                        usedIn: ["Hero Section", "Public Navbar"],
+                        createdAt: new Date().toISOString()
+                      });
+                      showToast(`Added Asset [${name}]`);
+                    }
+                  }}
+                  className="px-5 py-2.5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold text-xs shadow-md flex items-center gap-2 cursor-pointer"
                 >
-                  <Plus className="w-4 h-4" /> Add
+                  <Plus className="w-4 h-4" /> Upload New Asset
                 </button>
               </div>
 
-              <div className="space-y-2 max-h-[240px] overflow-y-auto pr-2">
-                {cms.hero.rotatingWords.map((word, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-bg-secondary/60 border border-glass-border gap-3">
-                    <input
-                      type="text"
-                      value={word}
-                      onChange={(e) => {
-                        const updated = [...cms.hero.rotatingWords];
-                        updated[idx] = e.target.value;
-                        updateHeroRotatingWords(updated);
-                        showToast("Updated phrase!");
-                      }}
-                      className="flex-1 bg-transparent text-xs font-bold font-serif italic text-accent-blue focus:outline-none"
-                    />
-                    <button
-                      onClick={() => handleRemoveRotatingWord(idx)}
-                      className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </GlassCard>
-          </div>
-
-          <div className="lg:col-span-5 space-y-6">
-            <GlassCard className="p-6 space-y-4">
-              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                <Activity className="w-4 h-4 text-emerald-400" /> Telemetry Metrics Grid
-              </h3>
-
-              {cms.hero.metrics.map((m) => (
-                <div key={m.id} className="p-3.5 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold text-text-secondary">{m.label}</span>
-                    <span className="text-xs font-mono font-bold text-accent-blue">{m.val}{m.suffix}</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <input
-                      type="number"
-                      value={m.val}
-                      onChange={(e) => {
-                        updateHeroMetric(m.id, { val: parseFloat(e.target.value) || 0 });
-                        showToast(`Updated ${m.label} value!`);
-                      }}
-                      className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono"
-                    />
-                    <input
-                      type="text"
-                      value={m.suffix}
-                      onChange={(e) => {
-                        updateHeroMetric(m.id, { suffix: e.target.value });
-                        showToast(`Updated ${m.label} suffix!`);
-                      }}
-                      className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono"
-                    />
-                    <input
-                      type="text"
-                      value={m.label}
-                      onChange={(e) => {
-                        updateHeroMetric(m.id, { label: e.target.value });
-                        showToast(`Updated metric label!`);
-                      }}
-                      className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono"
-                    />
-                  </div>
-                </div>
-              ))}
-            </GlassCard>
-          </div>
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          TAB 4: SECTIONS CMS
-         ───────────────────────────────────────────────────────────── */}
-      {activeTab === "sections" && (
-        <div className="space-y-8 text-left">
-          <GlassCard className="p-6 space-y-4">
-            <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-              <Layers className="w-4 h-4 text-accent-blue" /> Featured Products Headings
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-bold text-text-secondary block mb-1">Section Title</label>
-                <input
-                  type="text"
-                  value={cms.featuredSection.title}
-                  onChange={(e) => {
-                    updateFeaturedSection({ title: e.target.value });
-                    showToast("Updated Featured Title!");
-                  }}
-                  className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-text-secondary block mb-1">Section Subtitle</label>
-                <input
-                  type="text"
-                  value={cms.featuredSection.subtitle}
-                  onChange={(e) => {
-                    updateFeaturedSection({ subtitle: e.target.value });
-                    showToast("Updated Featured Subtitle!");
-                  }}
-                  className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
-                />
-              </div>
-            </div>
-          </GlassCard>
-
-          <GlassCard className="p-6 space-y-5">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-purple-400" /> Capabilities ({cms.capabilities.items.length})
-              </h3>
-              <input
-                type="text"
-                value={cms.capabilities.sectionTitle}
-                onChange={(e) => {
-                  updateCapabilities({ sectionTitle: e.target.value });
-                  showToast("Updated Capabilities Title!");
-                }}
-                className="px-3 py-1 rounded-lg bg-bg-secondary border border-glass-border text-xs font-bold"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-              <input
-                type="text"
-                placeholder="Capability Title"
-                value={newCapTitle}
-                onChange={(e) => setNewCapTitle(e.target.value)}
-                className="px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
-              />
-              <input
-                type="text"
-                placeholder="Description"
-                value={newCapDesc}
-                onChange={(e) => setNewCapDesc(e.target.value)}
-                className="px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
-              />
-              <button
-                onClick={handleAddCapability}
-                className="px-4 py-2 rounded-xl bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors cursor-pointer"
-              >
-                + Add Capability
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {cms.capabilities.items.map((cap) => (
-                <div key={cap.id} className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-2">
-                  <div className="flex items-center justify-between">
-                    <input
-                      type="text"
-                      value={cap.title}
-                      onChange={(e) => {
-                        updateCapabilityItem(cap.id, { title: e.target.value });
-                        showToast("Updated capability title!");
-                      }}
-                      className="bg-transparent font-bold text-xs text-text-primary focus:outline-none"
-                    />
-                    <button
-                      onClick={() => deleteCapabilityItem(cap.id)}
-                      className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition-colors cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                  <textarea
-                    rows={2}
-                    value={cap.desc}
-                    onChange={(e) => {
-                      updateCapabilityItem(cap.id, { desc: e.target.value });
-                      showToast("Updated capability description!");
-                    }}
-                    className="w-full bg-bg-primary px-3 py-1.5 rounded-lg border border-glass-border text-[11px] text-text-secondary focus:outline-none"
-                  />
-                </div>
-              ))}
-            </div>
-          </GlassCard>
-
-          {/* Unified Operating Architecture Nodes Editor */}
-          <GlassCard className="p-6 space-y-5">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                <Workflow className="w-4 h-4 text-purple-400" /> Unified Operating Architecture Nodes ({(cms.architectureNodes || []).length})
-              </h3>
-              <button
-                onClick={() => {
-                  const title = prompt("Node Title:", "New Node");
-                  const subtitle = title ? prompt("Node Subtitle:", "Infrastructure Layer") : "";
-                  if (title) {
-                    useSiteCMSStore.getState().addArchitectureNode({
-                      id: `node-${Date.now()}`,
-                      title,
-                      subtitle: subtitle || "Active Service",
-                      iconName: "Cpu",
-                      color: "from-purple-500/20 to-purple-600/5",
-                      border: "border-purple-500/30 hover:border-purple-500/60",
-                      glow: "shadow-purple-500/10",
-                      badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/30",
-                      badgeText: "Active Node",
-                      order: (cms.architectureNodes || []).length + 1
-                    });
-                    showToast(`Added Architecture Node [${title}]`);
-                  }
-                }}
-                className="px-4 py-2 rounded-xl bg-accent-blue text-white text-xs font-bold shadow-md flex items-center gap-1.5 cursor-pointer"
-              >
-                <Plus className="w-3.5 h-3.5" /> Add Architecture Node
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              {(cms.architectureNodes || []).map((node) => (
-                <div key={node.id} className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-3">
-                  <div className="flex items-center justify-between">
-                    <input
-                      type="text"
-                      value={node.title}
-                      onChange={(e) => {
-                        useSiteCMSStore.getState().updateArchitectureNode(node.id, { title: e.target.value });
-                        showToast("Updated node title!");
-                      }}
-                      className="font-bold text-xs text-text-primary bg-transparent focus:outline-none"
-                    />
-                    <button
-                      onClick={() => {
-                        useSiteCMSStore.getState().deleteArchitectureNode(node.id);
-                        showToast(`Deleted node [${node.title}]`);
-                      }}
-                      className="p-1 text-rose-500 hover:bg-rose-500/10 rounded cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-bold text-text-muted block">Subtitle / Description</label>
-                    <input
-                      type="text"
-                      value={node.subtitle}
-                      onChange={(e) => {
-                        useSiteCMSStore.getState().updateArchitectureNode(node.id, { subtitle: e.target.value });
-                        showToast("Updated node subtitle!");
-                      }}
-                      className="w-full px-2.5 py-1 rounded bg-bg-primary border border-glass-border text-xs font-medium"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-bold text-text-muted block">Badge Tag Text</label>
-                    <input
-                      type="text"
-                      value={node.badgeText}
-                      onChange={(e) => {
-                        useSiteCMSStore.getState().updateArchitectureNode(node.id, { badgeText: e.target.value });
-                        showToast("Updated node badge!");
-                      }}
-                      className="w-full px-2.5 py-1 rounded bg-bg-primary border border-glass-border text-xs font-mono"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </GlassCard>
-
-          {/* Earth Infrastructure Showcase Manager */}
-          <GlassCard className="p-6 space-y-5">
-            <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-              <Globe className="w-4 h-4 text-cyan-400" /> Earth Infrastructure Showcase Header & Stats
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <label className="text-xs font-bold text-text-secondary block mb-1">Headline Text</label>
-                <input
-                  type="text"
-                  value={cms.earthShowcase?.headline || ""}
-                  onChange={(e) => {
-                    useSiteCMSStore.getState().updateEarthShowcase({ headline: e.target.value });
-                    showToast("Updated Earth Showcase headline!");
-                  }}
-                  className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-text-secondary block mb-1">Description Copy</label>
-                <textarea
-                  rows={2}
-                  value={cms.earthShowcase?.description || ""}
-                  onChange={(e) => {
-                    useSiteCMSStore.getState().updateEarthShowcase({ description: e.target.value });
-                    showToast("Updated Earth Showcase description!");
-                  }}
-                  className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-text-secondary block mb-1">Earth Background Image WebP URL</label>
-                <input
-                  type="text"
-                  value={cms.earthShowcase?.earthImageUrl || ""}
-                  onChange={(e) => {
-                    useSiteCMSStore.getState().updateEarthShowcase({ earthImageUrl: e.target.value });
-                    showToast("Updated Earth background image!");
-                  }}
-                  className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
-                />
-              </div>
-
-              {/* Stats Editor Grid */}
-              <div className="pt-2">
-                <span className="text-xs font-bold text-text-primary block mb-3">Live Telemetry Metrics Grid (4 Stats)</span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                  {(cms.earthShowcase?.stats || []).map((stat) => (
-                    <div key={stat.id} className="p-3 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-2">
-                      <div>
-                        <label className="text-[10px] font-bold text-text-muted block mb-0.5">Value</label>
-                        <input
-                          type="text"
-                          value={stat.value}
-                          onChange={(e) => {
-                            useSiteCMSStore.getState().updateEarthStat(stat.id, { value: e.target.value });
-                            showToast("Updated stat value!");
-                          }}
-                          className="w-full px-2 py-1 rounded bg-bg-primary border border-glass-border text-xs font-mono font-bold text-text-primary"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[10px] font-bold text-text-muted block mb-0.5">Description</label>
-                        <input
-                          type="text"
-                          value={stat.description}
-                          onChange={(e) => {
-                            useSiteCMSStore.getState().updateEarthStat(stat.id, { description: e.target.value });
-                            showToast("Updated stat description!");
-                          }}
-                          className="w-full px-2 py-1 rounded bg-bg-primary border border-glass-border text-[11px] text-text-secondary"
-                        />
-                      </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {cms.media.map((med) => (
+                  <GlassCard key={med.id} className="p-3 space-y-2 flex flex-col justify-between group relative">
+                    <div className="h-28 w-full rounded-xl bg-black/40 overflow-hidden flex items-center justify-center border border-white/10 relative">
+                      <img src={med.url} alt={med.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </GlassCard>
-
-          {/* Device Showcase Manager */}
-          <GlassCard className="p-6 space-y-5">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                <Smartphone className="w-4 h-4 text-emerald-400" /> Device Showcase Cards ({cms.deviceShowcase?.cards?.length || 0})
-              </h3>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-text-secondary">Badge Text:</span>
-                <input
-                  type="text"
-                  value={cms.deviceShowcase?.topBadgeText || ""}
-                  onChange={(e) => {
-                    useSiteCMSStore.getState().updateDeviceShowcase({ topBadgeText: e.target.value });
-                    showToast("Updated top badge text!");
-                  }}
-                  className="px-3 py-1 rounded-lg bg-bg-secondary border border-glass-border text-xs font-bold"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {(cms.deviceShowcase?.cards || []).map((card) => (
-                <div key={card.id} className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-3">
-                  <div className="flex items-center justify-between">
-                    <input
-                      type="text"
-                      value={card.name}
-                      onChange={(e) => {
-                        useSiteCMSStore.getState().updateDeviceCard(card.id, { name: e.target.value });
-                        showToast("Updated card name!");
-                      }}
-                      className="font-bold text-xs text-text-primary bg-transparent focus:outline-none"
-                    />
-                    <button
-                      onClick={() => {
-                        useSiteCMSStore.getState().deleteDeviceCard(card.id);
-                        showToast(`Deleted card ${card.name}`);
-                      }}
-                      className="p-1 text-rose-500 hover:bg-rose-500/10 rounded cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-bold text-text-muted block">Role / Tagline</label>
-                    <input
-                      type="text"
-                      value={card.role}
-                      onChange={(e) => {
-                        useSiteCMSStore.getState().updateDeviceCard(card.id, { role: e.target.value });
-                        showToast("Updated card role!");
-                      }}
-                      className="w-full px-2.5 py-1 rounded bg-bg-primary border border-glass-border text-xs font-medium"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-bold text-text-muted block">Quote / Bio</label>
-                    <textarea
-                      rows={2}
-                      value={card.quote}
-                      onChange={(e) => {
-                        useSiteCMSStore.getState().updateDeviceCard(card.id, { quote: e.target.value });
-                        showToast("Updated card quote!");
-                      }}
-                      className="w-full px-2.5 py-1 rounded bg-bg-primary border border-glass-border text-[11px] text-text-secondary"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </GlassCard>
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          TAB: DOCUMENTATION CMS MANAGER
-         ───────────────────────────────────────────────────────────── */}
-      {activeTab === "documentation" && (
-        <div className="space-y-6 text-left">
-          <div className="p-6 rounded-2xl bg-glass-bg border border-glass-border flex items-center justify-between">
-            <div>
-              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                <FileText className="w-4 h-4 text-indigo-400" /> Documentation Categories & Articles Manager
-              </h3>
-              <p className="text-xs text-text-secondary mt-0.5">Edit sidebar categories, article markdown content, API specs, and component playgrounds live.</p>
-            </div>
-            <button
-              onClick={() => {
-                const title = prompt("Enter Article Title:", "New Doc Article");
-                const slug = title ? title.toLowerCase().replace(/[^a-z0-9]+/g, "-") : "";
-                if (title && slug) {
-                  useDocsStore.getState().addArticle(
-                    {
-                      id: `doc-${Date.now()}`,
-                      slug,
-                      categoryId: "getting-started",
-                      title,
-                      subtitle: "Custom documentation article created via Admin CMS.",
-                      readingTimeMinutes: 3,
-                      lastUpdated: new Date().toISOString().split("T")[0],
-                      author: "Kiwik Team",
-                      tags: ["guide", "cms"],
-                      toc: [{ id: "sec-1", title: "Overview", level: 2 }],
-                      sections: [
-                        {
-                          id: "sec-1",
-                          heading: "Overview",
-                          bodyMarkdown: "Write your markdown documentation here. Admin edits update the `/docs` page in real-time."
-                        }
-                      ]
-                    },
-                    "getting-started"
-                  );
-                  showToast(`Added new doc article [${title}]!`);
-                }
-              }}
-              className="px-5 py-2.5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold text-xs shadow-md flex items-center gap-2 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" /> Add Doc Article
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {useDocsStore.getState().categories.map((cat) => (
-              <GlassCard key={cat.id} className="p-5 space-y-4 text-left">
-                <div className="flex items-center justify-between border-b border-divider pb-3">
-                  <div>
-                    <h4 className="text-sm font-bold text-text-primary">{cat.name}</h4>
-                    <span className="text-[10px] font-mono font-bold text-accent-blue">{cat.articles.length} Articles</span>
-                  </div>
-                  {cat.badge && (
-                    <span className="px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[9px] font-mono font-bold">
-                      {cat.badge}
-                    </span>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  {cat.articles.map((art) => (
-                    <div key={art.id} className="p-3 rounded-xl bg-bg-secondary/60 border border-glass-border flex items-center justify-between">
-                      <div>
-                        <div className="text-xs font-bold text-text-primary">{art.title}</div>
-                        <div className="text-[10px] font-mono text-text-muted">/docs?slug={art.slug}</div>
-                      </div>
+                    <div className="text-left">
+                      <div className="text-xs font-bold text-text-primary truncate">{med.name}</div>
+                      <div className="text-[9px] font-mono text-text-muted mt-0.5">{med.mimeType}</div>
+                    </div>
+                    <div className="flex items-center justify-between pt-2 border-t border-divider">
                       <button
                         onClick={() => {
-                          const newTitle = prompt("Edit Article Title:", art.title);
-                          if (newTitle && newTitle !== art.title) {
-                            useDocsStore.getState().updateArticle(art.slug, { title: newTitle });
-                            showToast("Updated article title!");
+                          const newUrl = prompt("Replace Image URL:", med.url);
+                          if (newUrl && newUrl !== med.url) {
+                            showToast("Replaced image asset!");
                           }
                         }}
-                        className="p-1 text-accent-blue hover:bg-accent-blue/10 rounded cursor-pointer"
+                        className="text-[10px] font-bold text-accent-blue hover:underline cursor-pointer"
                       >
-                        <Edit className="w-3.5 h-3.5" />
+                        Replace
+                      </button>
+                      <button
+                        onClick={() => {
+                          deleteMediaItem(med.id);
+                          showToast(`Deleted media [${med.name}]`);
+                        }}
+                        className="p-1 text-rose-500 hover:bg-rose-500/10 rounded cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                  ))}
-                </div>
-              </GlassCard>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          TAB: AI KNOWLEDGE MANAGER
-         ───────────────────────────────────────────────────────────── */}
-      {activeTab === "ai" && (
-        <div className="space-y-6 text-left">
-          <div className="p-6 rounded-2xl bg-glass-bg border border-glass-border flex items-center justify-between">
-            <div>
-              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                <Terminal className="w-4 h-4 text-accent-blue" /> AI Assistant Knowledge Manager
-              </h3>
-              <p className="text-xs text-text-secondary mt-0.5">Upload, edit, and index knowledge snippets so the AI chatbot answers using authoritative CMS data.</p>
-            </div>
-            <button
-              onClick={() => {
-                const title = prompt("Enter Knowledge Article Title:", "New Knowledge Item");
-                const content = prompt("Enter Knowledge Content:", "Detailed explanation...");
-                if (title && content) {
-                  useSiteCMSStore.getState().addAiKnowledgeArticle({
-                    id: `k-${Date.now()}`,
-                    title,
-                    category: "General",
-                    content,
-                    tags: ["ai", "knowledge"],
-                    lastUpdated: new Date().toISOString().split("T")[0]
-                  });
-                  showToast(`Added AI Knowledge Article [${title}]!`);
-                }
-              }}
-              className="px-5 py-2.5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold text-xs shadow-md flex items-center gap-2 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" /> Add Knowledge Article
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {(cms.aiKnowledge?.articles || []).map((art) => (
-              <GlassCard key={art.id} className="p-5 space-y-3 text-left">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-sm font-bold text-text-primary">{art.title}</h4>
-                    <span className="text-[10px] font-mono text-accent-blue uppercase font-bold">{art.category}</span>
-                  </div>
-                  <button
-                    onClick={() => {
-                      useSiteCMSStore.getState().deleteAiKnowledgeArticle(art.id);
-                      showToast(`Deleted knowledge article [${art.title}]`);
-                    }}
-                    className="p-1.5 text-rose-500 hover:bg-rose-500/10 rounded cursor-pointer"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-                <textarea
-                  rows={4}
-                  value={art.content}
-                  onChange={(e) => {
-                    useSiteCMSStore.getState().updateAiKnowledgeArticle(art.id, { content: e.target.value });
-                    showToast("Updated knowledge article content!");
-                  }}
-                  className="w-full p-3 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono leading-relaxed"
-                />
-              </GlassCard>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          TAB: ANALYTICS TELEMETRY DASHBOARD
-         ───────────────────────────────────────────────────────────── */}
-      {activeTab === "analytics" && (
-        <div className="space-y-6 text-left">
-          <div className="p-6 rounded-2xl bg-glass-bg border border-glass-border space-y-2">
-            <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-              <Activity className="w-4 h-4 text-emerald-400" /> Real-time Analytics & Search Telemetry
-            </h3>
-            <p className="text-xs text-text-secondary">Tracks visitor activity, top command palette searches, project clicks, and AI prompt frequencies.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <GlassCard className="p-5 space-y-4">
-              <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted">Top Search Queries</h4>
-              <div className="space-y-2">
-                {(cms.analytics?.searches || []).map((s, i) => (
-                  <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-bg-secondary text-xs">
-                    <span className="font-mono font-bold text-text-primary">{s.query}</span>
-                    <span className="px-2 py-0.5 rounded-full bg-accent-blue/10 text-accent-blue font-mono font-bold text-[10px]">
-                      {s.count} searches
-                    </span>
-                  </div>
+                  </GlassCard>
                 ))}
               </div>
-            </GlassCard>
-
-            <GlassCard className="p-5 space-y-4">
-              <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted">Project Clicks Leaderboard</h4>
-              <div className="space-y-2">
-                {Object.entries(cms.analytics?.projectClicks || {}).map(([slug, count], i) => (
-                  <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-bg-secondary text-xs">
-                    <span className="font-mono font-bold text-text-primary">/projects/{slug}</span>
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-mono font-bold text-[10px]">
-                      {count} clicks
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </GlassCard>
-
-            <GlassCard className="p-5 space-y-4">
-              <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted">Visitor Geographic Breakdown</h4>
-              <div className="space-y-2">
-                {(cms.analytics?.countryBreakdown || []).map((c, i) => (
-                  <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-bg-secondary text-xs">
-                    <div className="flex items-center gap-2">
-                      <span>{c.flag}</span>
-                      <span className="font-bold text-text-primary">{c.country}</span>
-                    </div>
-                    <span className="font-mono text-text-secondary text-[11px] font-semibold">{c.count.toLocaleString()}</span>
-                  </div>
-                ))}
-              </div>
-            </GlassCard>
-          </div>
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          TAB 6: MEDIA LIBRARY
-         ───────────────────────────────────────────────────────────── */}
-      {activeTab === "media" && (
-        <div className="space-y-6 text-left">
-          <div className="p-6 rounded-2xl bg-glass-bg border border-glass-border flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>
-              <h3 className="text-base font-bold text-text-primary">Media Library Assets ({cms.media.length})</h3>
-              <p className="text-xs text-text-secondary mt-0.5">Upload images, icons, SVGs, and videos for website content blocks.</p>
             </div>
-            <button
-              onClick={() => {
-                const name = prompt("Enter asset name (e.g. Hero Banner):", "Custom Asset");
-                const url = prompt("Enter image/video URL:", "/logo.png");
-                if (name && url) {
-                  addMediaItem({
-                    id: `med-${Date.now()}`,
-                    name,
-                    url,
-                    type: "image",
-                    sizeBytes: 15400,
-                    mimeType: "image/png",
-                    folder: "General",
-                    tags: ["custom"],
-                    createdAt: new Date().toISOString()
-                  });
-                  showToast("Added asset to Media Library!");
-                }
-              }}
-              className="px-5 py-2.5 rounded-full bg-accent-blue text-white font-bold text-xs shadow-md transition-all hover:bg-blue-600 flex items-center gap-2 cursor-pointer"
-            >
-              <Upload className="w-4 h-4" /> Upload Asset
-            </button>
-          </div>
+          )}
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {cms.media.map((item) => (
-              <GlassCard key={item.id} className="p-3 text-left space-y-2 group relative">
-                <div className="w-full aspect-square rounded-xl bg-bg-secondary border border-glass-border overflow-hidden flex items-center justify-center p-2">
-                  <img src={item.url} alt={item.name} className="w-full h-full object-contain" />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-text-primary truncate">{item.name}</span>
-                  <button
-                    onClick={() => deleteMediaItem(item.id)}
-                    className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition-colors cursor-pointer"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </GlassCard>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          TAB 7: NAV & FOOTER
-         ───────────────────────────────────────────────────────────── */}
-      {activeTab === "navigation" && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-left">
-          <GlassCard className="p-6 space-y-5">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                <Compass className="w-4 h-4 text-accent-blue" /> Navbar Navigation Items ({cms.navigation.items.length})
-              </h3>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <input
-                type="text"
-                placeholder="Link Label (e.g. Pricing)"
-                value={newNavLabel}
-                onChange={(e) => setNewNavLabel(e.target.value)}
-                className="px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
-              />
-              <input
-                type="text"
-                placeholder="Href (e.g. /pricing)"
-                value={newNavHref}
-                onChange={(e) => setNewNavHref(e.target.value)}
-                className="px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
-              />
-            </div>
-            <button
-              onClick={handleAddNavItem}
-              className="w-full py-2 rounded-xl bg-accent-blue text-white text-xs font-bold shadow-md hover:bg-blue-600 transition-colors cursor-pointer flex items-center justify-center gap-1.5"
-            >
-              <Plus className="w-4 h-4" /> Add Navigation Link
-            </button>
-
-            <div className="space-y-3 max-h-[320px] overflow-y-auto pr-2">
-              {cms.navigation.items.map((item) => (
-                <div key={item.id} className="p-3 rounded-xl bg-bg-secondary/60 border border-glass-border flex items-center justify-between gap-3">
-                  <div className="grid grid-cols-2 gap-2 flex-1">
-                    <input
-                      type="text"
-                      value={item.label}
-                      onChange={(e) => {
-                        updateNavItem(item.id, { label: e.target.value });
-                        showToast("Updated nav label!");
-                      }}
-                      className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-semibold"
-                    />
-                    <input
-                      type="text"
-                      value={item.href}
-                      onChange={(e) => {
-                        updateNavItem(item.id, { href: e.target.value });
-                        showToast("Updated nav link!");
-                      }}
-                      className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono"
-                    />
-                  </div>
-                  <button
-                    onClick={() => deleteNavItem(item.id)}
-                    className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </GlassCard>
-
-          <GlassCard className="p-6 space-y-5">
-            <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-              <FileText className="w-4 h-4 text-indigo-400" /> Footer Newsletter & Copyright
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <label className="text-xs font-bold text-text-secondary block mb-1">Newsletter Headline</label>
-                <input
-                  type="text"
-                  value={cms.footer.newsletterHeadline}
-                  onChange={(e) => {
-                    updateFooter({ newsletterHeadline: e.target.value });
-                    showToast("Updated Newsletter Headline!");
+          {/* PROJECTS TAB */}
+          {mainTab === "projects" && (
+            <div className="space-y-6 text-left">
+              <div className="flex items-center justify-between p-5 rounded-2xl bg-glass-bg border border-glass-border">
+                <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                  <Folder className="w-4 h-4 text-accent-blue" /> Central Projects Catalog ({projects.length})
+                </h3>
+                <button
+                  onClick={() => {
+                    const name = prompt("Project Name:", "New Kiwik Platform");
+                    if (name) {
+                      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+                      addProject({ ...emptyProject, id: slug, slug, name });
+                      showToast(`Added Project [${name}]`);
+                    }
                   }}
-                  className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
-                />
+                  className="px-5 py-2.5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold text-xs shadow-md flex items-center gap-2 cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" /> Add Project
+                </button>
               </div>
 
-              <div>
-                <label className="text-xs font-bold text-text-secondary block mb-1">Newsletter Subtitle Description</label>
-                <textarea
-                  rows={2}
-                  value={cms.footer.newsletterDescription}
-                  onChange={(e) => {
-                    updateFooter({ newsletterDescription: e.target.value });
-                    showToast("Updated Newsletter Description!");
-                  }}
-                  className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-text-secondary block mb-1">Copyright Text</label>
-                <input
-                  type="text"
-                  value={cms.footer.copyrightText}
-                  onChange={(e) => {
-                    updateFooter({ copyrightText: e.target.value });
-                    showToast("Updated Copyright Text!");
-                  }}
-                  className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
-                />
-              </div>
-            </div>
-          </GlassCard>
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          TAB 8: THEME & STYLING
-         ───────────────────────────────────────────────────────────── */}
-      {activeTab === "theme" && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-left">
-          <GlassCard className="p-6 space-y-5">
-            <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-              <Palette className="w-4 h-4 text-accent-blue" /> Color Palette Engine
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { label: "Accent Blue", key: "accentBlue", val: cms.theme.colors.accentBlue },
-                { label: "Accent Cyan", key: "accentCyan", val: cms.theme.colors.accentCyan },
-                { label: "Accent Indigo", key: "accentIndigo", val: cms.theme.colors.accentIndigo }
-              ].map((c) => (
-                <div key={c.key} className="p-3 rounded-xl bg-bg-secondary border border-glass-border space-y-2">
-                  <label className="text-xs font-bold text-text-secondary block">{c.label}</label>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="color"
-                      value={c.val}
-                      onChange={(e) => {
-                        updateTheme({ colors: { ...cms.theme.colors, [c.key]: e.target.value } });
-                        showToast(`Updated ${c.label} color!`);
-                      }}
-                      className="w-10 h-10 rounded-lg cursor-pointer border-none bg-transparent"
-                    />
-                    <input
-                      type="text"
-                      value={c.val}
-                      onChange={(e) => {
-                        updateTheme({ colors: { ...cms.theme.colors, [c.key]: e.target.value } });
-                        showToast(`Updated ${c.label} hex!`);
-                      }}
-                      className="px-2.5 py-1.5 rounded-lg bg-bg-primary border border-glass-border text-xs font-mono w-24"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </GlassCard>
-
-          <GlassCard className="p-6 space-y-5">
-            <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-indigo-400" /> Glass & Border Controls
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <label className="text-xs font-bold text-text-secondary block mb-1">Glass Backdrop Blur (px)</label>
-                <input
-                  type="number"
-                  value={cms.theme.glassBlurPx}
-                  onChange={(e) => {
-                    updateTheme({ glassBlurPx: parseInt(e.target.value) || 20 });
-                    showToast("Updated Glass Blur!");
-                  }}
-                  className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-text-secondary block mb-1">Card Border Radius (px)</label>
-                <input
-                  type="number"
-                  value={cms.theme.borderRadiusPx}
-                  onChange={(e) => {
-                    updateTheme({ borderRadiusPx: parseInt(e.target.value) || 16 });
-                    showToast("Updated Border Radius!");
-                  }}
-                  className="w-full px-4 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
-                />
-              </div>
-            </div>
-          </GlassCard>
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          TAB 9: SEO ENGINE
-         ───────────────────────────────────────────────────────────── */}
-      {activeTab === "seo" && (
-        <GlassCard className="p-6 text-left space-y-5 max-w-3xl">
-          <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-            <Search className="w-4 h-4 text-accent-blue" /> Global SEO Metadata
-          </h3>
-          <div className="space-y-4">
-            <div>
-              <label className="text-xs font-bold text-text-secondary block mb-1">Default Meta Title</label>
-              <input
-                type="text"
-                value={cms.seo.defaultTitle}
-                onChange={(e) => {
-                  updateSEO({ defaultTitle: e.target.value });
-                  showToast("Updated Meta Title!");
-                }}
-                className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
-              />
-            </div>
-            <div>
-              <label className="text-xs font-bold text-text-secondary block mb-1">Default Meta Description</label>
-              <textarea
-                rows={3}
-                value={cms.seo.defaultDescription}
-                onChange={(e) => {
-                  updateSEO({ defaultDescription: e.target.value });
-                  showToast("Updated Meta Description!");
-                }}
-                className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-medium"
-              />
-            </div>
-          </div>
-        </GlassCard>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          TAB 10: AUDIT & VERSION SNAPSHOTS
-         ───────────────────────────────────────────────────────────── */}
-      {activeTab === "audit-snapshots" && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-left">
-          <div className="lg:col-span-6 space-y-6">
-            <GlassCard className="p-6 space-y-4">
-              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                <History className="w-4 h-4 text-indigo-400" /> Version Snapshots ({cms.snapshots.length})
-              </h3>
-              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
-                {cms.snapshots.map((snap) => (
-                  <div key={snap.id} className="p-3.5 rounded-xl bg-bg-secondary/60 border border-glass-border flex items-center justify-between">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProjects.map((proj) => (
+                  <GlassCard key={proj.id} className="p-5 space-y-4 flex flex-col justify-between">
                     <div>
-                      <h4 className="text-xs font-bold text-text-primary">{snap.versionName}</h4>
-                      <p className="text-[10px] text-text-secondary font-mono">{new Date(snap.timestamp).toLocaleString()}</p>
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-sm font-bold text-text-primary">{proj.name}</h4>
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-mono text-[9px] font-bold uppercase">
+                          {proj.status}
+                        </span>
+                      </div>
+                      <p className="text-xs text-text-secondary leading-relaxed line-clamp-2">{proj.tagline || proj.description}</p>
                     </div>
-                    <button
-                      onClick={() => {
-                        rollbackSnapshot(snap.id);
-                        showToast(`Rolled back to [${snap.versionName}]`);
-                      }}
-                      className="px-3 py-1.5 rounded-full bg-accent-blue text-white text-[10px] font-bold hover:bg-blue-600 transition-colors cursor-pointer"
-                    >
-                      Rollback
-                    </button>
-                  </div>
+
+                    <div className="flex items-center justify-between pt-3 border-t border-divider">
+                      <button
+                        onClick={() => {
+                          const newName = prompt("Edit Project Name:", proj.name);
+                          if (newName) {
+                            updateProject(proj.id, { name: newName });
+                            showToast("Updated project name!");
+                          }
+                        }}
+                        className="text-xs font-bold text-accent-blue flex items-center gap-1 cursor-pointer"
+                      >
+                        <Edit className="w-3.5 h-3.5" /> Edit Specs
+                      </button>
+                      <button
+                        onClick={() => {
+                          deleteProject(proj.id);
+                          showToast(`Deleted project [${proj.name}]`);
+                        }}
+                        className="p-1.5 text-rose-500 hover:bg-rose-500/10 rounded cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </GlassCard>
                 ))}
               </div>
-            </GlassCard>
-          </div>
+            </div>
+          )}
 
-          <div className="lg:col-span-6 space-y-6">
-            <GlassCard className="p-6 space-y-4">
+          {/* DOCUMENTATION TAB */}
+          {mainTab === "documentation" && (
+            <div className="space-y-6 text-left">
+              <div className="p-6 rounded-2xl bg-glass-bg border border-glass-border flex items-center justify-between">
+                <div>
+                  <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-indigo-400" /> Documentation Categories & Articles
+                  </h3>
+                  <p className="text-xs text-text-secondary mt-0.5">Manage docs sidebar categories, article markdown content, and playgrounds.</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {docsCategories.map((cat) => (
+                  <GlassCard key={cat.id} className="p-5 space-y-4">
+                    <div className="flex items-center justify-between border-b border-divider pb-3">
+                      <h4 className="text-sm font-bold text-text-primary">{cat.name}</h4>
+                      <span className="text-[10px] font-mono font-bold text-accent-blue">{cat.articles.length} Articles</span>
+                    </div>
+
+                    <div className="space-y-2">
+                      {cat.articles.map((art) => (
+                        <div key={art.id} className="p-3 rounded-xl bg-bg-secondary/60 border border-glass-border flex items-center justify-between">
+                          <div>
+                            <div className="text-xs font-bold text-text-primary">{art.title}</div>
+                            <div className="text-[10px] font-mono text-text-muted">/docs?slug={art.slug}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </GlassCard>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* AI ASSISTANT TAB */}
+          {mainTab === "ai" && (
+            <div className="space-y-6 text-left">
+              <div className="p-6 rounded-2xl bg-glass-bg border border-glass-border space-y-2">
+                <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                  <Terminal className="w-4 h-4 text-accent-blue" /> AI Assistant Knowledge Collections
+                </h3>
+                <p className="text-xs text-text-secondary">Upload markdown, repository specs, and knowledge articles for real-time prompt reasoning.</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {(cms.aiKnowledge?.articles || []).map((art) => (
+                  <GlassCard key={art.id} className="p-5 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-bold text-text-primary">{art.title}</h4>
+                      <span className="text-[10px] font-mono text-accent-blue uppercase font-bold">{art.category}</span>
+                    </div>
+                    <textarea
+                      rows={4}
+                      value={art.content}
+                      onChange={(e) => {
+                        useSiteCMSStore.getState().updateAiKnowledgeArticle(art.id, { content: e.target.value });
+                        showToast("Updated knowledge content!");
+                      }}
+                      className="w-full p-3 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono leading-relaxed"
+                    />
+                  </GlassCard>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ANALYTICS TAB */}
+          {mainTab === "analytics" && (
+            <div className="space-y-6 text-left">
+              <div className="p-6 rounded-2xl bg-glass-bg border border-glass-border space-y-2">
+                <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-emerald-400" /> Real-time Analytics & Search Telemetry
+                </h3>
+                <p className="text-xs text-text-secondary">Tracks visitor activity, command palette searches, project clicks, and country breakdown.</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <GlassCard className="p-5 space-y-4">
+                  <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted">Top Search Queries</h4>
+                  <div className="space-y-2">
+                    {(cms.analytics?.searches || []).map((s, i) => (
+                      <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-bg-secondary text-xs">
+                        <span className="font-mono font-bold text-text-primary">{s.query}</span>
+                        <span className="px-2 py-0.5 rounded-full bg-accent-blue/10 text-accent-blue font-mono font-bold text-[10px]">{s.count} searches</span>
+                      </div>
+                    ))}
+                  </div>
+                </GlassCard>
+
+                <GlassCard className="p-5 space-y-4">
+                  <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted">Project Clicks Leaderboard</h4>
+                  <div className="space-y-2">
+                    {Object.entries(cms.analytics?.projectClicks || {}).map(([slug, count], i) => (
+                      <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-bg-secondary text-xs">
+                        <span className="font-mono font-bold text-text-primary">/projects/{slug}</span>
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-mono font-bold text-[10px]">{count} clicks</span>
+                      </div>
+                    ))}
+                  </div>
+                </GlassCard>
+
+                <GlassCard className="p-5 space-y-4">
+                  <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted">Visitor Geographic Breakdown</h4>
+                  <div className="space-y-2">
+                    {(cms.analytics?.countryBreakdown || []).map((c, i) => (
+                      <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-bg-secondary text-xs">
+                        <div className="flex items-center gap-2">
+                          <span>{c.flag}</span>
+                          <span className="font-bold text-text-primary">{c.country}</span>
+                        </div>
+                        <span className="font-mono text-text-secondary text-[11px] font-semibold">{c.count.toLocaleString()}</span>
+                      </div>
+                    ))}
+                  </div>
+                </GlassCard>
+              </div>
+            </div>
+          )}
+
+          {/* USERS TAB */}
+          {mainTab === "users" && (
+            <div className="space-y-6 text-left">
+              <div className="p-6 rounded-2xl bg-glass-bg border border-glass-border space-y-2">
+                <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                  <Users className="w-4 h-4 text-purple-400" /> User Permissions & Role Governance
+                </h3>
+                <p className="text-xs text-text-secondary">Assign granular roles (Owner, Admin, Editor, Developer, Viewer).</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[
+                  { name: "Vivek Shaganti", role: "Owner", email: "shagantivivekgoud@gmail.com" },
+                  { name: "Sarah Lin", role: "Admin", email: "sarah@kiwik.io" },
+                  { name: "Alex Mercer", role: "Developer", email: "alex@kiwik.io" }
+                ].map((usr, i) => (
+                  <GlassCard key={i} className="p-5 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-bold text-text-primary">{usr.name}</h4>
+                      <span className="px-2 py-0.5 rounded-full bg-accent-blue/10 text-accent-blue font-mono font-bold text-[10px]">{usr.role}</span>
+                    </div>
+                    <div className="text-xs font-mono text-text-secondary">{usr.email}</div>
+                  </GlassCard>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* SETTINGS TAB */}
+          {mainTab === "settings" && (
+            <GlassCard className="p-6 space-y-5 text-left max-w-2xl">
               <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                <Download className="w-4 h-4 text-emerald-400" /> Import JSON Backup
+                <Settings className="w-4 h-4 text-accent-blue" /> Website Branding & General Settings
               </h3>
-              <textarea
-                rows={5}
-                placeholder="Paste CMS Backup JSON string here..."
-                value={jsonBackupInput}
-                onChange={(e) => setJsonBackupInput(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
-              />
-              <button
-                onClick={handleImportBackup}
-                className="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-500 transition-colors cursor-pointer"
-              >
-                Restore from JSON Backup
-              </button>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold text-text-secondary block mb-1">Site Title</label>
+                  <input
+                    type="text"
+                    value={cms.settings.siteName}
+                    onChange={(e) => {
+                      updateSettings({ siteName: e.target.value });
+                      showToast("Updated site name!");
+                    }}
+                    className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-semibold"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-text-secondary block mb-1">Contact Email</label>
+                  <input
+                    type="text"
+                    value={cms.settings.contactEmail}
+                    onChange={(e) => {
+                      updateSettings({ contactEmail: e.target.value });
+                      showToast("Updated contact email!");
+                    }}
+                    className="w-full px-3 py-2 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
+                  />
+                </div>
+              </div>
             </GlassCard>
-          </div>
-        </div>
-      )}
+          )}
+
+        </main>
+      </div>
 
     </div>
+  );
+}
+
+// Auxiliary BookOpenIcon helper
+function BookOpenIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+    </svg>
   );
 }

@@ -303,6 +303,21 @@ export interface ArchitectureNodeCMS {
   order: number;
 }
 
+export interface WhyCriskaPillCMS {
+  id: string;
+  text: string;
+  iconName: string;
+  order: number;
+  visible: boolean;
+}
+
+export interface DashboardShowcaseCMS {
+  sectionTitle: string;
+  searchPlaceholder: string;
+  kernelStatusText: string;
+  systemCoreTechs: string[];
+}
+
 export interface SiteCMSData {
   settings: WebsiteSettings;
   hero: HeroCMS;
@@ -315,6 +330,8 @@ export interface SiteCMSData {
   deviceShowcase: DeviceShowcaseCMS;
   earthShowcase: EarthShowcaseCMS;
   architectureNodes: ArchitectureNodeCMS[];
+  whyCriskaPills: WhyCriskaPillCMS[];
+  dashboardShowcase: DashboardShowcaseCMS;
   aiKnowledge: AIKnowledgeCMS;
   analytics: AnalyticsData;
   pages: PageCMS[];

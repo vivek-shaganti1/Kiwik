@@ -276,6 +276,19 @@ const defaultCMSData: SiteCMSData = {
     { id: "criska-cloud", title: "CriskaCloud", subtitle: "Cloud & Infrastructure Platform", iconName: "Cloud", color: "from-blue-500/20 to-indigo-600/5", border: "border-blue-500/30 hover:border-blue-500/60", glow: "shadow-blue-500/10", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/30", badgeText: "Active Node", order: 3 },
     { id: "security-identity", title: "Security & Identity", subtitle: "Secure Access & Governance", iconName: "Shield", color: "from-emerald-500/20 to-teal-600/5", border: "border-emerald-500/30 hover:border-emerald-500/60", glow: "shadow-emerald-500/10", badgeColor: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30", badgeText: "Active Node", order: 4 }
   ],
+  whyCriskaPills: [
+    { id: "w-1", text: "AI-Powered Intelligence", iconName: "Cpu", order: 1, visible: true },
+    { id: "w-2", text: "Security First", iconName: "Shield", order: 2, visible: true },
+    { id: "w-3", text: "Enterprise Ready", iconName: "Layers", order: 3, visible: true },
+    { id: "w-4", text: "Cloud Native", iconName: "Cloud", order: 4, visible: true },
+    { id: "w-5", text: "Scalable by Design", iconName: "Sparkles", order: 5, visible: true }
+  ],
+  dashboardShowcase: {
+    sectionTitle: "KIWIK OS Kernel",
+    searchPlaceholder: "Search projects, docs, commands...",
+    kernelStatusText: "OS Kernel Active",
+    systemCoreTechs: ["Next.js", "React", "TS TypeScript", "Tailwind CSS", "Prisma", "PostgreSQL", "Vercel"]
+  },
   aiKnowledge: {
     articles: [
       { id: "k-1", title: "Kiwik Architecture Overview", category: "Core Platform", content: "Kiwik is an enterprise digital product operating system built on Next.js 16, React 19, and Tailwind CSS. It features Zustand telemetry stores, real-time CMS synchronization, and multi-agent AI assistants.", tags: ["architecture", "nextjs", "zustand"], lastUpdated: "2026-07-24" },
