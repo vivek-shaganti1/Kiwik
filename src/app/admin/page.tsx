@@ -702,103 +702,90 @@ export default function AdminPage() {
               {/* 2. FLOATING GALLERY EDITOR */}
               {activePage === "home" && homeSection === "floating-gallery" && (
                 <div className="space-y-6 text-left">
-                  <div className="p-6 rounded-2xl bg-glass-bg border border-glass-border flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="flex items-center justify-between p-5 rounded-2xl bg-glass-bg border border-glass-border">
                     <div>
                       <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
-                        <ImageIcon className="w-4 h-4 text-purple-400" /> Parallax Ribbon Floating Gallery Manager ({(cms.floatingGallery || []).length})
+                        <ImageIcon className="w-4 h-4 text-purple-400" /> Parallax Ribbon Image Gallery Manager ({(cms.hero.galleryImages || []).length})
                       </h3>
-                      <p className="text-xs text-text-secondary mt-0.5">Manage floating gallery images, replacement URLs, titles, and click destination links.</p>
+                      <p className="text-xs text-text-secondary mt-0.5">Add, edit, delete, and attach click target URLs for 3D ribbon floating images.</p>
                     </div>
-
                     <button
                       onClick={() => {
-                        const title = prompt("Image Title / Alt:", "New Ribbon Asset");
-                        const url = prompt("Image Source URL:", "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=600&auto=format&fit=crop");
-                        const linkUrl = prompt("Click Destination Link URL (e.g. /projects or https://...):", "/projects");
-                        if (title && url) {
-                          useSiteCMSStore.getState().addFloatingGalleryItem({
-                            id: `fg-${Date.now()}`,
-                            title,
-                            url,
-                            linkUrl: linkUrl || "/projects"
-                          });
-                          showToast(`Added Gallery Image [${title}]`);
+                        const url = prompt("Image URL (Unsplash/CDN):", "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=600&auto=format&fit=crop");
+                        const title = prompt("Image Title:", "Featured Artwork");
+                        const linkUrl = prompt("Click Target Link URL (e.g. /projects or https://...):", "/projects");
+                        if (url && title) {
+                          const updated = [...(cms.hero.galleryImages || []), { id: `g-${Date.now()}`, url, title, linkUrl: linkUrl || "/projects" }];
+                          updateHero({ galleryImages: updated });
+                          showToast(`Added Floating Ribbon Image [${title}]`);
                         }
                       }}
                       className="px-5 py-2.5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-bold text-xs shadow-md flex items-center gap-2 cursor-pointer"
                     >
-                      <Plus className="w-4 h-4" /> Add Gallery Image
+                      <Plus className="w-4 h-4" /> Add Ribbon Image
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {(cms.floatingGallery || []).map((img) => (
-                      <GlassCard key={img.id} className="p-4 space-y-3 flex flex-col justify-between">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    {(cms.hero.galleryImages || []).map((img, idx) => (
+                      <GlassCard key={img.id || idx} className="p-4 space-y-3 flex flex-col justify-between">
+                        <div className="h-36 w-full rounded-xl bg-black/40 overflow-hidden relative border border-white/10">
+                          <img src={img.url} alt={img.title} className="w-full h-full object-cover" />
+                        </div>
+                        
                         <div className="space-y-2">
-                          <div className="h-32 w-full rounded-xl bg-black/40 overflow-hidden relative border border-white/10">
-                            <img src={img.url} alt={img.title} className="w-full h-full object-cover" />
-                            <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/70 text-white font-mono text-[9px] font-bold backdrop-blur-md">
-                              ID: {img.id}
-                            </span>
-                          </div>
-
                           <div>
                             <label className="text-[10px] font-bold text-text-muted block">Image Title</label>
                             <input
                               type="text"
                               value={img.title}
                               onChange={(e) => {
-                                useSiteCMSStore.getState().updateFloatingGalleryItem(img.id, { title: e.target.value });
+                                const updated = (cms.hero.galleryImages || []).map((g) => (g.id === img.id ? { ...g, title: e.target.value } : g));
+                                updateHero({ galleryImages: updated });
                                 showToast("Updated image title!");
                               }}
-                              className="w-full px-2.5 py-1.5 rounded-lg bg-bg-secondary border border-glass-border text-xs font-bold"
+                              className="w-full px-3 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-bold"
                             />
                           </div>
 
                           <div>
-                            <label className="text-[10px] font-bold text-text-muted block">Image Source URL</label>
-                            <input
-                              type="text"
-                              value={img.url}
-                              onChange={(e) => {
-                                useSiteCMSStore.getState().updateFloatingGalleryItem(img.id, { url: e.target.value });
-                                showToast("Updated image URL!");
-                              }}
-                              className="w-full px-2.5 py-1.5 rounded-lg bg-bg-secondary border border-glass-border text-[11px] font-mono"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="text-[10px] font-bold text-accent-blue block">Click Destination Link URL</label>
+                            <label className="text-[10px] font-bold text-text-muted block">Click Target Link URL</label>
                             <input
                               type="text"
                               value={img.linkUrl || "/projects"}
                               onChange={(e) => {
-                                useSiteCMSStore.getState().updateFloatingGalleryItem(img.id, { linkUrl: e.target.value });
-                                showToast("Updated click link URL!");
+                                const updated = (cms.hero.galleryImages || []).map((g) => (g.id === img.id ? { ...g, linkUrl: e.target.value } : g));
+                                updateHero({ galleryImages: updated });
+                                showToast("Updated click target URL!");
                               }}
-                              placeholder="e.g. /projects or https://..."
-                              className="w-full px-2.5 py-1.5 rounded-lg bg-bg-secondary border border-accent-blue/40 text-[11px] font-mono font-bold text-accent-blue"
+                              className="w-full px-3 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono text-accent-blue"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="text-[10px] font-bold text-text-muted block">Image URL</label>
+                            <input
+                              type="text"
+                              value={img.url}
+                              onChange={(e) => {
+                                const updated = (cms.hero.galleryImages || []).map((g) => (g.id === img.id ? { ...g, url: e.target.value } : g));
+                                updateHero({ galleryImages: updated });
+                                showToast("Updated image URL!");
+                              }}
+                              className="w-full px-3 py-1.5 rounded-xl bg-bg-secondary border border-glass-border text-xs font-mono"
                             />
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between pt-3 border-t border-divider">
-                          {img.linkUrl && (
-                            <Link
-                              href={img.linkUrl}
-                              target="_blank"
-                              className="text-[10px] font-bold text-accent-blue hover:underline flex items-center gap-1"
-                            >
-                              <ExternalLink className="w-3 h-3" /> Test Link
-                            </Link>
-                          )}
+                        <div className="flex items-center justify-between pt-2 border-t border-divider">
+                          <span className="text-[10px] font-mono text-text-muted">Index #{idx + 1}</span>
                           <button
                             onClick={() => {
-                              useSiteCMSStore.getState().deleteFloatingGalleryItem(img.id);
-                              showToast(`Deleted gallery image [${img.title}]`);
+                              const updated = (cms.hero.galleryImages || []).filter((g) => g.id !== img.id);
+                              updateHero({ galleryImages: updated });
+                              showToast(`Deleted image [${img.title}]`);
                             }}
-                            className="p-1.5 text-rose-500 hover:bg-rose-500/10 rounded cursor-pointer ml-auto"
+                            className="p-1.5 text-rose-500 hover:bg-rose-500/10 rounded cursor-pointer"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>

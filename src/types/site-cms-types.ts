@@ -31,6 +31,13 @@ export interface HeroButton {
   visible: boolean;
 }
 
+export interface FloatingGalleryImage {
+  id: string;
+  url: string;
+  title: string;
+  linkUrl?: string;
+}
+
 export interface HeroCMS {
   versionBadge: string;
   headlinePrefix: string;
@@ -44,6 +51,7 @@ export interface HeroCMS {
   orbTitle: string;
   backgroundIntensity: "low" | "medium" | "high";
   animationSpeedSeconds: number;
+  galleryImages: FloatingGalleryImage[];
 }
 
 export interface NavigationItem {
@@ -318,14 +326,6 @@ export interface DashboardShowcaseCMS {
   systemCoreTechs: string[];
 }
 
-export interface FloatingGalleryItemCMS {
-  id: string;
-  url: string;
-  title: string;
-  linkUrl?: string;
-  order?: number;
-}
-
 export interface SiteCMSData {
   settings: WebsiteSettings;
   hero: HeroCMS;
@@ -340,7 +340,6 @@ export interface SiteCMSData {
   architectureNodes: ArchitectureNodeCMS[];
   whyCriskaPills: WhyCriskaPillCMS[];
   dashboardShowcase: DashboardShowcaseCMS;
-  floatingGallery: FloatingGalleryItemCMS[];
   aiKnowledge: AIKnowledgeCMS;
   analytics: AnalyticsData;
   pages: PageCMS[];
