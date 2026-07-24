@@ -21,7 +21,8 @@ import type {
   SEOMetadata,
   AuditLogEntry,
   VersionSnapshot,
-  HeroMetric
+  HeroMetric,
+  ArchitectureNodeCMS
 } from "@/types/site-cms-types";
 
 const defaultCMSData: SiteCMSData = {
@@ -269,6 +270,12 @@ const defaultCMSData: SiteCMSData = {
       { id: "st-4", value: "3M+", label: "Daily Events", description: "Daily edge events processed and synced." }
     ]
   },
+  architectureNodes: [
+    { id: "criska-ai", title: "CriskaAI", subtitle: "Enterprise Intelligence", iconName: "Cpu", color: "from-purple-500/20 to-purple-600/5", border: "border-purple-500/30 hover:border-purple-500/60", glow: "shadow-purple-500/10", badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/30", badgeText: "Active Node", order: 1 },
+    { id: "kiwik", title: "Kiwik", subtitle: "Product & Knowledge Hub", iconName: "Layers", color: "from-cyan-500/20 to-blue-600/5", border: "border-cyan-500/30 hover:border-cyan-500/60", glow: "shadow-cyan-500/10", badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30", badgeText: "Active Node", order: 2 },
+    { id: "criska-cloud", title: "CriskaCloud", subtitle: "Cloud & Infrastructure Platform", iconName: "Cloud", color: "from-blue-500/20 to-indigo-600/5", border: "border-blue-500/30 hover:border-blue-500/60", glow: "shadow-blue-500/10", badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/30", badgeText: "Active Node", order: 3 },
+    { id: "security-identity", title: "Security & Identity", subtitle: "Secure Access & Governance", iconName: "Shield", color: "from-emerald-500/20 to-teal-600/5", border: "border-emerald-500/30 hover:border-emerald-500/60", glow: "shadow-emerald-500/10", badgeColor: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30", badgeText: "Active Node", order: 4 }
+  ],
   aiKnowledge: {
     articles: [
       { id: "k-1", title: "Kiwik Architecture Overview", category: "Core Platform", content: "Kiwik is an enterprise digital product operating system built on Next.js 16, React 19, and Tailwind CSS. It features Zustand telemetry stores, real-time CMS synchronization, and multi-agent AI assistants.", tags: ["architecture", "nextjs", "zustand"], lastUpdated: "2026-07-24" },
@@ -347,6 +354,11 @@ interface SiteCMSStoreState {
 
   updateEarthShowcase: (sec: Partial<import("@/types/site-cms-types").EarthShowcaseCMS>) => void;
   updateEarthStat: (id: string, stat: Partial<import("@/types/site-cms-types").StatItem>) => void;
+
+  // Architecture Nodes Mutators
+  updateArchitectureNode: (id: string, node: Partial<ArchitectureNodeCMS>) => void;
+  addArchitectureNode: (node: ArchitectureNodeCMS) => void;
+  deleteArchitectureNode: (id: string) => void;
 
   // AI Knowledge Mutators
   addAiKnowledgeArticle: (article: import("@/types/site-cms-types").AIKnowledgeArticle) => void;
@@ -693,7 +705,46 @@ export const useSiteCMSStore = create<SiteCMSStoreState>()(
             }
           };
         });
-        get().addAuditLog("UPDATE_EARTH_STAT", "Earth Showcase", `Updated stat [${id}]`);
+        get().addAuditLog("UPDATE_EARTH_STAT", "Earth Showcase", `Updated Earth stat [${id}]`);
+      },
+
+      updateArchitectureNode: (id, node) => {
+        set((state) => {
+          const current = state.cms.architectureNodes || defaultCMSData.architectureNodes;
+          return {
+            cms: {
+              ...state.cms,
+              architectureNodes: current.map((n) => (n.id === id ? { ...n, ...node } : n))
+            }
+          };
+        });
+        get().addAuditLog("UPDATE_ARCH_NODE", "Ecosystem Pipeline", `Updated node [${id}]`);
+      },
+
+      addArchitectureNode: (node) => {
+        set((state) => {
+          const current = state.cms.architectureNodes || defaultCMSData.architectureNodes;
+          return {
+            cms: {
+              ...state.cms,
+              architectureNodes: [...current, node]
+            }
+          };
+        });
+        get().addAuditLog("ADD_ARCH_NODE", "Ecosystem Pipeline", `Added node [${node.title}]`);
+      },
+
+      deleteArchitectureNode: (id) => {
+        set((state) => {
+          const current = state.cms.architectureNodes || defaultCMSData.architectureNodes;
+          return {
+            cms: {
+              ...state.cms,
+              architectureNodes: current.filter((n) => n.id !== id)
+            }
+          };
+        });
+        get().addAuditLog("DELETE_ARCH_NODE", "Ecosystem Pipeline", `Deleted node [${id}]`);
       },
 
       addAiKnowledgeArticle: (article) => {

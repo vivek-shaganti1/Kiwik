@@ -3,51 +3,71 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Cpu, Layers, Cloud, Shield, ArrowRight } from "lucide-react";
+import { useSiteCMSStore } from "@/stores/site-cms-store";
 import { cn } from "@/lib/utils";
 
+const ICON_MAP: Record<string, React.ReactNode> = {
+  Cpu: <Cpu className="w-5 h-5 text-purple-400" />,
+  Layers: <Layers className="w-5 h-5 text-cyan-400" />,
+  Cloud: <Cloud className="w-5 h-5 text-blue-400" />,
+  Shield: <Shield className="w-5 h-5 text-emerald-400" />
+};
+
 export function EcosystemPipeline() {
-  const nodes = [
+  const cmsNodes = useSiteCMSStore((state) => state.cms.architectureNodes) || [];
+
+  const defaultNodes = [
     {
       id: "criska-ai",
       title: "CriskaAI",
       subtitle: "Enterprise Intelligence",
-      icon: <Cpu className="w-5 h-5 text-purple-400" />,
+      iconName: "Cpu",
       color: "from-purple-500/20 to-purple-600/5",
       border: "border-purple-500/30 hover:border-purple-500/60",
       glow: "shadow-purple-500/10",
-      badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/30"
+      badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/30",
+      badgeText: "Active Node",
+      order: 1
     },
     {
       id: "kiwik",
       title: "Kiwik",
       subtitle: "Product & Knowledge Hub",
-      icon: <Layers className="w-5 h-5 text-cyan-400" />,
+      iconName: "Layers",
       color: "from-cyan-500/20 to-blue-600/5",
       border: "border-cyan-500/30 hover:border-cyan-500/60",
       glow: "shadow-cyan-500/10",
-      badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30"
+      badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30",
+      badgeText: "Active Node",
+      order: 2
     },
     {
       id: "criska-cloud",
       title: "CriskaCloud",
       subtitle: "Cloud & Infrastructure Platform",
-      icon: <Cloud className="w-5 h-5 text-blue-400" />,
+      iconName: "Cloud",
       color: "from-blue-500/20 to-indigo-600/5",
       border: "border-blue-500/30 hover:border-blue-500/60",
       glow: "shadow-blue-500/10",
-      badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/30"
+      badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/30",
+      badgeText: "Active Node",
+      order: 3
     },
     {
       id: "security-identity",
       title: "Security & Identity",
       subtitle: "Secure Access & Governance",
-      icon: <Shield className="w-5 h-5 text-emerald-400" />,
+      iconName: "Shield",
       color: "from-emerald-500/20 to-teal-600/5",
       border: "border-emerald-500/30 hover:border-emerald-500/60",
       glow: "shadow-emerald-500/10",
-      badgeColor: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+      badgeColor: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
+      badgeText: "Active Node",
+      order: 4
     }
   ];
+
+  const nodes = cmsNodes.length > 0 ? cmsNodes : defaultNodes;
 
   return (
     <section className="py-20 px-4 sm:px-6 md:px-8 max-w-[1400px] mx-auto relative z-20">
@@ -79,10 +99,10 @@ export function EcosystemPipeline() {
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="p-3 rounded-xl bg-bg-primary/80 border border-white/10 shadow-inner">
-                  {node.icon}
+                  {ICON_MAP[node.iconName] || <Cpu className="w-5 h-5 text-purple-400" />}
                 </div>
                 <span className={cn("text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border", node.badgeColor)}>
-                  Active Node
+                  {node.badgeText || "Active Node"}
                 </span>
               </div>
 

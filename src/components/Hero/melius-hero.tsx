@@ -5,9 +5,16 @@ import { motion } from "framer-motion";
 import { PaperBackground } from "./paper-background";
 import { ImageRibbon } from "./ribbon";
 import { PromptCTA } from "./prompt-cta";
+import { useSiteCMSStore } from "@/stores/site-cms-store";
 import { cn } from "@/lib/utils";
 
 export function MeliusHero() {
+  const hero = useSiteCMSStore((state) => state.cms.hero);
+
+  const headlinePrefix = hero?.headlinePrefix || "One platform.";
+  const headlineHighlight = hero?.headlineHighlightWord || "Every creative outcome.";
+  const description = hero?.description || "Be the creative director. Let agents be your team. Brief our agent Mel, watch the work assemble, and steer any prompt until the output lands exactly as you imagined.";
+
   return (
     <PaperBackground className="min-h-screen flex flex-col justify-between pt-12 pb-12 overflow-hidden">
       {/* Hero Center Section */}
@@ -23,9 +30,9 @@ export function MeliusHero() {
           className="space-y-1 sm:space-y-2 max-w-4xl mx-auto"
         >
           <h1 className="text-4xl sm:text-6xl md:text-7xl font-serif font-medium tracking-tight leading-[0.95] text-[#18181B] dark:text-[#F4F4F5]">
-            One platform. <br />
+            {headlinePrefix} <br />
             <span className="italic font-semibold bg-clip-text text-transparent bg-gradient-to-r from-[#18181B] via-zinc-800 to-zinc-500 dark:from-white dark:via-zinc-200 dark:to-zinc-400">
-              Every creative outcome.
+              {headlineHighlight}
             </span>
           </h1>
         </motion.div>
@@ -45,8 +52,7 @@ export function MeliusHero() {
           className="max-w-md mx-auto text-center"
         >
           <p className="text-xs sm:text-sm text-[#52525B] dark:text-[#A1A1AA] leading-relaxed font-sans font-medium">
-            Be the creative director. Let agents be your team. <br className="hidden sm:block" />
-            Brief our agent Mel, watch the work assemble, and steer any prompt until the output lands exactly as you imagined.
+            {description}
           </p>
         </motion.div>
 

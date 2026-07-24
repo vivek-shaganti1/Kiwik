@@ -1296,6 +1296,90 @@ export default function AdminPage() {
             </div>
           </GlassCard>
 
+          {/* Unified Operating Architecture Nodes Editor */}
+          <GlassCard className="p-6 space-y-5">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                <Workflow className="w-4 h-4 text-purple-400" /> Unified Operating Architecture Nodes ({(cms.architectureNodes || []).length})
+              </h3>
+              <button
+                onClick={() => {
+                  const title = prompt("Node Title:", "New Node");
+                  const subtitle = title ? prompt("Node Subtitle:", "Infrastructure Layer") : "";
+                  if (title) {
+                    useSiteCMSStore.getState().addArchitectureNode({
+                      id: `node-${Date.now()}`,
+                      title,
+                      subtitle: subtitle || "Active Service",
+                      iconName: "Cpu",
+                      color: "from-purple-500/20 to-purple-600/5",
+                      border: "border-purple-500/30 hover:border-purple-500/60",
+                      glow: "shadow-purple-500/10",
+                      badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/30",
+                      badgeText: "Active Node",
+                      order: (cms.architectureNodes || []).length + 1
+                    });
+                    showToast(`Added Architecture Node [${title}]`);
+                  }
+                }}
+                className="px-4 py-2 rounded-xl bg-accent-blue text-white text-xs font-bold shadow-md flex items-center gap-1.5 cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" /> Add Architecture Node
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              {(cms.architectureNodes || []).map((node) => (
+                <div key={node.id} className="p-4 rounded-xl bg-bg-secondary/60 border border-glass-border space-y-3">
+                  <div className="flex items-center justify-between">
+                    <input
+                      type="text"
+                      value={node.title}
+                      onChange={(e) => {
+                        useSiteCMSStore.getState().updateArchitectureNode(node.id, { title: e.target.value });
+                        showToast("Updated node title!");
+                      }}
+                      className="font-bold text-xs text-text-primary bg-transparent focus:outline-none"
+                    />
+                    <button
+                      onClick={() => {
+                        useSiteCMSStore.getState().deleteArchitectureNode(node.id);
+                        showToast(`Deleted node [${node.title}]`);
+                      }}
+                      className="p-1 text-rose-500 hover:bg-rose-500/10 rounded cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-text-muted block">Subtitle / Description</label>
+                    <input
+                      type="text"
+                      value={node.subtitle}
+                      onChange={(e) => {
+                        useSiteCMSStore.getState().updateArchitectureNode(node.id, { subtitle: e.target.value });
+                        showToast("Updated node subtitle!");
+                      }}
+                      className="w-full px-2.5 py-1 rounded bg-bg-primary border border-glass-border text-xs font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-text-muted block">Badge Tag Text</label>
+                    <input
+                      type="text"
+                      value={node.badgeText}
+                      onChange={(e) => {
+                        useSiteCMSStore.getState().updateArchitectureNode(node.id, { badgeText: e.target.value });
+                        showToast("Updated node badge!");
+                      }}
+                      className="w-full px-2.5 py-1 rounded bg-bg-primary border border-glass-border text-xs font-mono"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </GlassCard>
+
           {/* Earth Infrastructure Showcase Manager */}
           <GlassCard className="p-6 space-y-5">
             <h3 className="text-base font-bold text-text-primary flex items-center gap-2">

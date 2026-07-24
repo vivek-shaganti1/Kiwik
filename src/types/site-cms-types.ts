@@ -290,6 +290,19 @@ export interface VersionSnapshot {
   data: string;
 }
 
+export interface ArchitectureNodeCMS {
+  id: string;
+  title: string;
+  subtitle: string;
+  iconName: string;
+  color: string;
+  border: string;
+  glow: string;
+  badgeColor: string;
+  badgeText: string;
+  order: number;
+}
+
 export interface SiteCMSData {
   settings: WebsiteSettings;
   hero: HeroCMS;
@@ -301,6 +314,7 @@ export interface SiteCMSData {
   howWeWork: HowWeWorkCMS;
   deviceShowcase: DeviceShowcaseCMS;
   earthShowcase: EarthShowcaseCMS;
+  architectureNodes: ArchitectureNodeCMS[];
   aiKnowledge: AIKnowledgeCMS;
   analytics: AnalyticsData;
   pages: PageCMS[];
