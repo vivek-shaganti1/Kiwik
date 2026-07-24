@@ -289,6 +289,16 @@ const defaultCMSData: SiteCMSData = {
     kernelStatusText: "OS Kernel Active",
     systemCoreTechs: ["Next.js", "React", "TS TypeScript", "Tailwind CSS", "Prisma", "PostgreSQL", "Vercel"]
   },
+  floatingGallery: [
+    { id: "fg-1", url: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=600&auto=format&fit=crop", title: "Porcelain Roses", linkUrl: "/projects" },
+    { id: "fg-2", url: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=600&auto=format&fit=crop", title: "Liquid Chroma", linkUrl: "/projects" },
+    { id: "fg-3", url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=600&auto=format&fit=crop", title: "Patent Gloss", linkUrl: "/projects" },
+    { id: "fg-4", url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600&auto=format&fit=crop", title: "Holographic Waves", linkUrl: "/projects" },
+    { id: "fg-5", url: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=600&auto=format&fit=crop", title: "Crimson Velvet", linkUrl: "/projects" },
+    { id: "fg-6", url: "https://images.unsplash.com/photo-1563241527-3004b7be0ffd?q=80&w=600&auto=format&fit=crop", title: "Botanical Specimen", linkUrl: "/projects" },
+    { id: "fg-7", url: "https://images.unsplash.com/photo-1518837695005-2083093ee35b?q=80&w=600&auto=format&fit=crop", title: "Luminous Jellyfish", linkUrl: "/projects" },
+    { id: "fg-8", url: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?q=80&w=600&auto=format&fit=crop", title: "Emerald Canopy", linkUrl: "/projects" }
+  ],
   aiKnowledge: {
     articles: [
       { id: "k-1", title: "Kiwik Architecture Overview", category: "Core Platform", content: "Kiwik is an enterprise digital product operating system built on Next.js 16, React 19, and Tailwind CSS. It features Zustand telemetry stores, real-time CMS synchronization, and multi-agent AI assistants.", tags: ["architecture", "nextjs", "zustand"], lastUpdated: "2026-07-24" },
@@ -372,6 +382,11 @@ interface SiteCMSStoreState {
   updateArchitectureNode: (id: string, node: Partial<ArchitectureNodeCMS>) => void;
   addArchitectureNode: (node: ArchitectureNodeCMS) => void;
   deleteArchitectureNode: (id: string) => void;
+
+  // Floating Gallery Mutators
+  addFloatingGalleryItem: (item: import("@/types/site-cms-types").FloatingGalleryItemCMS) => void;
+  updateFloatingGalleryItem: (id: string, item: Partial<import("@/types/site-cms-types").FloatingGalleryItemCMS>) => void;
+  deleteFloatingGalleryItem: (id: string) => void;
 
   // AI Knowledge Mutators
   addAiKnowledgeArticle: (article: import("@/types/site-cms-types").AIKnowledgeArticle) => void;
@@ -758,6 +773,45 @@ export const useSiteCMSStore = create<SiteCMSStoreState>()(
           };
         });
         get().addAuditLog("DELETE_ARCH_NODE", "Ecosystem Pipeline", `Deleted node [${id}]`);
+      },
+
+      addFloatingGalleryItem: (item: import("@/types/site-cms-types").FloatingGalleryItemCMS) => {
+        set((state) => {
+          const current = state.cms.floatingGallery || defaultCMSData.floatingGallery;
+          return {
+            cms: {
+              ...state.cms,
+              floatingGallery: [item, ...current]
+            }
+          };
+        });
+        get().addAuditLog("ADD_GALLERY_ITEM", "Floating Gallery", `Added gallery image [${item.title}]`);
+      },
+
+      updateFloatingGalleryItem: (id: string, item: Partial<import("@/types/site-cms-types").FloatingGalleryItemCMS>) => {
+        set((state) => {
+          const current = state.cms.floatingGallery || defaultCMSData.floatingGallery;
+          return {
+            cms: {
+              ...state.cms,
+              floatingGallery: current.map((g) => (g.id === id ? { ...g, ...item } : g))
+            }
+          };
+        });
+        get().addAuditLog("UPDATE_GALLERY_ITEM", "Floating Gallery", `Updated gallery item [${id}]`);
+      },
+
+      deleteFloatingGalleryItem: (id: string) => {
+        set((state) => {
+          const current = state.cms.floatingGallery || defaultCMSData.floatingGallery;
+          return {
+            cms: {
+              ...state.cms,
+              floatingGallery: current.filter((g) => g.id !== id)
+            }
+          };
+        });
+        get().addAuditLog("DELETE_GALLERY_ITEM", "Floating Gallery", `Deleted gallery item [${id}]`);
       },
 
       addAiKnowledgeArticle: (article) => {

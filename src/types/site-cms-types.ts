@@ -318,6 +318,14 @@ export interface DashboardShowcaseCMS {
   systemCoreTechs: string[];
 }
 
+export interface FloatingGalleryItemCMS {
+  id: string;
+  url: string;
+  title: string;
+  linkUrl?: string;
+  order?: number;
+}
+
 export interface SiteCMSData {
   settings: WebsiteSettings;
   hero: HeroCMS;
@@ -332,6 +340,7 @@ export interface SiteCMSData {
   architectureNodes: ArchitectureNodeCMS[];
   whyCriskaPills: WhyCriskaPillCMS[];
   dashboardShowcase: DashboardShowcaseCMS;
+  floatingGallery: FloatingGalleryItemCMS[];
   aiKnowledge: AIKnowledgeCMS;
   analytics: AnalyticsData;
   pages: PageCMS[];
