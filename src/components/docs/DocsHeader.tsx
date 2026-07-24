@@ -12,16 +12,12 @@ interface DocsHeaderProps {
 
 export function DocsHeader({ searchQuery, onSearchChange, onOpenCommandPalette }: DocsHeaderProps) {
   return (
-    <div className="relative mb-10 overflow-hidden rounded-3xl bg-neutral-200/50 dark:bg-white/5 border border-slate-300/60 dark:border-white/10 p-6 sm:p-8 md:p-10 backdrop-blur-2xl transition-all shadow-xl">
-      {/* Background glow and gradient orb */}
-      <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-gradient-to-br from-indigo-500/20 via-cyan-500/10 to-transparent blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-gradient-to-tr from-violet-500/15 via-blue-500/10 to-transparent blur-3xl pointer-events-none" />
-
-      <div className="relative z-10 space-y-6">
+    <div className="relative mb-10 overflow-hidden rounded-3xl bg-white dark:bg-[#101114] border border-neutral-200/80 dark:border-white/10 p-6 sm:p-8 md:p-10 transition-all shadow-sm">
+      <div className="relative z-10 space-y-6 text-left">
         {/* Top Badges */}
         <div className="flex items-center gap-3 flex-wrap">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-mono font-bold tracking-tight">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-500 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100 dark:bg-white/10 border border-neutral-200 dark:border-white/10 text-neutral-800 dark:text-neutral-200 text-xs font-mono font-bold tracking-tight">
+            <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
             <span>Kiwik.1 Platform Specs</span>
           </div>
 
@@ -33,10 +29,10 @@ export function DocsHeader({ searchQuery, onSearchChange, onOpenCommandPalette }
 
         {/* Title & Subtitle */}
         <div className="space-y-2">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-slate-900 dark:text-white tracking-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-neutral-900 dark:text-white tracking-wide">
             Documentation Center
           </h1>
-          <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg max-w-2xl font-semibold leading-relaxed">
+          <p className="text-neutral-600 dark:text-neutral-400 text-base sm:text-lg max-w-2xl font-medium leading-relaxed">
             Everything about Kiwik in one place. Explore system blueprints, API specifications, component libraries, and live telemetry engines.
           </p>
         </div>
@@ -44,61 +40,61 @@ export function DocsHeader({ searchQuery, onSearchChange, onOpenCommandPalette }
         {/* Search & Command Palette Button Bar */}
         <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
           <div className="relative flex-1 w-full">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 dark:text-neutral-500" />
             <input
               type="text"
               placeholder="Search documentation, APIs, components, commands... (Press '/' to focus)"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full pl-11 pr-12 py-3 rounded-2xl bg-white/80 dark:bg-white/5 border border-slate-300/60 dark:border-white/10 focus:outline-none focus:border-indigo-500 text-sm font-semibold text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-sm backdrop-blur-xl transition-all"
+              className="w-full pl-11 pr-12 py-3 rounded-2xl bg-slate-50 dark:bg-black/60 border border-neutral-200 dark:border-white/15 focus:outline-none focus:border-neutral-900 dark:focus:border-white text-sm font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 shadow-xs transition-all"
             />
-            <kbd className="absolute right-3.5 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-neutral-200 dark:bg-white/10 text-[10px] font-mono text-slate-500 dark:text-slate-400 font-bold border border-slate-300/40 dark:border-white/10">
+            <kbd className="absolute right-3.5 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-neutral-200 dark:bg-white/10 text-[10px] font-mono text-neutral-600 dark:text-neutral-400 font-bold border border-neutral-300 dark:border-white/10">
               /
             </kbd>
           </div>
 
           <button
             onClick={onOpenCommandPalette}
-            className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-xs font-bold transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2 cursor-pointer shrink-0"
+            className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100 text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer shrink-0"
           >
             <Command className="w-4 h-4" />
             <span>Command Palette</span>
-            <kbd className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-white/20 text-[10px] font-mono">⌘K</kbd>
+            <kbd className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-white/20 dark:bg-black/20 text-[10px] font-mono">⌘K</kbd>
           </button>
         </div>
 
         {/* Quick Stats Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-300/40 dark:border-white/10">
-          <div className="p-3.5 rounded-2xl bg-white/60 dark:bg-white/5 border border-slate-300/40 dark:border-white/10 backdrop-blur-xl">
-            <div className="flex items-center gap-2 text-indigo-500 dark:text-indigo-400 mb-1">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-neutral-200/80 dark:border-white/10">
+          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-neutral-200/80 dark:border-white/10 shadow-xs">
+            <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 mb-1">
               <FileText className="w-4 h-4" />
-              <span className="text-xl font-bold text-slate-900 dark:text-white">120+</span>
+              <span className="text-xl font-bold text-neutral-900 dark:text-white">120+</span>
             </div>
-            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Documentation Pages</p>
+            <p className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400">Documentation Pages</p>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-white/60 dark:bg-white/5 border border-slate-300/40 dark:border-white/10 backdrop-blur-xl">
-            <div className="flex items-center gap-2 text-cyan-500 dark:text-cyan-400 mb-1">
+          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-neutral-200/80 dark:border-white/10 shadow-xs">
+            <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 mb-1">
               <Box className="w-4 h-4" />
-              <span className="text-xl font-bold text-slate-900 dark:text-white">48</span>
+              <span className="text-xl font-bold text-neutral-900 dark:text-white">48</span>
             </div>
-            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">UI Components</p>
+            <p className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400">UI Components</p>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-white/60 dark:bg-white/5 border border-slate-300/40 dark:border-white/10 backdrop-blur-xl">
-            <div className="flex items-center gap-2 text-emerald-500 dark:text-emerald-400 mb-1">
+          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-neutral-200/80 dark:border-white/10 shadow-xs">
+            <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 mb-1">
               <Globe className="w-4 h-4" />
-              <span className="text-xl font-bold text-slate-900 dark:text-white">16</span>
+              <span className="text-xl font-bold text-neutral-900 dark:text-white">16</span>
             </div>
-            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">API Modules</p>
+            <p className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400">API Modules</p>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-white/60 dark:bg-white/5 border border-slate-300/40 dark:border-white/10 backdrop-blur-xl">
-            <div className="flex items-center gap-2 text-violet-500 dark:text-violet-400 mb-1">
+          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-neutral-200/80 dark:border-white/10 shadow-xs">
+            <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 mb-1">
               <Folder className="w-4 h-4" />
-              <span className="text-xl font-bold text-slate-900 dark:text-white">24</span>
+              <span className="text-xl font-bold text-neutral-900 dark:text-white">24</span>
             </div>
-            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Active Projects</p>
+            <p className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400">Active Projects</p>
           </div>
         </div>
       </div>

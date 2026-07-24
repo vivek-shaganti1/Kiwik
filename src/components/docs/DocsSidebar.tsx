@@ -30,27 +30,27 @@ export function DocsSidebar({ categories, activeSlug, onSelectArticle, bookmarks
   })).filter(cat => cat.articles.length > 0);
 
   return (
-    <aside className="w-full lg:w-72 shrink-0 space-y-6 lg:sticky lg:top-24 lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto pr-2 custom-scrollbar select-none">
+    <aside className="w-full lg:w-72 shrink-0 space-y-6 lg:sticky lg:top-24 lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto pr-2 custom-scrollbar select-none text-left">
       {/* Search Filter Box */}
       <div className="relative">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-400 dark:text-neutral-500" />
         <input
           type="text"
           placeholder="Filter navigation..."
           value={sidebarFilter}
           onChange={(e) => setSidebarFilter(e.target.value)}
-          className="w-full pl-9 pr-3 py-2 rounded-xl bg-white/60 dark:bg-white/5 border border-slate-300/50 dark:border-white/10 text-xs font-semibold text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 shadow-sm backdrop-blur-md"
+          className="w-full pl-9 pr-3 py-2 rounded-xl bg-white dark:bg-black/60 border border-neutral-200/80 dark:border-white/15 text-xs font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:border-neutral-900 dark:focus:border-white shadow-xs"
         />
       </div>
 
       {/* Bookmarks Quick Bar */}
       {bookmarksCount > 0 && (
-        <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-between text-xs font-bold text-indigo-600 dark:text-indigo-400">
+        <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between text-xs font-bold text-amber-600 dark:text-amber-400">
           <div className="flex items-center gap-2">
-            <Bookmark className="w-3.5 h-3.5 text-indigo-500 fill-indigo-500" />
+            <Bookmark className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
             <span>Saved Bookmarks</span>
           </div>
-          <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 text-[10px]">{bookmarksCount}</span>
+          <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-[10px]">{bookmarksCount}</span>
         </div>
       )}
 
@@ -61,19 +61,19 @@ export function DocsSidebar({ categories, activeSlug, onSelectArticle, bookmarks
 
           return (
             <div key={category.id} className="space-y-2">
-              <div className="flex items-center justify-between px-2 text-xs font-mono font-bold tracking-wider text-slate-900 dark:text-slate-100 uppercase">
+              <div className="flex items-center justify-between px-2 text-xs font-mono font-bold tracking-wider text-neutral-900 dark:text-white uppercase">
                 <div className="flex items-center gap-2">
-                  <CategoryIcon className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
+                  <CategoryIcon className="w-3.5 h-3.5 text-neutral-700 dark:text-neutral-300" />
                   <span>{category.name}</span>
                 </div>
                 {category.badge && (
-                  <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-neutral-200 dark:bg-white/10 text-slate-600 dark:text-slate-300 font-sans font-bold">
+                  <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-neutral-100 dark:bg-white/10 text-neutral-700 dark:text-neutral-300 font-sans font-bold border border-neutral-200/80 dark:border-white/10">
                     {category.badge}
                   </span>
                 )}
               </div>
 
-              <div className="space-y-0.5 pl-2 border-l border-slate-300/40 dark:border-white/10">
+              <div className="space-y-0.5 pl-2 border-l border-neutral-200/80 dark:border-white/10">
                 {category.articles.map((art) => {
                   const isActive = art.slug === activeSlug;
 
@@ -81,14 +81,14 @@ export function DocsSidebar({ categories, activeSlug, onSelectArticle, bookmarks
                     <button
                       key={art.id}
                       onClick={() => onSelectArticle(art.slug)}
-                      className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-between transition-all cursor-pointer ${
+                      className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-all cursor-pointer ${
                         isActive
-                          ? "bg-indigo-600 text-white font-bold shadow-md shadow-indigo-500/20"
-                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-neutral-200/50 dark:hover:bg-white/5"
+                          ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 font-bold shadow-xs"
+                          : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 font-medium"
                       }`}
                     >
                       <span>{art.title}</span>
-                      {isActive && <ChevronRight className="w-3.5 h-3.5 text-white shrink-0" />}
+                      {isActive && <ChevronRight className="w-3.5 h-3.5 shrink-0 opacity-80" />}
                     </button>
                   );
                 })}

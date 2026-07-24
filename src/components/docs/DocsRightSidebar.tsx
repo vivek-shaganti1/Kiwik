@@ -52,39 +52,39 @@ export function DocsRightSidebar({
   };
 
   return (
-    <aside className="w-full lg:w-64 shrink-0 space-y-6 lg:sticky lg:top-24 lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto pl-2 custom-scrollbar select-none">
+    <aside className="w-full lg:w-64 shrink-0 space-y-6 lg:sticky lg:top-24 lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto pl-2 custom-scrollbar select-none text-left">
       {/* Ask Kiwik AI Banner */}
       <button
         onClick={onOpenAiAssistant}
-        className="w-full p-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-left transition-all shadow-lg shadow-indigo-500/20 cursor-pointer relative overflow-hidden group"
+        className="w-full p-4 rounded-2xl bg-neutral-900 hover:bg-neutral-800 dark:bg-white/10 dark:hover:bg-white/15 text-white text-left transition-all shadow-md border border-neutral-800 dark:border-white/15 cursor-pointer relative overflow-hidden group"
       >
         <div className="flex items-center justify-between mb-1">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-200">AI Assistant</span>
-          <Sparkles className="w-4 h-4 text-amber-300 animate-pulse group-hover:scale-110 transition-transform" />
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400">AI Assistant</span>
+          <Sparkles className="w-4 h-4 text-amber-400 animate-pulse group-hover:scale-110 transition-transform" />
         </div>
         <p className="text-xs font-bold leading-tight">Ask Kiwik AI about this document</p>
-        <span className="text-[10px] text-indigo-100 font-medium mt-1 inline-block">Summarize, explain architecture, or generate code →</span>
+        <span className="text-[10px] text-neutral-400 font-medium mt-1 inline-block">Summarize, explain architecture, or generate code →</span>
       </button>
 
       {/* On-Page Table of Contents */}
       {toc.length > 0 && (
         <div className="space-y-3">
-          <h5 className="text-[11px] font-mono tracking-widest text-slate-900 dark:text-white uppercase font-bold">
+          <h5 className="text-xs font-mono tracking-wider text-neutral-900 dark:text-white uppercase font-bold">
             On This Page
           </h5>
-          <nav className="space-y-1 text-xs border-l border-slate-300/40 dark:border-white/10 pl-3">
+          <nav className="space-y-1 text-xs border-l border-neutral-200/80 dark:border-white/10 pl-3">
             {toc.map((item) => {
               const isActive = activeSectionId === item.id;
               return (
                 <button
                   key={item.id}
                   onClick={() => onSelectToc(item.id)}
-                  className={`block text-left py-1 text-xs font-semibold transition-all cursor-pointer ${
+                  className={`block text-left py-1 text-xs font-medium transition-all cursor-pointer ${
                     item.level === 3 ? "pl-3 text-[11px]" : ""
                   } ${
                     isActive
-                      ? "text-indigo-600 dark:text-indigo-400 font-bold translate-x-1"
-                      : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                      ? "text-neutral-900 dark:text-white font-bold translate-x-1"
+                      : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
                   }`}
                 >
                   {item.title}
@@ -96,8 +96,8 @@ export function DocsRightSidebar({
       )}
 
       {/* Page Metadata Card */}
-      <div className="p-4 rounded-2xl bg-white/40 dark:bg-white/5 border border-slate-300/40 dark:border-white/10 space-y-3 text-left backdrop-blur-xl">
-        <h5 className="text-[11px] font-mono tracking-widest text-slate-900 dark:text-white uppercase font-bold">
+      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-neutral-200/80 dark:border-white/10 space-y-3 text-left shadow-xs">
+        <h5 className="text-xs font-mono tracking-wider text-neutral-900 dark:text-white uppercase font-bold">
           Page Info
         </h5>
 

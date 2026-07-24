@@ -148,23 +148,23 @@ function DocsMainContent() {
         />
 
         {/* Center Main Content Deck */}
-        <main className="flex-1 w-full min-w-0 bg-neutral-200/40 dark:bg-white/5 border border-slate-300/60 dark:border-white/10 rounded-3xl p-6 sm:p-8 md:p-10 backdrop-blur-2xl shadow-xl space-y-8">
+        <main className="flex-1 w-full min-w-0 bg-white dark:bg-[#101114] border border-neutral-200/80 dark:border-white/10 rounded-3xl p-6 sm:p-8 md:p-10 shadow-sm space-y-8">
           
           {/* Article Header */}
-          <div className="space-y-3 border-b border-slate-300/40 dark:border-white/10 pb-6 text-left">
+          <div className="space-y-3 border-b border-neutral-200/80 dark:border-white/10 pb-6 text-left">
             <div className="flex items-center gap-2 flex-wrap">
               {currentArticle.tags.map((tag, i) => (
-                <span key={i} className="px-2.5 py-0.5 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-mono font-bold border border-indigo-500/20">
+                <span key={i} className="px-2.5 py-0.5 rounded-md bg-neutral-100 dark:bg-white/10 text-neutral-800 dark:text-neutral-200 text-xs font-mono font-bold border border-neutral-200 dark:border-white/10">
                   {tag}
                 </span>
               ))}
             </div>
 
-            <h1 className="text-3xl sm:text-4xl font-serif font-bold text-slate-900 dark:text-white tracking-tight">
+            <h1 className="text-3xl sm:text-4xl font-serif font-bold text-neutral-900 dark:text-white tracking-wide">
               {currentArticle.title}
             </h1>
 
-            <p className="text-slate-600 dark:text-slate-300 text-base font-semibold leading-relaxed">
+            <p className="text-neutral-600 dark:text-neutral-400 text-base font-medium leading-relaxed">
               {currentArticle.subtitle}
             </p>
           </div>
