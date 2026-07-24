@@ -370,6 +370,25 @@ export function AppleCoverflowCarousel() {
         </button>
 
       </div>
+
+      {/* ─────────────────────────────────────────────────────────────
+          FLOATING CORNER SIDE NAVIGATION ARROWS
+         ───────────────────────────────────────────────────────────── */}
+      <button
+        onClick={handlePrev}
+        className="absolute left-6 top-[40%] sm:top-[45%] -translate-y-1/2 w-14 h-14 rounded-full bg-black/40 dark:bg-white/10 backdrop-blur-xl border border-black/15 dark:border-white/20 flex items-center justify-center text-white hover:bg-black/60 dark:hover:bg-white/20 active:scale-95 transition-all shadow-[0_12px_40px_rgba(0,0,0,0.5)] z-40 cursor-pointer hidden md:flex group"
+        aria-label="Previous project"
+      >
+        <ArrowLeft className="w-6 h-6 text-white/80 group-hover:text-white group-hover:-translate-x-0.5 transition-all" />
+      </button>
+
+      <button
+        onClick={handleNext}
+        className="absolute right-6 top-[40%] sm:top-[45%] -translate-y-1/2 w-14 h-14 rounded-full bg-black/40 dark:bg-white/10 backdrop-blur-xl border border-black/15 dark:border-white/20 flex items-center justify-center text-white hover:bg-black/60 dark:hover:bg-white/20 active:scale-95 transition-all shadow-[0_12px_40px_rgba(0,0,0,0.5)] z-40 cursor-pointer hidden md:flex group"
+        aria-label="Next project"
+      >
+        <ArrowRight className="w-6 h-6 text-white/80 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+      </button>
     </div>
   );
 }
