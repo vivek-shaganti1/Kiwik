@@ -43,8 +43,13 @@ export function ContactInbox() {
   const [error, setError] = useState("");
   const [busyId, setBusyId] = useState<number | null>(null);
   const [filter, setFilter] = useState<"all" | Submission["status"]>("all");
+  // Refresh had no visible feedback: it refetched, but if nothing changed the
+  // list looked identical and the button seemed dead. Track the in-flight state
+  // so the icon spins and the button disables while it runs.
+  const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
+    setRefreshing(true);
     try {
       const res = await fetch("/api/contact", { cache: "no-store" });
       if (!res.ok) throw new Error(res.status === 401 ? "Session expired — sign in again." : "Couldn't load submissions.");
@@ -53,6 +58,8 @@ export function ContactInbox() {
       setError("");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Couldn't load submissions.");
+    } finally {
+      setRefreshing(false);
     }
   }, []);
 
@@ -98,9 +105,11 @@ export function ContactInbox() {
         </div>
         <button
           onClick={load}
-          className="flex items-center gap-1.5 rounded-xl border border-glass-border px-3 py-1.5 text-[11px] font-bold text-text-secondary hover:border-accent-blue/40"
+          disabled={refreshing}
+          aria-busy={refreshing}
+          className="flex items-center gap-1.5 rounded-xl border border-glass-border px-3 py-1.5 text-[11px] font-bold text-text-secondary hover:border-accent-blue/40 disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          <RefreshCw className="h-3 w-3" /> Refresh
+          <RefreshCw className={`h-3 w-3 ${refreshing ? "animate-spin" : ""}`} /> {refreshing ? "Refreshing…" : "Refresh"}
         </button>
       </div>
 

@@ -768,6 +768,50 @@ interface SiteCMSStoreState {
   resetCMSToDefaults: () => void;
 }
 
+/**
+ * Per-tab gate on writing the CMS to localStorage.
+ *
+ * The public site and the admin studio share this one store, and the store is
+ * cached in localStorage. Any tab that opens the public site hydrates from that
+ * cache. The admin used to persist every keystroke, so an unsaved edit was
+ * written to localStorage instantly and then showed up on the public site the
+ * moment it was opened in another tab — content changing with no "Save".
+ *
+ * The admin now disables persistence while editing (setCmsPersistEnabled(false))
+ * so drafts live only in that tab's memory, and calls flushCmsToStorage() on an
+ * explicit save. The public site never touches this flag, so its poller keeps
+ * caching the published content normally. The flag is module-scoped, i.e.
+ * per browser tab, so turning it off in the studio never affects a visitor.
+ */
+let cmsPersistEnabled = true;
+export function setCmsPersistEnabled(enabled: boolean) {
+  cmsPersistEnabled = enabled;
+}
+const gatedCmsStorage = {
+  getItem: (name: string): string | null => {
+    try {
+      return typeof localStorage !== "undefined" ? localStorage.getItem(name) : null;
+    } catch {
+      return null;
+    }
+  },
+  setItem: (name: string, value: string): void => {
+    if (!cmsPersistEnabled) return;
+    try {
+      if (typeof localStorage !== "undefined") localStorage.setItem(name, value);
+    } catch {
+      /* storage full or unavailable — the DB remains the source of truth */
+    }
+  },
+  removeItem: (name: string): void => {
+    try {
+      if (typeof localStorage !== "undefined") localStorage.removeItem(name);
+    } catch {
+      /* ignore */
+    }
+  },
+};
+
 export const useSiteCMSStore = create<SiteCMSStoreState>()(
   persist(
     (set, get) => ({
@@ -1484,7 +1528,7 @@ export const useSiteCMSStore = create<SiteCMSStoreState>()(
     }),
     {
       name: "kiwik-site-cms-v3",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => gatedCmsStorage),
       merge: (persistedState: any, currentState) => ({
         ...currentState,
         cms: {
@@ -1531,6 +1575,23 @@ export const useSiteCMSStore = create<SiteCMSStoreState>()(
     }
   )
 );
+
+/**
+ * Write the current CMS to localStorage immediately, regardless of the persist
+ * gate. Called by the admin on an explicit "Save All Changes" so the saved
+ * content is cached locally (and shown by any public tab on this browser) while
+ * unsaved drafts still never touch storage.
+ */
+export function flushCmsToStorage() {
+  const prev = cmsPersistEnabled;
+  cmsPersistEnabled = true;
+  try {
+    // Touch the store so the persist middleware serialises current state.
+    useSiteCMSStore.setState((s) => ({ ...s }));
+  } finally {
+    cmsPersistEnabled = prev;
+  }
+}
 
 export function useSiteCMS() {
   const [hasHydrated, setHasHydrated] = useState(false);

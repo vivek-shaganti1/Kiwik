@@ -85,7 +85,7 @@ import { AdminSecurityPanel } from "@/components/admin/admin-security-panel";
 import { ContactInbox } from "@/components/admin/contact-inbox";
 import { useProductsStore, useProducts } from "@/stores/products-store";
 import type { PartnerProduct } from "@/types/partner";
-import { useSiteCMSStore } from "@/stores/site-cms-store";
+import { useSiteCMSStore, setCmsPersistEnabled, flushCmsToStorage } from "@/stores/site-cms-store";
 import { useDocsStore } from "@/stores/docs-store";
 import { useThemeStore } from "@/stores/theme-store";
 import { ProjectDetailContent } from "@/components/projects/project-detail-content";
@@ -339,6 +339,16 @@ export default function AdminPage() {
   // the operator clicks "Save All Changes" (or Cmd/Ctrl+S), which is the single,
   // explicit commit point. The live preview still updates instantly because it
   // reads the store, not the database.
+  // While the studio is open, CMS edits must not be written to localStorage —
+  // otherwise an unsaved draft leaks to the public site the moment it is opened
+  // in another tab (it hydrates from the same cache). Drafts stay in this tab's
+  // memory; "Save All Changes" flushes them. Re-enable on unmount so a normal
+  // visitor tab caches published content as usual.
+  useEffect(() => {
+    setCmsPersistEnabled(false);
+    return () => setCmsPersistEnabled(true);
+  }, []);
+
   // Arm change-tracking shortly after mount, once localStorage hydration and the
   // initial DB load have settled, seeding whatever is loaded as the saved
   // baseline. A fixed timer (rather than gating on the network) guarantees the
@@ -406,6 +416,10 @@ export default function AdminPage() {
           /* ignore */
         }
       }
+
+      // Persisted content is now the published version, so cache it locally too
+      // (drafts stayed out of localStorage while editing).
+      flushCmsToStorage();
 
       // Everything just written is now the saved baseline, so clear the
       // unsaved-changes indicator.
@@ -3177,7 +3191,10 @@ export default function AdminPage() {
                     <GlassCard className="p-6 space-y-4 sticky top-24">
                       <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted block">Live Visual Preview</span>
                       <div className="p-8 rounded-2xl bg-black text-center space-y-4 border border-white/20">
-                        <h1 className="text-2xl sm:text-3xl font-serif font-medium text-text-primary tracking-tight leading-tight">
+                        {/* The preview box is always black, so the headline must
+                            stay white in both themes. It used text-text-primary,
+                            which turns dark in light mode — invisible on black. */}
+                        <h1 className="text-2xl sm:text-3xl font-serif font-medium text-white tracking-tight leading-tight">
                           {cms.hero.headlinePrefix} <br />
                           <span className="italic font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-zinc-400">
                             {cms.hero.headlineHighlightWord}

@@ -91,7 +91,7 @@ export function GlassCard({
           background: `radial-gradient(circle 300px at var(--mouse-x, 0) var(--mouse-y, 0), hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.15), transparent 80%)`,
         }}
       />
-      <div 
+      <div
         className={cn(
           "relative z-10 h-full w-full",
           className?.includes("flex") && "flex",
@@ -99,7 +99,16 @@ export function GlassCard({
           className?.includes("flex-row") && "flex-row",
           className?.includes("items-") && className.split(" ").filter(c => c.startsWith("items-")).join(" "),
           className?.includes("justify-") && className.split(" ").filter(c => c.startsWith("justify-")).join(" "),
-          className?.includes("gap-") && className.split(" ").filter(c => c.startsWith("gap-")).join(" ")
+          className?.includes("gap-") && className.split(" ").filter(c => c.startsWith("gap-")).join(" "),
+          // Children live in THIS inner div, not the outer one that receives
+          // `className`. Vertical/horizontal rhythm classes were applied to the
+          // outer div, which has a single child (this wrapper), so they did
+          // nothing — headers collapsed onto the first row and action buttons
+          // overlapped inputs. Mirror the spacing/divider classes here so the
+          // intended gaps actually apply between the content.
+          className?.includes("space-y-") && className.split(" ").filter(c => c.startsWith("space-y-")).join(" "),
+          className?.includes("space-x-") && className.split(" ").filter(c => c.startsWith("space-x-")).join(" "),
+          className?.includes("divide-") && className.split(" ").filter(c => c.startsWith("divide-")).join(" ")
         )}
         style={{ transform: tilt && isHovered ? "translateZ(30px)" : "none" }}
       >
